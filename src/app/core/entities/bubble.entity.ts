@@ -78,6 +78,11 @@ export class Bubble {
   private applyNews(news) {
     this.news = news;
 
+    // Sort news (best one first)
+    this.news.sort((a, b) => {
+      return a.sentiment > b.sentiment ? 1 : -1;
+    });
+
     this.greenSegments = 0;
     this.graySegments = 0;
     this.redSegments = 0;
@@ -112,7 +117,8 @@ export class Bubble {
       .draw(this.graySegments, Bubble.grayColor, positionX, positionY)
       .draw(this.redSegments, Bubble.redColor, positionX, positionY);
 
-    this.handleZoom(this.container);
+    // this.handleZoom(this.container);
+    this.handleEvents();
   }
 
   private draw(segments, color, positionX?, positionY?) {
@@ -122,12 +128,13 @@ export class Bubble {
     this.x = positionX ? positionX : rect.width / 2;
     this.y = positionY ? positionY : rect.height / 2;
 
-    const angleDistance = 360 / (this.greenSegments + this.graySegments + this.redSegments);
+    const angleDistance = this.getAngleDistance();
     for (let i = startValue; i < startValue + segments; i++) {
       this.svg.append('path')
         .attr('fill', 'none')
         .attr('stroke', color)
         .attr('stroke-width', this.radius / 5)
+        .attr('news-id', i)
         .attr('d', () => {
           return this.describeArc(
             this.x,
@@ -140,16 +147,6 @@ export class Bubble {
     }
 
     return this;
-  }
-
-  private handleZoom(container) {
-    const zoom_handler = d3.zoom().on('zoom', zoom_actions);
-    function zoom_actions() {
-      const transform = d3.event.transform;
-      container.selectAll('svg').attr('transform', transform);
-    }
-
-    zoom_handler(container);
   }
 
   private describeArc(x, y, radius, startAngle, endAngle) {
@@ -173,6 +170,35 @@ export class Bubble {
     };
   }
 
+  private handleZoom(container) {
+    const zoom_handler = d3.zoom().on('zoom', zoom_actions);
+    function zoom_actions() {
+      const transform = d3.event.transform;
+      container.selectAll('svg').attr('transform', transform);
+    }
+
+    zoom_handler(container);
+  }
+
+  private handleEvents() {
+    const news = this.news;
+    const radius = this.radius;
+
+    this.svg.selectAll('path').on('mouseover', function() {
+      d3.select(this).transition()
+        .attr('stroke-width', radius / 5 + 15)
+        .style('cursor', 'pointer');
+    }).on('mouseout', function() {
+      d3.select(this).transition()
+        .attr('stroke-width', radius / 5)
+        .style('cursor', 'default');
+    }).on('click', function() {
+      const newsId = d3.select(this).attr('news-id');
+
+      console.log(news[newsId].name);
+    });
+  }
+
   /**
    * Despawns circle
    */
@@ -184,12 +210,8 @@ export class Bubble {
     this.y = -1;
   }
 
-  public isSpawned() {
-    return this.svg !== null;
-  }
-
-  public getSvg() {
-    return this.svg;
+  public getAngleDistance() {
+    return 360 / (this.greenSegments + this.graySegments + this.redSegments);
   }
 
   public getRadius() {

@@ -5,7 +5,7 @@ export class News {
   private url: string;
   private datePublished: string;
 
-  public sentiment: number;
+  public sentiment = 0.5;
 
   constructor(name, description, category, url, datePublished) {
     this.name = name;

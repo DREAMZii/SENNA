@@ -16,11 +16,9 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.configService.fetch(() => {
-      this.azureService.searchNews('cpi technologies', (news) => {
+      this.azureService.searchNews('kion', (news) => {
         const bubble = new Bubble(news);
         bubble.spawn();
-
-        console.log(bubble);
       });
     });
   }
