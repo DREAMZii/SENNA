@@ -1,16 +1,65 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
+import {ReactiveFormsModule} from '@angular/forms';
 
-import { AppComponent } from './app.component';
+import {AppComponent} from './app.component';
+import {AppRouteModule} from './app.routing';
+
+import {SennaFooterComponent, SennaHeaderComponent} from './core/components';
+import {HomeComponent} from './views/home';
+import {LoginComponent} from './views/login';
+
+import {CustomAdalGuard} from '@app/core/guards/customAdal.guard';
+import {ConfigService, CustomAdalService, AzureService} from '@app/services';
+import {CustomAdalInterceptor} from '@app/core/interceptors/customAdal.interceptor';
+
+import {SennaAlertModule} from '@app/core/modules';
+
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {TranslateCompiler, TranslateLoader, TranslateModule} from '@ngx-translate/core';
+import {TranslateMessageFormatCompiler} from 'ngx-translate-messageformat-compiler';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    SennaAlertModule,
+    TranslateModule.forRoot({
+      compiler: {
+        provide: TranslateCompiler,
+        useClass: TranslateMessageFormatCompiler
+      },
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
+    AppRouteModule
   ],
-  providers: [],
+  declarations: [
+    AppComponent,
+    SennaHeaderComponent,
+    SennaFooterComponent,
+    HomeComponent,
+    LoginComponent
+  ],
+  providers: [
+    CustomAdalService,
+    CustomAdalGuard,
+    ConfigService,
+    AzureService,
+    {provide: HTTP_INTERCEPTORS, useClass: CustomAdalInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+
+export class AppModule {
+}
+
+// required for AOT compilation
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/');
+}

@@ -1,0 +1,29 @@
+{
+  "spinner": {
+    "initText": "Initializing ..."
+  },
+  "components": {
+    "header": {
+      "buttons": {
+        "signOut": "Sign out"
+      }
+    }
+  },
+  "views": {
+    "login": {
+      "content": {
+        "introduction": "SENNA stands for \"Sentiment Analysis\" and is a small web application to experiment with cloud-based News Search and Text Analysis APIs",
+        "description": "Ayrton SENNA da Silva was a Brazilian racing driver who won Formula One world championships for McLaren in 1988, 1990 and 1991, and who is widely regarded as one of the greatest Formula One drivers of all time."
+      },
+      "buttons": {
+        "kionLogin": "Login with KION E-Mail"
+      }
+    },
+    "home": {
+      "messages": {
+        "applicationSuccessfullyInitialized": "Application successfully initialized!",
+        "permissionDeniedError": "Permission denied. Please refresh and give permission."
+      }
+    }
+  }
+}
