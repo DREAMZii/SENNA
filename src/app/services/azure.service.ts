@@ -1,22 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { ConfigService } from './config.service';
 import {
-  HTTP_HEADER_AZ_CS_SUBSCRIPTION_API_KEY_NAME,
-  HTTP_HEADER_CONTENT_TYPE_NAME,
-  HTTP_HEADER_CONTENT_TYPE_VALUE_APPLICATION_OCTECT_STREAM,
-  HTTP_HEADER_CONTENT_TYPE_VALUE_APPLICATION_JSON
+  HTTP_HEADER_AZ_CS_SUBSCRIPTION_API_KEY_NAME
 } from '@app/core/constants/http.constants';
 
 
 @Injectable({ providedIn: 'root' })
 export class AzureService {
-
   constructor(
     private configService: ConfigService,
     private http: HttpClient
-  ) {}
+  ) {
+  }
 
   private headersJson() {
     return {
@@ -25,7 +22,6 @@ export class AzureService {
   }
 
   searchNews(query: string) {
-
     const uri = environment.azure.cognitiveServices.newsSearchUrl;
     const headers = new HttpHeaders(this.headersJson());
     const params = new HttpParams()

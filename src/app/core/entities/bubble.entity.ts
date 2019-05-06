@@ -45,7 +45,7 @@ export class Bubble {
     const svg = d3.select('#graphContainer')
       .append('svg')
       .attr('width', '100%')
-      .attr('height', 'auto')
+      .attr('height', '100%')
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0);
@@ -86,7 +86,7 @@ export class Bubble {
     this.svg = this.container
       .append('svg')
       .attr('width', '100%')
-      .attr('height', 'auto')
+      .attr('height', '100%')
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0)
