@@ -1,9 +1,5 @@
 import {Component, ViewChild, ElementRef, AfterContentInit} from '@angular/core';
-import { BubbleService } from '@app/services/bubble.service';
-import * as d3 from 'd3';
-import {promise} from 'selenium-webdriver';
-import delayed = promise.delayed;
-import {delay} from 'rxjs/operators';
+import {Bubble} from '@app/core/entities/bubble.entity';
 
 @Component({
   templateUrl: './home.component.html',
@@ -12,10 +8,13 @@ import {delay} from 'rxjs/operators';
 export class HomeComponent implements AfterContentInit {
   @ViewChild('graphContainer') graphContainer: ElementRef;
 
-  constructor(private bubbleService: BubbleService) {}
+  constructor() {}
 
   ngAfterContentInit() {
-    const svg = this.bubbleService.spawnCircle(3, 3, 3);
+
+    const bubble = new Bubble();
+    bubble.spawn();
+    /*const svg = this.bubbleService.spawnCircle(3, 3, 3);
     this.bubbleService.spawnCircle(10, 4, 3, 50, 150, 300);
 
     // Calculate angle between 2 middle points
@@ -37,11 +36,11 @@ export class HomeComponent implements AfterContentInit {
     const y2 = 300 + 50 * Math.sin(angleInRad2);
 
     // Append line with calculated endpoints
-    svg.append("line")          // attach a line
-      .style("stroke", "black")  // colour the line
-      .attr("x1", x1)     // x position of the first end of the line
-      .attr("y1", y1)      // y position of the first end of the line
-      .attr("x2", x2)     // x position of the second end of the line
-      .attr("y2", y2);    // y position of the second end of the line
+    svg.append('line')
+      .style('stroke', 'black')
+      .attr('x1', x1)
+      .attr('y1', y1)
+      .attr('x2', x2)
+      .attr('y2', y2);*/
   }
 }
