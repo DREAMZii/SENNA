@@ -7,7 +7,6 @@ import {TranslateService} from '@ngx-translate/core';
 
 @Component({ selector: 'app-senna', templateUrl: 'app.component.html' })
 export class AppComponent {
-
   constructor(
     private router: Router,
     private adalService: CustomAdalService,

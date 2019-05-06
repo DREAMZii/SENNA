@@ -16,16 +16,11 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.configService.fetch(() => {
-      const bubbleCenter = new Bubble(3, 3, 3, 75);
-      bubbleCenter.spawn();
+      this.azureService.searchNews('cpi technologies', (news) => {
+        const bubble = new Bubble(news);
+        bubble.spawn();
 
-      const bubbleLeft = new Bubble(5, 2, 1, 50);
-      bubbleLeft.spawn(150, 300);
-
-      Bubble.connect(bubbleCenter, bubbleLeft);
-
-      this.azureService.searchNews('kion').subscribe(data => {
-
+        console.log(bubble);
       });
     });
   }

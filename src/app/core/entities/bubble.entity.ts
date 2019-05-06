@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import {News} from '@app/core/entities/news.entity';
 
 export class Bubble {
   // Color values
@@ -10,12 +11,14 @@ export class Bubble {
   // Relevant fields
   private readonly container: any;
   private svg: any;
-  private readonly greenSegments: number;
-  private readonly graySegments: number;
-  private readonly redSegments: number;
+  private greenSegments: number;
+  private graySegments: number;
+  private redSegments: number;
   private readonly radius: number;
   private x: number;
   private y: number;
+
+  private news;
 
   /**
    * Connect two bubbles
@@ -62,18 +65,31 @@ export class Bubble {
   /**
    * Constructor for Bubble instance
    *
-   * @param greenSegments - amount of green segments in circle
-   * @param graySegments  - amount of gray segments in circle
-   * @param redSegments   - amount of red segments in circle
+   * @param news          - news that will create bubble
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(greenSegments = 3, graySegments = 3, redSegments = 3, radius = 50, container = '#graphContainer') {
+  constructor(news, radius = 50, container = '#graphContainer') {
+    this.applyNews(news);
     this.container = d3.select(container);
-    this.greenSegments = greenSegments;
-    this.graySegments = graySegments;
-    this.redSegments = redSegments;
     this.radius = radius;
+  }
+
+  private applyNews(news) {
+    this.news = news;
+
+    this.greenSegments = 0;
+    this.graySegments = 0;
+    this.redSegments = 0;
+    for (const single of news) {
+      if (single.sentiment >= 0.6) {
+        this.greenSegments++;
+      } else if (single.sentiment > 0.4 && single.sentiment < 0.6) {
+        this.graySegments++;
+      } else {
+        this.redSegments++;
+      }
+    }
   }
 
   /**
