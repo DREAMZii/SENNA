@@ -5,7 +5,7 @@ import { LoginComponent } from './views/login';
 import { CustomAdalGuard } from '@app/core/guards/customAdal.guard';
 
 const appRoutes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', component: HomeComponent, canActivate: [CustomAdalGuard] },
   { path: 'login', component: LoginComponent },
 
   // otherwise redirect to home

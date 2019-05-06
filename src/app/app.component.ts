@@ -14,10 +14,10 @@ export class AppComponent {
     private translate: TranslateService
   ) {
     translate.setDefaultLang('en');
-    /*this.adalService.init(environment.azure.adal);
+    this.adalService.init(environment.azure.adal);
     if (!this.adalService.isAuthenticated()) {
       this.router.navigate(['/login']);
-    }*/
+    }
   }
 }
 

@@ -5,6 +5,7 @@ export class Bubble {
   private static greenColor = 'green';
   private static grayColor = 'gray';
   private static redColor = 'red';
+  private static lineColor = 'black';
 
   // Relevant fields
   private readonly container: any;
@@ -15,6 +16,48 @@ export class Bubble {
   private readonly radius: number;
   private x: number;
   private y: number;
+
+  /**
+   * Connect two bubbles
+   *
+   * @param bubble1 - first bubble
+   * @param bubble2 - second bubble
+   */
+  static connect(bubble1: Bubble, bubble2: Bubble) {
+    // Calculate angle between 2 middle points
+    const xDiff = bubble2.getCenterX() - bubble1.getCenterX();
+    const yDiff = bubble2.getCenterY() - bubble1.getCenterY();
+    const angleInRad1 = Math.atan2(yDiff, xDiff);
+
+    const xDiff2 = bubble1.getCenterX() - bubble2.getCenterX();
+    const yDiff2 = bubble1.getCenterY() - bubble2.getCenterY();
+    const angleInRad2 = Math.atan2(yDiff2, xDiff2);
+
+
+    // Find point on circle relative to calculated angle
+    const x1 = bubble1.getCenterX() + bubble1.getRadius() * Math.cos(angleInRad1);
+    const y1 = bubble1.getCenterY() + bubble1.getRadius() * Math.sin(angleInRad1);
+
+    // Find point on circle 2
+    const x2 = bubble2.getCenterX() + bubble2.getRadius() * Math.cos(angleInRad2);
+    const y2 = bubble2.getCenterY() + bubble2.getRadius() * Math.sin(angleInRad2);
+
+    const svg = d3.select('#graphContainer')
+      .append('svg')
+      .attr('width', '100%')
+      .attr('height', 'auto')
+      .style('position', 'absolute')
+      .style('top', 0)
+      .style('left', 0);
+
+    // Append line with calculated endpoints
+    svg.append('line')
+      .style('stroke', this.lineColor)
+      .attr('x1', x1)
+      .attr('y1', y1)
+      .attr('x2', x2)
+      .attr('y2', y2);
+  }
 
   /**
    * Constructor for Bubble instance
@@ -46,7 +89,8 @@ export class Bubble {
       .attr('height', 'auto')
       .style('position', 'absolute')
       .style('top', 0)
-      .style('left', 0);
+      .style('left', 0)
+      .style('z-index', 10);
 
     this.draw(this.greenSegments, Bubble.greenColor, positionX, positionY)
       .draw(this.graySegments, Bubble.grayColor, positionX, positionY)
@@ -85,10 +129,11 @@ export class Bubble {
   private handleZoom(container) {
     const zoom_handler = d3.zoom().on('zoom', zoom_actions);
     function zoom_actions() {
-      container.selectAll('svg').attr('transform', d3.event.transform);
+      const transform = d3.event.transform;
+      container.selectAll('svg').attr('transform', transform);
     }
 
-    zoom_handler(d3.select('#graphContainer'));
+    zoom_handler(container);
   }
 
   private describeArc(x, y, radius, startAngle, endAngle) {
