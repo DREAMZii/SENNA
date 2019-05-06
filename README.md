@@ -1,27 +1,65 @@
-# NgD3GraphEditor
+  <h1>SENNA</h1>
+  <p>
+    <a href="https://travis-ci.com/KIDICA/SENNA" name="SENNA Builds" target="_blank">
+      <img src="https://travis-ci.com/KIDICA/SENNA.svg?branch=master" alt="TravisCi Build Status" />
+    </a>
+  </p>
+  <p>
+    <a href="https://kidica.github.io/SENNA" target="_blank">LIVE DEMO</a>
+    <br>
+    <a href="https://github.com/KIDICA/SENNA/issues/new">Report bug</a>
+    <br>
+    <a href="https://github.com/KIDICA/SENNA/issues/new">Request feature</a>
+  </p>
+</p>
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.2.
+## Table of contents
 
-## Development server
+- [Quick start](#quick-start)
+- [What's included](#whats-included)
+- [Copyright and license](#copyright-and-license)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Quick start
 
-## Code scaffolding
+**Warning**
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+> Verify that you are running at least node 8.9.x and npm 5.x.x by running node -v and npm -v in a terminal/console window. Older versions produce errors, but newer versions are fine.
 
-## Build
+1. Go to project folder and install dependencies.
+ ```bash
+ npm install
+ ```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+2. Launch development server:
+ ```bash
+ npm run start
+ ```
+ 
+## What's included
 
-## Running unit tests
++ Authentication with KION Azure AD
++ Access to <a href='https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home' target='_blank'>Azure Cognitive Services</a> API
+* Internationalization with ng-translate and ngx-translate-extract. Also use cache busting for translation files with [webpack translate loader](https://github.com/ngx-translate/http-loader#angular-cliwebpack-translateloader-example)
+* Unit tests with Jasmine and Karma including code coverage
+* End-to-end tests with Protractor
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Tasks                    | Description
+-------------------------|---------------------------------------------------------------------------------------
+npm install              | Install dependencies
+npm run start            | Start the app in development mode
+npm run test             | Run unit tests with karma and jasmine
+npm run e2e              | Run end to end tests with protractor
+npm run build            | Build the app for production
+npm run lint             | Run the linter (tslint)
+npm run update           | Update the project dependencies with ng update
 
-## Running end-to-end tests
+### Travis CI
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+We use Travis CI to run this tasks in order:
+* Linter
+* Tests
+* Build for production
 
-## Further help
+## Copyright and license
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Code and documentation copyright 2018 the authors. Code released under the [MIT License](https://github.com/KIDICA/SENNA/blob/master/LICENSE).
