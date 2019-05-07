@@ -1,24 +1,28 @@
 import * as d3 from 'd3';
 import {News} from '@app/core/entities/news.entity';
+import {zoom} from 'd3';
 
 export class Bubble {
-  // Color values
-  private static greenColor = 'green';
-  private static grayColor = 'gray';
-  private static redColor = 'red';
+  // Standard values
+  private static greenColor = '#8CA528';
+  private static grayColor = '#E1E1E1';
+  private static redColor = '#AE0055';
   private static lineColor = 'black';
+
+  private static positiveThreshhold = 0.55;
+  private static negativeThreshhold = 0.4;
+  private static offset = 2;
 
   // Relevant fields
   private readonly container: any;
-  private svg: any;
+  private group: any;
   private greenSegments: number;
   private graySegments: number;
   private redSegments: number;
   private readonly radius: number;
   private x: number;
   private y: number;
-
-  private news;
+  private news: News[];
 
   /**
    * Connect two bubbles
@@ -45,16 +49,18 @@ export class Bubble {
     const x2 = bubble2.getCenterX() + bubble2.getRadius() * Math.cos(angleInRad2);
     const y2 = bubble2.getCenterY() + bubble2.getRadius() * Math.sin(angleInRad2);
 
-    const svg = d3.select('#graphContainer')
-      .append('svg')
+    const group = d3.select('#graphContainer')
+      .select('svg')
+      .append('g')
       .attr('width', '100%')
       .attr('height', '100%')
       .style('position', 'absolute')
       .style('top', 0)
-      .style('left', 0);
+      .style('left', 0)
+      .style('z-index', 0);
 
     // Append line with calculated endpoints
-    svg.append('line')
+    group.append('line')
       .style('stroke', this.lineColor)
       .attr('x1', x1)
       .attr('y1', y1)
@@ -69,9 +75,9 @@ export class Bubble {
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(news, radius = 50, container = '#graphContainer') {
+  constructor(news, radius = 75, container = '#graphContainer') {
     this.applyNews(news);
-    this.container = d3.select(container);
+    this.container = d3.select(container).select('svg');
     this.radius = radius;
   }
 
@@ -87,9 +93,9 @@ export class Bubble {
     this.graySegments = 0;
     this.redSegments = 0;
     for (const single of news) {
-      if (single.sentiment >= 0.6) {
+      if (single.sentiment >= Bubble.positiveThreshhold) {
         this.greenSegments++;
-      } else if (single.sentiment > 0.4 && single.sentiment < 0.6) {
+      } else if (single.sentiment > Bubble.negativeThreshhold && single.sentiment < Bubble.positiveThreshhold) {
         this.graySegments++;
       } else {
         this.redSegments++;
@@ -104,8 +110,8 @@ export class Bubble {
    * @param positionY - possible starting Y coordinate (uses centered y of svg when not given)
    */
   public spawn(positionX?, positionY?) {
-    this.svg = this.container
-      .append('svg')
+    this.group = this.container
+      .append('g')
       .attr('width', '100%')
       .attr('height', '100%')
       .style('position', 'absolute')
@@ -117,20 +123,21 @@ export class Bubble {
       .draw(this.graySegments, Bubble.grayColor, positionX, positionY)
       .draw(this.redSegments, Bubble.redColor, positionX, positionY);
 
-    // this.handleZoom(this.container);
+    this.handleZoom();
     this.handleEvents();
   }
 
   private draw(segments, color, positionX?, positionY?) {
-    const startValue = this.svg.selectAll('path').size();
-    const rect = this.svg.node().getBoundingClientRect();
+    const startValue = this.group.selectAll('path').size();
+    const rect = this.container.node().getBoundingClientRect();
 
     this.x = positionX ? positionX : rect.width / 2;
     this.y = positionY ? positionY : rect.height / 2;
 
     const angleDistance = this.getAngleDistance();
     for (let i = startValue; i < startValue + segments; i++) {
-      this.svg.append('path')
+      this.group
+        .append('path')
         .attr('fill', 'none')
         .attr('stroke', color)
         .attr('stroke-width', this.radius / 5)
@@ -140,8 +147,8 @@ export class Bubble {
             this.x,
             this.y,
             this.radius,
-            i * angleDistance + 1,
-            (i + 1) * angleDistance - 1
+            i * angleDistance + Bubble.offset,
+            (i + 1) * angleDistance - Bubble.offset
           );
         });
     }
@@ -170,21 +177,39 @@ export class Bubble {
     };
   }
 
-  private handleZoom(container) {
-    const zoom_handler = d3.zoom().on('zoom', zoom_actions);
-    function zoom_actions() {
-      const transform = d3.event.transform;
-      container.selectAll('svg').attr('transform', transform);
+  private handleZoom() {
+    const container = this.container;
+
+    d3.select('#graphContainer').call(
+        d3.zoom().scaleExtent([1 / 4, 6]).on('zoom', zoomed)
+    );
+
+    container.selectAll('g').call(
+      d3.drag().on('drag', dragged)
+    );
+
+    function zoomed() {
+      container.selectAll('g')
+        .attr('transform', d3.event.transform);
     }
 
-    zoom_handler(container);
+    function dragged(d) {
+      d3.select(this)
+        .attr('cx', d.x = d3.event.x)
+        .attr('cy', d.y = d3.event.y);
+    }
   }
 
   private handleEvents() {
+    const group = this.group;
     const news = this.news;
     const radius = this.radius;
+    const angleDistance = this.getAngleDistance();
 
-    this.svg.selectAll('path').on('mouseover', function() {
+    const centerX = this.x;
+    const centerY = this.y;
+
+    this.group.selectAll('path').on('mouseover', function() {
       d3.select(this).transition()
         .attr('stroke-width', radius / 5 + 15)
         .style('cursor', 'pointer');
@@ -193,9 +218,18 @@ export class Bubble {
         .attr('stroke-width', radius / 5)
         .style('cursor', 'default');
     }).on('click', function() {
-      const newsId = d3.select(this).attr('news-id');
+      const newsId = parseInt(d3.select(this).attr('news-id'), 16);
+      const angle = newsId * angleDistance;
+      const angleInRadians = (angle - 90) * Math.PI / 180.0;
 
-      console.log(news[newsId].name);
+      const x = centerX + radius * Math.cos(angleInRadians);
+      const y = centerY + radius * Math.sin(angleInRadians);
+
+      group.selectAll('g')
+        .transition()
+        .style('opacity', '0');
+
+      news[newsId].draw(group, x, y, 200, 300, newsId);
     });
   }
 
@@ -203,9 +237,9 @@ export class Bubble {
    * Despawns circle
    */
   public despawn() {
-    this.svg.remove();
+    this.group.remove();
 
-    this.svg = null;
+    this.group = null;
     this.x = -1;
     this.y = -1;
   }
