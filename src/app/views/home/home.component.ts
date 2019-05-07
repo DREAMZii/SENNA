@@ -34,7 +34,7 @@ export class HomeComponent implements OnInit {
         const bubble2 = new Bubble(news);
         bubble2.spawn(300, 300);
 
-        // Bubble.connect(bubble, bubble2);
+        Bubble.connect(bubble, bubble2);
       });
     });
   }

@@ -1,6 +1,5 @@
 import * as d3 from 'd3';
 import {News} from '@app/core/entities/news.entity';
-import {zoom} from 'd3';
 
 export class Bubble {
   // Standard values
@@ -12,6 +11,10 @@ export class Bubble {
   private static positiveThreshhold = 0.55;
   private static negativeThreshhold = 0.4;
   private static offset = 2;
+
+  private static scale = 1;
+  private static offsetX = 0;
+  private static offsetY = 0;
 
   // Relevant fields
   private readonly container: any;
@@ -57,7 +60,8 @@ export class Bubble {
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0)
-      .style('z-index', 0);
+      .style('z-index', 0)
+      .classed('line', true);
 
     // Append line with calculated endpoints
     group.append('line')
@@ -179,27 +183,50 @@ export class Bubble {
   }
 
   private handleZoom() {
+    const graphContainer = d3.select('#graphContainer');
     const container = this.container;
 
-    d3.select('#graphContainer').call(
-        d3.zoom().scaleExtent([1 / 4, 6]).on('zoom', zoomed)
-    );
-
-    container.selectAll('g').call(
-      d3.drag().on('drag', dragged)
-    );
+    const zoom = d3.zoom()
+      .scaleExtent([1 / 4, 6])
+      .on('zoom', zoomed);
 
     function zoomed() {
       container.selectAll('g')
-        .filter('.bubble')
+        .filter(function() {
+          return d3.select(this).classed('bubble') || d3.select(this).classed('line');
+        })
         .attr('transform', d3.event.transform);
+
+      Bubble.scale = d3.event.transform.k;
+      Bubble.offsetX = d3.event.transform.x;
+      Bubble.offsetY = d3.event.transform.y;
     }
 
-    function dragged(d) {
-      d3.select(this)
-        .attr('cx', d.x = d3.event.x)
-        .attr('cy', d.y = d3.event.y);
-    }
+    graphContainer.call(zoom);
+
+    // Recenter button
+    this.container.on('click', function() {
+      const rect = container.node().getBoundingClientRect();
+
+      // parenthesis just for readability
+      const distX = rect.width / 2 - d3.event.x + Bubble.offsetX;
+      const distY = rect.height / 2 - d3.event.y + Bubble.offsetY;
+
+      graphContainer.selectAll('g')
+        .filter(function() {
+          return d3.select(this).classed('bubble') || d3.select(this).classed('line');
+        })
+        .transition()
+        .duration(750)
+        .attr('transform', d3.zoomIdentity
+          .translate(
+            d3.zoomIdentity.applyX(distX),
+            d3.zoomIdentity.applyY(distY)
+          ).scale(Bubble.scale).toString())
+        .on('end', function() {
+          graphContainer.call(zoom.transform, d3.zoomIdentity.translate(distX, distY).scale(Bubble.scale));
+        });
+    });
   }
 
   private handleEvents() {
@@ -211,6 +238,7 @@ export class Bubble {
     const centerX = this.x;
     const centerY = this.y;
 
+    // Path events for news
     this.group.selectAll('path').on('mouseover', function() {
       d3.select(this).transition()
         .attr('stroke-width', radius / 5 + 15)
