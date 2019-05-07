@@ -117,7 +117,8 @@ export class Bubble {
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0)
-      .style('z-index', 10);
+      .style('z-index', 10)
+      .classed('bubble', true);
 
     this.draw(this.greenSegments, Bubble.greenColor, positionX, positionY)
       .draw(this.graySegments, Bubble.grayColor, positionX, positionY)
@@ -190,6 +191,7 @@ export class Bubble {
 
     function zoomed() {
       container.selectAll('g')
+        .filter('.bubble')
         .attr('transform', d3.event.transform);
     }
 
