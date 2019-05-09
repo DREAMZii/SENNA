@@ -14,13 +14,39 @@ export class BubbleUtil {
   public static offsetX = 0;
   public static offsetY = 0;
 
+  public static zoomToBubble(zoom, container, cx, cy, scale) {
+    const rect = container.node().getBoundingClientRect();
+
+    const kx = rect.width / 2 * (scale - 1);
+    const ky = rect.height / 2 * (scale - 1);
+
+    const tx = (rect.width / 2 - cx) * 2 ** (scale - 1);
+    const ty = (rect.height / 2 - cy) * 2 ** (scale - 1);
+
+    const graphContainer = d3.select('#graphContainer');
+    graphContainer.selectAll('g')
+      .filter(function() {
+        return d3.select(this).classed('bubble') || d3.select(this).classed('line');
+      })
+      .transition()
+      .duration(750)
+      .attr('transform', d3.zoomIdentity
+        .translate(
+          -kx + tx,
+          -ky + ty
+        ).scale(scale).toString())
+      .on('end', function() {
+        graphContainer.call(zoom.transform, d3.zoomIdentity.translate(-kx + tx, -ky + ty).scale(scale));
+      });
+  }
+
   /**
    * Connect two bubbles
    *
    * @param bubble1 - first bubble
    * @param bubble2 - second bubble
    */
-  static connect(bubble1, bubble2) {
+  public static connect(bubble1, bubble2) {
     // Calculate angle between 2 middle points
     const xDiff = bubble2.getCenterX() - bubble1.getCenterX();
     const yDiff = bubble2.getCenterY() - bubble1.getCenterY();
@@ -29,7 +55,6 @@ export class BubbleUtil {
     const xDiff2 = bubble1.getCenterX() - bubble2.getCenterX();
     const yDiff2 = bubble1.getCenterY() - bubble2.getCenterY();
     const angleInRad2 = Math.atan2(yDiff2, xDiff2);
-
 
     // Find point on circle relative to calculated angle
     const x1 = bubble1.getCenterX() + bubble1.getRadius() * Math.cos(angleInRad1);
@@ -58,6 +83,15 @@ export class BubbleUtil {
       .attr('y1', y1)
       .attr('x2', x2)
       .attr('y2', y2);
+  }
+
+  public static getPointOnCircle(cx, cy, radius, angle) {
+    const angleInRad = BubbleUtil.getAngleInRadians(angle);
+
+    const x = cx + radius * Math.cos(angleInRad);
+    const y = cy + radius * Math.cos(angleInRad);
+
+    return [x, y];
   }
 
   public static describeArc(x, y, radius, startAngle, endAngle) {

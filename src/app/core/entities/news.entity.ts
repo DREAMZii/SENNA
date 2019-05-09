@@ -17,10 +17,25 @@ export class News {
     this.datePublished = datePublished;
   }
 
-  public draw(svg, x, y, width, height, id) {
+  public draw(svg, x, y, width, height, id, factor) {
+    width /= factor;
+    height /= factor;
+
+    const fontSize = 16 / factor;
+
+    const xOffset = 12 / factor;
+    const yOffset = 12 / factor;
+
+    svg.selectAll('g')
+      .filter('.news')
+      .transition()
+      .duration(750)
+      .style('opacity', '0');
+
     if (this.isDrawn(svg, id)) {
       svg.select(`.news-${id}`)
         .transition()
+        .duration(750)
         .style('opacity', '1');
 
       return;
@@ -45,13 +60,15 @@ export class News {
       .attr('y2', y - height);
 
     group.append('text')
-      .attr('x', x + 12)
-      .attr('y', y - height + 12)
+      .attr('x', x + xOffset)
+      .attr('y', y - height + yOffset)
       .attr('dy', '.71')
+      .attr('font-size', fontSize)
       .text(this.name)
       .call(this.wrap, width);
 
     group.transition()
+      .duration(750)
       .style('opacity', '1');
   }
 

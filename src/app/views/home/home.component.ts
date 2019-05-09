@@ -32,6 +32,9 @@ export class HomeComponent implements OnInit {
         const bubble = new Bubble(news);
         bubble.spawn();
 
+        const bubble2 = new Bubble(news, true, bubble, 75 / 2);
+        bubble2.spawn(300, 300);
+
         this.referenceService.getReferences('kion', function(references) {
           console.log(references);
         })

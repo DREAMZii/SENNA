@@ -16,11 +16,14 @@ export class Bubble {
   private x: number;
   private y: number;
   private news: News[];
-  private strokeWidth: number;
+  private readonly strokeWidth: number;
+  private zoom: any;
+
+  // Visual
   private angleShift = 25;
   private angleOffset = 2;
 
-  private referredNumber: number;
+  private readonly referredNumber: number;
   private readonly isReferred: boolean;
   private referrer: Bubble;
 
@@ -40,7 +43,7 @@ export class Bubble {
     this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
     this.container = d3.select(container).select('svg');
     this.radius = radius;
-    this.strokeWidth = radius / 5 / 2 ** this.referredNumber;
+    this.strokeWidth = radius / 5 / 2 ** (this.referredNumber - 1);
   }
 
   private applyNews(news) {
@@ -134,7 +137,7 @@ export class Bubble {
     const graphContainer = d3.select('#graphContainer');
     const container = this.container;
 
-    const zoom = d3.zoom()
+    this.zoom = d3.zoom()
       .scaleExtent([1 / 4, 6])
       .on('zoom', zoomed);
 
@@ -150,35 +153,23 @@ export class Bubble {
       BubbleUtil.offsetY = d3.event.transform.y;
     }
 
-    graphContainer.call(zoom);
+    graphContainer.call(this.zoom);
 
     // Recenter button
-    this.container.on('click', function() {
-      const rect = container.node().getBoundingClientRect();
+    this.group.selectAll('circle').on('click', () => {
+      const circle = d3.select(d3.event.srcElement);
+      const cx = circle.attr('cx');
+      const cy = circle.attr('cy');
+      const bubbleId = parseInt(circle.attr('bubble-id'), 10);
 
-      // parenthesis just for readability
-      const distX = rect.width / 2 - d3.event.x + BubbleUtil.offsetX;
-      const distY = rect.height / 2 - d3.event.y + BubbleUtil.offsetY;
+      const bubble = Bubble.bubbles[bubbleId];
 
-      graphContainer.selectAll('g')
-        .filter(function() {
-          return d3.select(this).classed('bubble') || d3.select(this).classed('line');
-        })
-        .transition()
-        .duration(750)
-        .attr('transform', d3.zoomIdentity
-          .translate(
-            d3.zoomIdentity.applyX(distX),
-            d3.zoomIdentity.applyY(distY)
-          ).scale(BubbleUtil.scale).toString())
-        .on('end', function() {
-          graphContainer.call(zoom.transform, d3.zoomIdentity.translate(distX, distY).scale(BubbleUtil.scale));
-        });
+      BubbleUtil.zoomToBubble(this.zoom, this.container, cx, cy, bubble.referredNumber + 1);
     });
   }
 
   private handleEvents() {
-    const group = this.group;
+    const container = this.container;
     const news = this.news;
     const radius = this.radius;
     const angleDistance = this.getAngleDistance();
@@ -189,25 +180,21 @@ export class Bubble {
     // Path events for news
     this.group.selectAll('path').on('mouseover', function() {
       d3.select(this).transition()
-        .attr('stroke-width', radius / 5 + 15)
+        .attr('stroke-width', radius / 5 * 2)
         .style('cursor', 'pointer');
     }).on('mouseout', function() {
       d3.select(this).transition()
         .attr('stroke-width', radius / 5)
         .style('cursor', 'default');
-    }).on('click', function() {
-      const newsId = parseInt(d3.select(this).attr('news-id'), 10);
+    }).on('click', () =>  {
+      const newsId = parseInt(d3.select(d3.event.srcElement).attr('news-id'), 10);
       const angle = newsId * angleDistance;
       const angleInRadians = (angle - 90) * Math.PI / 180.0;
 
       const x = centerX + radius * Math.cos(angleInRadians);
       const y = centerY + radius * Math.sin(angleInRadians);
 
-      group.selectAll('g')
-        .transition()
-        .style('opacity', '0');
-
-      news[newsId].draw(group, x, y, 200, 300, newsId);
+      news[newsId].draw(container, x, y, 200, 300, newsId, 2 ** (this.referredNumber - 1));
     });
   }
 
