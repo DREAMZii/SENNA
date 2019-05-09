@@ -9,6 +9,9 @@ export const environment = {
   config: {
     url: 'https://yacovi-config-service.azurewebsites.net/api/GetYaCoViConfig'
   },
+  references: {
+    url: 'http://localhost:7071/api/SearchReferences'
+  },
   canvas: {
     font: {
       size: '25px',

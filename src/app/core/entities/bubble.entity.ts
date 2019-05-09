@@ -1,20 +1,10 @@
 import * as d3 from 'd3';
 import {News} from '@app/core/entities/news.entity';
+import {BubbleUtil} from "@app/core/util/bubble.util";
 
 export class Bubble {
-  // Standard values
-  private static greenColor = '#8CA528';
-  private static grayColor = '#E1E1E1';
-  private static redColor = '#AE0055';
-  private static lineColor = 'black';
-
-  private static positiveThreshhold = 0.55;
-  private static negativeThreshhold = 0.4;
-  private static offset = 2;
-
-  private static scale = 1;
-  private static offsetX = 0;
-  private static offsetY = 0;
+  // All the bubbles
+  private static bubbles = [];
 
   // Relevant fields
   private readonly container: any;
@@ -26,63 +16,31 @@ export class Bubble {
   private x: number;
   private y: number;
   private news: News[];
+  private strokeWidth: number;
+  private angleShift = 25;
+  private angleOffset = 2;
 
-  /**
-   * Connect two bubbles
-   *
-   * @param bubble1 - first bubble
-   * @param bubble2 - second bubble
-   */
-  static connect(bubble1: Bubble, bubble2: Bubble) {
-    // Calculate angle between 2 middle points
-    const xDiff = bubble2.getCenterX() - bubble1.getCenterX();
-    const yDiff = bubble2.getCenterY() - bubble1.getCenterY();
-    const angleInRad1 = Math.atan2(yDiff, xDiff);
-
-    const xDiff2 = bubble1.getCenterX() - bubble2.getCenterX();
-    const yDiff2 = bubble1.getCenterY() - bubble2.getCenterY();
-    const angleInRad2 = Math.atan2(yDiff2, xDiff2);
-
-
-    // Find point on circle relative to calculated angle
-    const x1 = bubble1.getCenterX() + bubble1.getRadius() * Math.cos(angleInRad1);
-    const y1 = bubble1.getCenterY() + bubble1.getRadius() * Math.sin(angleInRad1);
-
-    // Find point on circle 2
-    const x2 = bubble2.getCenterX() + bubble2.getRadius() * Math.cos(angleInRad2);
-    const y2 = bubble2.getCenterY() + bubble2.getRadius() * Math.sin(angleInRad2);
-
-    const group = d3.select('#graphContainer')
-      .select('svg')
-      .append('g')
-      .attr('width', '100%')
-      .attr('height', '100%')
-      .style('position', 'absolute')
-      .style('top', 0)
-      .style('left', 0)
-      .style('z-index', 0)
-      .classed('line', true);
-
-    // Append line with calculated endpoints
-    group.append('line')
-      .style('stroke', this.lineColor)
-      .attr('x1', x1)
-      .attr('y1', y1)
-      .attr('x2', x2)
-      .attr('y2', y2);
-  }
+  private referredNumber: number;
+  private readonly isReferred: boolean;
+  private referrer: Bubble;
 
   /**
    * Constructor for Bubble instance
    *
    * @param news          - news that will create bubble
+   * @param isReferred    - whether this bubble is spawned by referring
+   * @param referrer      - referrer bubble
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(news, radius = 75, container = '#graphContainer') {
+  constructor(news, isReferred = false, referrer = null, radius = 75, container = '#graphContainer') {
     this.applyNews(news);
+    this.isReferred = isReferred;
+    this.referrer = referrer;
+    this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
     this.container = d3.select(container).select('svg');
     this.radius = radius;
+    this.strokeWidth = radius / 5 / 2 ** this.referredNumber;
   }
 
   private applyNews(news) {
@@ -97,9 +55,9 @@ export class Bubble {
     this.graySegments = 0;
     this.redSegments = 0;
     for (const single of news) {
-      if (single.sentiment >= Bubble.positiveThreshhold) {
+      if (single.sentiment >= BubbleUtil.positiveThreshhold) {
         this.greenSegments++;
-      } else if (single.sentiment > Bubble.negativeThreshhold && single.sentiment < Bubble.positiveThreshhold) {
+      } else if (single.sentiment > BubbleUtil.negativeThreshhold && single.sentiment < BubbleUtil.positiveThreshhold) {
         this.graySegments++;
       } else {
         this.redSegments++;
@@ -114,6 +72,8 @@ export class Bubble {
    * @param positionY - possible starting Y coordinate (uses centered y of svg when not given)
    */
   public spawn(positionX?, positionY?) {
+    Bubble.bubbles.push(this);
+
     this.group = this.container
       .append('g')
       .attr('width', '100%')
@@ -124,9 +84,18 @@ export class Bubble {
       .style('z-index', 10)
       .classed('bubble', true);
 
-    this.draw(this.greenSegments, Bubble.greenColor, positionX, positionY)
-      .draw(this.graySegments, Bubble.grayColor, positionX, positionY)
-      .draw(this.redSegments, Bubble.redColor, positionX, positionY);
+    this.draw(this.redSegments, BubbleUtil.redColor, positionX, positionY)
+      .draw(this.graySegments, BubbleUtil.grayColor, positionX, positionY)
+      .draw(this.greenSegments, BubbleUtil.greenColor, positionX, positionY);
+
+    // Draw invisible circle for click event
+    this.group
+      .append('circle')
+      .attr('cx', this.x)
+      .attr('cy', this.y)
+      .attr('fill-opacity', '0')
+      .attr('bubble-id', `${Bubble.bubbles.length - 1}`)
+      .attr('r', this.radius - this.strokeWidth / 2);
 
     this.handleZoom();
     this.handleEvents();
@@ -145,41 +114,20 @@ export class Bubble {
         .append('path')
         .attr('fill', 'none')
         .attr('stroke', color)
-        .attr('stroke-width', this.radius / 5)
+        .attr('stroke-width', this.strokeWidth)
         .attr('news-id', i)
         .attr('d', () => {
-          return this.describeArc(
+          return BubbleUtil.describeArc(
             this.x,
             this.y,
             this.radius,
-            i * angleDistance + Bubble.offset,
-            (i + 1) * angleDistance - Bubble.offset
+            i * angleDistance + this.angleOffset + this.angleShift,
+            (i + 1) * angleDistance - this.angleOffset + this.angleShift
           );
         });
     }
 
     return this;
-  }
-
-  private describeArc(x, y, radius, startAngle, endAngle) {
-    const start = this.polarToCartesian(x, y, radius, endAngle);
-    const end = this.polarToCartesian(x, y, radius, startAngle);
-
-    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-
-    return [
-      'M', start.x, start.y,
-      'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
-    ].join(' ');
-  }
-
-  private polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-
-    return {
-      x: centerX + (radius * Math.cos(angleInRadians)),
-      y: centerY + (radius * Math.sin(angleInRadians))
-    };
   }
 
   private handleZoom() {
@@ -197,9 +145,9 @@ export class Bubble {
         })
         .attr('transform', d3.event.transform);
 
-      Bubble.scale = d3.event.transform.k;
-      Bubble.offsetX = d3.event.transform.x;
-      Bubble.offsetY = d3.event.transform.y;
+      BubbleUtil.scale = d3.event.transform.k;
+      BubbleUtil.offsetX = d3.event.transform.x;
+      BubbleUtil.offsetY = d3.event.transform.y;
     }
 
     graphContainer.call(zoom);
@@ -209,8 +157,8 @@ export class Bubble {
       const rect = container.node().getBoundingClientRect();
 
       // parenthesis just for readability
-      const distX = rect.width / 2 - d3.event.x + Bubble.offsetX;
-      const distY = rect.height / 2 - d3.event.y + Bubble.offsetY;
+      const distX = rect.width / 2 - d3.event.x + BubbleUtil.offsetX;
+      const distY = rect.height / 2 - d3.event.y + BubbleUtil.offsetY;
 
       graphContainer.selectAll('g')
         .filter(function() {
@@ -222,9 +170,9 @@ export class Bubble {
           .translate(
             d3.zoomIdentity.applyX(distX),
             d3.zoomIdentity.applyY(distY)
-          ).scale(Bubble.scale).toString())
+          ).scale(BubbleUtil.scale).toString())
         .on('end', function() {
-          graphContainer.call(zoom.transform, d3.zoomIdentity.translate(distX, distY).scale(Bubble.scale));
+          graphContainer.call(zoom.transform, d3.zoomIdentity.translate(distX, distY).scale(BubbleUtil.scale));
         });
     });
   }
@@ -248,7 +196,7 @@ export class Bubble {
         .attr('stroke-width', radius / 5)
         .style('cursor', 'default');
     }).on('click', function() {
-      const newsId = parseInt(d3.select(this).attr('news-id'), 16);
+      const newsId = parseInt(d3.select(this).attr('news-id'), 10);
       const angle = newsId * angleDistance;
       const angleInRadians = (angle - 90) * Math.PI / 180.0;
 
@@ -263,15 +211,8 @@ export class Bubble {
     });
   }
 
-  /**
-   * Despawns circle
-   */
-  public despawn() {
-    this.group.remove();
-
-    this.group = null;
-    this.x = -1;
-    this.y = -1;
+  public getReferredNumber() {
+    return this.referredNumber;
   }
 
   public getAngleDistance() {

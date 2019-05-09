@@ -1,6 +1,6 @@
 import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
 import {Bubble} from '@app/core/entities/bubble.entity';
-import {AzureService, ConfigService} from '@app/services';
+import {AzureService, ConfigService, ReferencesService} from '@app/services';
 
 import * as d3 from 'd3';
 
@@ -13,7 +13,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private configService: ConfigService,
-    private azureService: AzureService
+    private azureService: AzureService,
+    private referenceService: ReferencesService
   ) {
   }
 
@@ -31,10 +32,14 @@ export class HomeComponent implements OnInit {
         const bubble = new Bubble(news);
         bubble.spawn();
 
-        const bubble2 = new Bubble(news);
+        this.referenceService.getReferences('kion', function(references) {
+          console.log(references);
+        })
+
+        /*const bubble2 = new Bubble(news);
         bubble2.spawn(300, 300);
 
-        Bubble.connect(bubble, bubble2);
+        Bubble.connect(bubble, bubble2);*/
       });
     });
   }

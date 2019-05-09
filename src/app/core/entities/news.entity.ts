@@ -27,7 +27,7 @@ export class News {
     }
 
     const group = svg.append('g')
-      .attr('class', `news-${id}`)
+      .attr('class', `news news-${id}`)
       .style('opacity', '0');
 
     group.append('line')
