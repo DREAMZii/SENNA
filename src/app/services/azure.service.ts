@@ -31,8 +31,8 @@ export class AzureService {
       .set('offset', '0')
       .set('mkt', 'de-DE');
 
-    const news = [];
-    this.http.get(uri, {headers: headers, params: params}).subscribe(response => {
+    return this.http.get(uri, {headers: headers, params: params}).subscribe((response) => {
+      const news = [];
       for (const newsJson of response['value']) {
         news.push(this.buildNews(newsJson));
       }
@@ -78,7 +78,7 @@ export class AzureService {
     return this.http.post(uri, request, {headers: headers});
   }
 
-  determineNewsSentiment(news: News[], callback) {
+  determineNewsSentiment(news: News[], callback?) {
     const texts = [];
     for (const single of news) {
       texts.push(single.getName());
@@ -86,7 +86,9 @@ export class AzureService {
 
     if (texts.length <= 0) {
       // Don't even try to request this
-      callback(news);
+      if (callback !== null) {
+        return callback(news);
+      }
       return;
     }
 
@@ -100,7 +102,9 @@ export class AzureService {
         news[i].sentiment = sentiments[i]['score'];
       }
 
-      callback(news);
+      if (callback !== null) {
+        callback(news);
+      }
     });
   }
 

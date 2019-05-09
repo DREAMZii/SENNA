@@ -24,8 +24,8 @@ export class BubbleUtil {
     const kx = (rect.width / 2) * (scale - 1);
     const ky = (rect.height / 2) * (scale - 1);
 
-    const tx = (rect.width / 2 - cx) * (scale - 1);
-    const ty = (rect.height / 2 - cy) * (scale - 1);
+    const tx = (rect.width / 2 - cx) * scale;
+    const ty = (rect.height / 2 - cy) * scale;
 
     const graphContainer = d3.select('#graphContainer');
     graphContainer.selectAll('g')

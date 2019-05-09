@@ -118,6 +118,7 @@ export class Bubble {
   }
 
   private preloadReferences() {
+
     // Load references on initialization
     BubbleUtil.referenceService.getReferences(this.searchTerm, (referenceNames) => {
       this.referenceNames = referenceNames;
@@ -232,6 +233,7 @@ export class Bubble {
 
     // Spawn after loaded
     if (!this.referencesLoaded) {
+      this.shouldLoad = true;
       return;
     }
 

@@ -3,6 +3,7 @@ import {Bubble} from '@app/core/entities/bubble.entity';
 import {AzureService, ConfigService, ReferenceService} from '@app/services';
 
 import * as d3 from 'd3';
+import {News} from "@app/core/entities/news.entity";
 
 @Component({
   templateUrl: './home.component.html',
