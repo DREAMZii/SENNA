@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    const searchTerm = 'kion';
+    const searchTerm = 'rewe';
 
     this.configService.fetch(() => {
       d3.select('#graphContainer')

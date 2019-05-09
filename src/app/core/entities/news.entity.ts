@@ -33,6 +33,7 @@ export class News {
       .style('opacity', '0');
 
     if (this.isDrawn(group, id)) {
+      console.log('ciao');
       group.select(`.news-${id}`)
         .transition()
         .duration(750)
@@ -41,7 +42,7 @@ export class News {
       return;
     }
 
-    const lineGroup = group.append('g')
+    const lineGroup = group.insert('g', ':first-child')
       .attr('class', `news news-${id}`)
       .style('opacity', '0');
 
@@ -68,10 +69,6 @@ export class News {
       .attr('font-size', fontSize)
       .text(this.name)
       .call(this.wrap, width);
-
-    lineGroup.transition()
-      .duration(750)
-      .style('opacity', '1');
   }
 
   private isDrawn(svg, id) {

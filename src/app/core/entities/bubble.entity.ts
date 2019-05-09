@@ -23,6 +23,7 @@ export class Bubble {
   // Visual
   private angleShift = 25;
   private angleOffset = 2;
+  private scalingFactor = 1.5;
 
   // Referrer
   private readonly referredNumber: number;
@@ -46,15 +47,16 @@ export class Bubble {
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(searchTerm, news, isReferred = false, referrer = null, radius = 50, container = '#graphContainer') {
+  constructor(searchTerm, news, isReferred = false, referrer = null, radius = 100, container = '#graphContainer') {
     this.searchTerm = searchTerm;
-    this.applyNews(news);
     this.isReferred = isReferred;
     this.referrer = referrer;
     this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
     this.container = d3.select(container).select('svg');
     this.radius = radius;
     this.strokeWidth = radius / 5;
+
+    this.applyNews(news);
   }
 
   private applyNews(news) {
@@ -111,6 +113,14 @@ export class Bubble {
       .attr('bubble-id', `${Bubble.bubbles.length - 1}`)
       .attr('r', this.radius - this.strokeWidth / 2);
 
+    for (const article of this.news) {
+      const newsId = this.group.selectAll('.news').size();
+      const angle = newsId * this.getAngleDistance() + this.angleShift;
+      const point = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius, angle);
+
+      article.draw(this.container, this.group, point[0], point[1], 200, 300, newsId, this.scalingFactor ** this.referredNumber);
+    }
+
     this.handleZoom();
     this.handleEvents();
 
@@ -118,7 +128,6 @@ export class Bubble {
   }
 
   private preloadReferences() {
-
     // Load references on initialization
     BubbleUtil.referenceService.getReferences(this.searchTerm, (referenceNames) => {
       this.referenceNames = referenceNames;
@@ -130,7 +139,7 @@ export class Bubble {
             return;
           }
 
-          this.references.push(new Bubble(this.searchTerm, news, true, this, this.radius / 2));
+          this.references.push(new Bubble(this.searchTerm, news, true, this, this.radius / this.scalingFactor));
         });
       }
 
@@ -210,16 +219,16 @@ export class Bubble {
       const angle = newsId * angleDistance + this.angleShift;
       const point = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius, angle);
 
-      news[newsId].draw(this.container, this.group, point[0], point[1], 200, 300, newsId, 2 ** this.referredNumber);
+      news[newsId].draw(this.container, this.group, point[0], point[1], 200, 300, newsId, this.scalingFactor ** this.referredNumber);
 
-      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, 2 ** this.referredNumber);
+      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.scalingFactor ** this.referredNumber);
     });
 
     // Recenter button
     this.group.selectAll('circle').on('click', () => {
       console.log(this);
 
-      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, 2 ** this.referredNumber, () => {
+      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.scalingFactor ** this.referredNumber, () => {
         this.spawnReferences();
       });
     });
@@ -245,12 +254,16 @@ export class Bubble {
       // Add some fake dynamic
       angle += 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
 
-      const centerPoint = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius * 2.5, angle);
+      if (this.referrer !== null && referencesCount % 2 !== 0) {
+        angle += 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
+      }
+
+      const centerPoint = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius * (this.scalingFactor * 2), angle);
       const bubble = this.references[i];
 
       bubble.spawn(centerPoint[0], centerPoint[1]);
 
-      BubbleUtil.connect(bubble, this);
+      BubbleUtil.connect(this, bubble);
     }
   }
 
