@@ -43,7 +43,7 @@ export class Bubble {
     this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
     this.container = d3.select(container).select('svg');
     this.radius = radius;
-    this.strokeWidth = radius / 5 / 2 ** (this.referredNumber - 1);
+    this.strokeWidth = radius / 5;
   }
 
   private applyNews(news) {
@@ -157,19 +157,11 @@ export class Bubble {
 
     // Recenter button
     this.group.selectAll('circle').on('click', () => {
-      const circle = d3.select(d3.event.srcElement);
-      const cx = circle.attr('cx');
-      const cy = circle.attr('cy');
-      const bubbleId = parseInt(circle.attr('bubble-id'), 10);
-
-      const bubble = Bubble.bubbles[bubbleId];
-
-      BubbleUtil.zoomToBubble(this.zoom, this.container, cx, cy, bubble.referredNumber + 1);
+      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.referredNumber + 1);
     });
   }
 
   private handleEvents() {
-    const container = this.container;
     const news = this.news;
     const radius = this.radius;
     const angleDistance = this.getAngleDistance();
@@ -177,24 +169,28 @@ export class Bubble {
     const centerX = this.x;
     const centerY = this.y;
 
+    const strokeWidth = this.strokeWidth;
+
     // Path events for news
     this.group.selectAll('path').on('mouseover', function() {
       d3.select(this).transition()
-        .attr('stroke-width', radius / 5 * 2)
+        .attr('stroke-width', strokeWidth * 2)
         .style('cursor', 'pointer');
     }).on('mouseout', function() {
       d3.select(this).transition()
-        .attr('stroke-width', radius / 5)
+        .attr('stroke-width', strokeWidth)
         .style('cursor', 'default');
     }).on('click', () =>  {
       const newsId = parseInt(d3.select(d3.event.srcElement).attr('news-id'), 10);
       const angle = newsId * angleDistance;
-      const angleInRadians = (angle - 90) * Math.PI / 180.0;
+      const angleInRadians = (angle + this.angleShift - 90) * Math.PI / 180.0;
 
       const x = centerX + radius * Math.cos(angleInRadians);
       const y = centerY + radius * Math.sin(angleInRadians);
 
-      news[newsId].draw(container, x, y, 200, 300, newsId, 2 ** (this.referredNumber - 1));
+      news[newsId].draw(this.container, this.group, x, y, 200, 300, newsId, 2 ** this.referredNumber);
+
+      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.referredNumber + 1);
     });
   }
 

@@ -17,7 +17,7 @@ export class News {
     this.datePublished = datePublished;
   }
 
-  public draw(svg, x, y, width, height, id, factor) {
+  public draw(container, group, x, y, width, height, id, factor) {
     width /= factor;
     height /= factor;
 
@@ -26,14 +26,14 @@ export class News {
     const xOffset = 12 / factor;
     const yOffset = 12 / factor;
 
-    svg.selectAll('g')
+    container.selectAll('g')
       .filter('.news')
       .transition()
       .duration(750)
       .style('opacity', '0');
 
-    if (this.isDrawn(svg, id)) {
-      svg.select(`.news-${id}`)
+    if (this.isDrawn(group, id)) {
+      group.select(`.news-${id}`)
         .transition()
         .duration(750)
         .style('opacity', '1');
@@ -41,25 +41,25 @@ export class News {
       return;
     }
 
-    const group = svg.append('g')
+    const lineGroup = group.append('g')
       .attr('class', `news news-${id}`)
       .style('opacity', '0');
 
-    group.append('line')
+    lineGroup.append('line')
       .style('stroke', 'green')
       .attr('x1', x)
       .attr('y1', y)
       .attr('x2', x)
       .attr('y2', y - height);
 
-    group.append('line')
+    lineGroup.append('line')
       .style('stroke', 'green')
       .attr('x1', x)
       .attr('y1', y - height)
       .attr('x2', x + width)
       .attr('y2', y - height);
 
-    group.append('text')
+    lineGroup.append('text')
       .attr('x', x + xOffset)
       .attr('y', y - height + yOffset)
       .attr('dy', '.71')
@@ -67,7 +67,7 @@ export class News {
       .text(this.name)
       .call(this.wrap, width);
 
-    group.transition()
+    lineGroup.transition()
       .duration(750)
       .style('opacity', '1');
   }
