@@ -47,6 +47,7 @@ export class News {
 
     lineGroup.append('line')
       .style('stroke', 'green')
+      .style('stroke-width', 1 / factor)
       .attr('x1', x)
       .attr('y1', y)
       .attr('x2', x)
@@ -54,6 +55,7 @@ export class News {
 
     lineGroup.append('line')
       .style('stroke', 'green')
+      .style('stroke-width', 1 / factor)
       .attr('x1', x)
       .attr('y1', y - height)
       .attr('x2', x + width)

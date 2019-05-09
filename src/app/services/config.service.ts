@@ -14,17 +14,13 @@ export class ConfigService {
   ) {}
 
   fetch(callback) {
-    console.log('#### ConfigService fetching azure service api key');
     this.http.get(`${environment.config.url}`).subscribe(value => {
-      console.log('#### ConfigService subscribe called');
       this.azCognitiveServiceKey = value['cognitiveServiceApiKey'];
       this.subject.next(this);
       this.subject.complete();
 
-      console.log('### ConfigService done. Using callback.');
       callback();
     }, error => {
-      console.log('#### ConfigService error called');
       this.subject.error(error);
     });
   }
@@ -34,7 +30,6 @@ export class ConfigService {
   }
 
   getAzCognitiveServiceKey(): string {
-    console.log('ConfigService getAzCognitiveServiceKey called', this.azCognitiveServiceKey);
     return this.azCognitiveServiceKey;
   }
 }

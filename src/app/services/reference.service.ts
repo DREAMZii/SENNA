@@ -8,7 +8,7 @@ import {
 
 
 @Injectable({ providedIn: 'root' })
-export class ReferencesService {
+export class ReferenceService {
   constructor(
     private configService: ConfigService,
     private http: HttpClient

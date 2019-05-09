@@ -1,6 +1,6 @@
 import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
 import {Bubble} from '@app/core/entities/bubble.entity';
-import {AzureService, ConfigService, ReferencesService} from '@app/services';
+import {AzureService, ConfigService, ReferenceService} from '@app/services';
 
 import * as d3 from 'd3';
 
@@ -13,12 +13,13 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private configService: ConfigService,
-    private azureService: AzureService,
-    private referenceService: ReferencesService
+    private azureService: AzureService
   ) {
   }
 
   ngOnInit() {
+    const searchTerm = 'kion';
+
     this.configService.fetch(() => {
       d3.select('#graphContainer')
         .append('svg')
@@ -28,21 +29,9 @@ export class HomeComponent implements OnInit {
         .style('top', 0)
         .style('left', 0);
 
-      this.azureService.searchNews('kion', (news) => {
-        const bubble = new Bubble(news);
+      this.azureService.searchNews(searchTerm, (news) => {
+        const bubble = new Bubble(searchTerm, news);
         bubble.spawn();
-
-        const bubble2 = new Bubble(news, true, bubble, 75 / 2);
-        bubble2.spawn(300, 300);
-
-        this.referenceService.getReferences('kion', function(references) {
-          console.log(references);
-        })
-
-        /*const bubble2 = new Bubble(news);
-        bubble2.spawn(300, 300);
-
-        Bubble.connect(bubble, bubble2);*/
       });
     });
   }

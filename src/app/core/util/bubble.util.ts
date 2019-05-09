@@ -1,6 +1,10 @@
 import * as d3 from 'd3';
+import {AzureService, ReferenceService} from "@app/services";
 
 export class BubbleUtil {
+  public static referenceService: ReferenceService;
+  public static azureService: AzureService;
+
   // Standard values
   public static greenColor = '#8CA528';
   public static grayColor = '#E1E1E1';
@@ -14,14 +18,14 @@ export class BubbleUtil {
   public static offsetX = 0;
   public static offsetY = 0;
 
-  public static zoomToBubble(zoom, container, cx, cy, scale) {
+  public static zoomToBubble(zoom, container, cx, cy, scale, callback?: Function) {
     const rect = container.node().getBoundingClientRect();
 
-    const kx = rect.width / 2 * (scale - 1);
-    const ky = rect.height / 2 * (scale - 1);
+    const kx = (rect.width / 2) * (scale - 1);
+    const ky = (rect.height / 2) * (scale - 1);
 
-    const tx = (rect.width / 2 - cx) * 2 ** (scale - 1);
-    const ty = (rect.height / 2 - cy) * 2 ** (scale - 1);
+    const tx = (rect.width / 2 - cx) * (scale - 1);
+    const ty = (rect.height / 2 - cy) * (scale - 1);
 
     const graphContainer = d3.select('#graphContainer');
     graphContainer.selectAll('g')
@@ -37,6 +41,10 @@ export class BubbleUtil {
         ).scale(scale).toString())
       .on('end', function() {
         graphContainer.call(zoom.transform, d3.zoomIdentity.translate(-kx + tx, -ky + ty).scale(scale));
+
+        if (callback instanceof Function) {
+          callback();
+        }
       });
   }
 
@@ -78,7 +86,7 @@ export class BubbleUtil {
     // Append line with calculated endpoints
     group.append('line')
       .style('stroke', BubbleUtil.lineColor)
-      .style('stroke-width', 2 / 2 ** bubble2.getReferredNumber())
+      .style('stroke-width', 2 / 2 ** bubble1.getReferredNumber())
       .attr('x1', x1)
       .attr('y1', y1)
       .attr('x2', x2)
@@ -89,7 +97,7 @@ export class BubbleUtil {
     const angleInRad = BubbleUtil.getAngleInRadians(angle);
 
     const x = cx + radius * Math.cos(angleInRad);
-    const y = cy + radius * Math.cos(angleInRad);
+    const y = cy + radius * Math.sin(angleInRad);
 
     return [x, y];
   }

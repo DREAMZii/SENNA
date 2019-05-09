@@ -11,7 +11,7 @@ import {HomeComponent} from './views/home';
 import {LoginComponent} from './views/login';
 
 import {CustomAdalGuard} from '@app/core/guards/customAdal.guard';
-import {ConfigService, CustomAdalService, AzureService} from '@app/services';
+import {ConfigService, CustomAdalService, AzureService, ReferenceService} from '@app/services';
 import {CustomAdalInterceptor} from '@app/core/interceptors/customAdal.interceptor';
 
 import {SennaAlertModule} from '@app/core/modules';
@@ -19,6 +19,7 @@ import {SennaAlertModule} from '@app/core/modules';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {TranslateCompiler, TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateMessageFormatCompiler} from 'ngx-translate-messageformat-compiler';
+import {BubbleUtil} from "@app/core/util/bubble.util";
 
 @NgModule({
   imports: [
@@ -57,7 +58,13 @@ import {TranslateMessageFormatCompiler} from 'ngx-translate-messageformat-compil
 })
 
 export class AppModule {
-
+  constructor(
+    private referenceService: ReferenceService,
+    private azureService: AzureService
+  ) {
+    BubbleUtil.referenceService = referenceService;
+    BubbleUtil.azureService = azureService;
+  }
 }
 
 // required for AOT compilation

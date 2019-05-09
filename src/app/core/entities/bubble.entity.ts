@@ -7,6 +7,7 @@ export class Bubble {
   private static bubbles = [];
 
   // Relevant fields
+  private readonly searchTerm: any;
   private readonly container: any;
   private group: any;
   private greenSegments: number;
@@ -23,20 +24,30 @@ export class Bubble {
   private angleShift = 25;
   private angleOffset = 2;
 
+  // Referrer
   private readonly referredNumber: number;
   private readonly isReferred: boolean;
   private referrer: Bubble;
 
+  // References
+  private referencesLoaded = false;
+  private shouldLoad = false;
+  private referencesSpawned = false;
+  private referenceNames = [];
+  private references = [];
+
   /**
    * Constructor for Bubble instance
    *
+   * @param searchTerm    - search term that created the bubble
    * @param news          - news that will create bubble
    * @param isReferred    - whether this bubble is spawned by referring
    * @param referrer      - referrer bubble
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(news, isReferred = false, referrer = null, radius = 75, container = '#graphContainer') {
+  constructor(searchTerm, news, isReferred = false, referrer = null, radius = 50, container = '#graphContainer') {
+    this.searchTerm = searchTerm;
     this.applyNews(news);
     this.isReferred = isReferred;
     this.referrer = referrer;
@@ -102,6 +113,28 @@ export class Bubble {
 
     this.handleZoom();
     this.handleEvents();
+
+    this.preloadReferences();
+  }
+
+  private preloadReferences() {
+    // Load references on initialization
+    BubbleUtil.referenceService.getReferences(this.searchTerm, (referenceNames) => {
+      this.referenceNames = referenceNames;
+
+      for (let referenceName of referenceNames) {
+        BubbleUtil.azureService.searchNews(referenceName, (news) => {
+          // We don't want those
+          if (news.length <= 0) {
+            return;
+          }
+
+          this.references.push(new Bubble(this.searchTerm, news, true, this, this.radius / 2));
+        });
+      }
+
+      this.referencesLoaded = true;
+    });
   }
 
   private draw(segments, color, positionX?, positionY?) {
@@ -154,20 +187,11 @@ export class Bubble {
     }
 
     graphContainer.call(this.zoom);
-
-    // Recenter button
-    this.group.selectAll('circle').on('click', () => {
-      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.referredNumber + 1);
-    });
   }
 
   private handleEvents() {
     const news = this.news;
-    const radius = this.radius;
     const angleDistance = this.getAngleDistance();
-
-    const centerX = this.x;
-    const centerY = this.y;
 
     const strokeWidth = this.strokeWidth;
 
@@ -182,16 +206,50 @@ export class Bubble {
         .style('cursor', 'default');
     }).on('click', () =>  {
       const newsId = parseInt(d3.select(d3.event.srcElement).attr('news-id'), 10);
-      const angle = newsId * angleDistance;
-      const angleInRadians = (angle + this.angleShift - 90) * Math.PI / 180.0;
+      const angle = newsId * angleDistance + this.angleShift;
+      const point = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius, angle);
 
-      const x = centerX + radius * Math.cos(angleInRadians);
-      const y = centerY + radius * Math.sin(angleInRadians);
+      news[newsId].draw(this.container, this.group, point[0], point[1], 200, 300, newsId, 2 ** this.referredNumber);
 
-      news[newsId].draw(this.container, this.group, x, y, 200, 300, newsId, 2 ** this.referredNumber);
-
-      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.referredNumber + 1);
+      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, 2 ** this.referredNumber);
     });
+
+    // Recenter button
+    this.group.selectAll('circle').on('click', () => {
+      console.log(this);
+
+      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, 2 ** this.referredNumber, () => {
+        this.spawnReferences();
+      });
+    });
+  }
+
+  private spawnReferences() {
+    // Already queued or even spawned
+    if (this.referencesSpawned) {
+      return;
+    }
+
+    // Spawn after loaded
+    if (!this.referencesLoaded) {
+      return;
+    }
+
+    // Spawn references
+    this.referencesSpawned = true;
+    for (let i = 0; i < this.references.length; i++) {
+      const referencesCount = this.references.length;
+      let angle = i * 360 / referencesCount;
+      // Add some fake dynamic
+      angle += 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
+
+      const centerPoint = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius * 2.5, angle);
+      const bubble = this.references[i];
+
+      bubble.spawn(centerPoint[0], centerPoint[1]);
+
+      BubbleUtil.connect(bubble, this);
+    }
   }
 
   public getReferredNumber() {
