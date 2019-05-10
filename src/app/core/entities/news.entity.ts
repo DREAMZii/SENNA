@@ -18,6 +18,11 @@ export class News {
   }
 
   public draw(container, group, x, y, width, height, id, factor) {
+    if (this.isDrawn(group, id)) {
+      this.show(container, group, id);
+      return;
+    }
+
     width /= factor;
     height /= factor;
 
@@ -25,22 +30,6 @@ export class News {
 
     const xOffset = 12 / factor;
     const yOffset = 12 / factor;
-
-    container.selectAll('g')
-      .filter('.news')
-      .transition()
-      .duration(750)
-      .style('opacity', '0');
-
-    if (this.isDrawn(group, id)) {
-      console.log('ciao');
-      group.select(`.news-${id}`)
-        .transition()
-        .duration(750)
-        .style('opacity', '1');
-
-      return;
-    }
 
     const lineGroup = group.insert('g', ':first-child')
       .attr('class', `news news-${id}`)
@@ -100,6 +89,23 @@ export class News {
         }
       }
     });
+  }
+
+  public show(container, group, id) {
+    container.selectAll('g')
+      .filter('.news')
+      .transition()
+      .duration(750)
+      .style('opacity', '0');
+
+    if (this.isDrawn(group, id)) {
+      group.select(`.news-${id}`)
+        .transition()
+        .duration(750)
+        .style('opacity', '1');
+
+      return;
+    }
   }
 
   public getName() {

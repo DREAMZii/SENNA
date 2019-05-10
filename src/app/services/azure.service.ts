@@ -29,7 +29,8 @@ export class AzureService {
       .set('q', query)
       .set('count', '7')
       .set('offset', '0')
-      .set('mkt', 'de-DE');
+      .set('mkt', 'de-DE')
+      .set('sortBy', 'date');
 
     return this.http.get(uri, {headers: headers, params: params}).subscribe((response) => {
       const news = [];

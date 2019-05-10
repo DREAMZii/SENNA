@@ -216,18 +216,13 @@ export class Bubble {
         .style('cursor', 'default');
     }).on('click', () =>  {
       const newsId = parseInt(d3.select(d3.event.srcElement).attr('news-id'), 10);
-      const angle = newsId * angleDistance + this.angleShift;
-      const point = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius, angle);
-
-      news[newsId].draw(this.container, this.group, point[0], point[1], 200, 300, newsId, this.scalingFactor ** this.referredNumber);
+      news[newsId].show(this.container, this.group, newsId);
 
       BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.scalingFactor ** this.referredNumber);
     });
 
     // Recenter button
     this.group.selectAll('circle').on('click', () => {
-      console.log(this);
-
       BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.scalingFactor ** this.referredNumber, () => {
         this.spawnReferences();
       });
