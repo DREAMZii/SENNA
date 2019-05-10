@@ -4,6 +4,7 @@ import {AzureService, ConfigService, ReferenceService} from '@app/services';
 
 import * as d3 from 'd3';
 import {News} from "@app/core/entities/news.entity";
+import {CacheUtil} from "@app/core/util/cache.util";
 
 @Component({
   templateUrl: './home.component.html',
@@ -13,8 +14,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('graphContainer') graphContainer: ElementRef;
 
   constructor(
-    private configService: ConfigService,
-    private azureService: AzureService
+    private configService: ConfigService
   ) {
   }
 
@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
         .style('top', 0)
         .style('left', 0);
 
-      this.azureService.searchNews(searchTerm, (news) => {
+      CacheUtil.getNews(searchTerm).then((news) => {
         const bubble = new Bubble(searchTerm, news);
         bubble.spawn();
       });

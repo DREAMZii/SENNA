@@ -22,7 +22,7 @@ export class AzureService {
     };
   }
 
-  searchNews(query: string, callback) {
+  async searchNews(query: string) {
     const uri = environment.azure.cognitiveServices.newsSearchUrl;
     const headers = new HttpHeaders(this.headersJson());
     const params = new HttpParams()
@@ -32,14 +32,16 @@ export class AzureService {
       .set('mkt', 'de-DE')
       .set('sortBy', 'date');
 
-    return this.http.get(uri, {headers: headers, params: params}).subscribe((response) => {
-      const news = [];
-      for (const newsJson of response['value']) {
-        news.push(this.buildNews(newsJson));
-      }
+    const response = await this.http.get(uri, {headers: headers, params: params});
 
-      this.determineNewsSentiment(news, callback);
+    const newsEntities = [];
+    await response.toPromise().then((news) => {
+      for (const single of news['value']) {
+        newsEntities.push(this.buildNews(single));
+      }
     });
+
+    return await this.determineNewsSentiment(newsEntities);
   }
 
   private buildNews(data): News {
@@ -52,44 +54,13 @@ export class AzureService {
     );
   }
 
-  search(query: string) {
-    const uri = environment.azure.cognitiveServices.searchUrl;
-    const headers = new HttpHeaders(this.headersJson());
-    const params = new HttpParams()
-      .set('q', query)
-      .set('count', '7')
-      .set('offset', '0')
-      .set('mkt', 'de-DE');
-
-    return this.http.get(uri, {headers: headers, params: params});
-  }
-
-  determineKeyPhrases(texts: string[]) {
-    const uri = environment.azure.cognitiveServices.textAnalysisKeyPhrasesUrl;
-    const headers = new HttpHeaders(this.headersJson());
-    const request = { 'documents' : texts.map(this.mappingFunction) };
-    return this.http.post(uri, request, {headers: headers});
-  }
-
-  determineSentiment(texts: string[]) {
-    const uri = environment.azure.cognitiveServices.textAnalysisSentimentUrl;
-    const headers = new HttpHeaders(this.headersJson());
-    const request = { 'documents' : texts.map(this.mappingFunction) };
-
-    return this.http.post(uri, request, {headers: headers});
-  }
-
-  determineNewsSentiment(news: News[], callback?) {
+  async determineNewsSentiment(news: News[]) {
     const texts = [];
     for (const single of news) {
       texts.push(single.getName());
     }
 
     if (texts.length <= 0) {
-      // Don't even try to request this
-      if (callback !== null) {
-        return callback(news);
-      }
       return;
     }
 
@@ -97,16 +68,14 @@ export class AzureService {
     const headers = new HttpHeaders(this.headersJson());
     const request = { 'documents' : texts.map(this.mappingFunction) };
 
-    return this.http.post(uri, request, {headers: headers}).subscribe(response => {
-      const sentiments = response['documents'];
-      for (let i = 0; i < sentiments.length; i++) {
-        news[i].sentiment = sentiments[i]['score'];
-      }
-
-      if (callback !== null) {
-        callback(news);
+    const response = await this.http.post(uri, request, {headers: headers});
+    await response.toPromise().then((documents) => {
+      for (const sentiment of documents['documents']) {
+        news[sentiment['id'] - 1].sentiment = sentiment['score'];
       }
     });
+
+    return news;
   }
 
   private mappingFunction(currentValue: string, index: number) {

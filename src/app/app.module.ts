@@ -20,6 +20,7 @@ import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {TranslateCompiler, TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateMessageFormatCompiler} from 'ngx-translate-messageformat-compiler';
 import {BubbleUtil} from "@app/core/util/bubble.util";
+import {ServiceUtil} from "@app/core/util/service.util";
 
 @NgModule({
   imports: [
@@ -62,8 +63,8 @@ export class AppModule {
     private referenceService: ReferenceService,
     private azureService: AzureService
   ) {
-    BubbleUtil.referenceService = referenceService;
-    BubbleUtil.azureService = azureService;
+    ServiceUtil.referenceService = referenceService;
+    ServiceUtil.azureService = azureService;
   }
 }
 

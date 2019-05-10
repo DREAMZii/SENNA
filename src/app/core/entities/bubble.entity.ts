@@ -1,34 +1,32 @@
 import * as d3 from 'd3';
 import {News} from '@app/core/entities/news.entity';
 import {BubbleUtil} from "@app/core/util/bubble.util";
+import {CacheUtil} from "@app/core/util/cache.util";
 
 export class Bubble {
-  // All the bubbles
-  private static bubbles = [];
-
   // Relevant fields
+  private id: number;
   private readonly searchTerm: any;
   private readonly container: any;
   private group: any;
   private greenSegments: number;
   private graySegments: number;
   private redSegments: number;
-  private readonly radius: number;
+  public radius: number;
   private x: number;
   private y: number;
   private news: News[];
-  private readonly strokeWidth: number;
+  public strokeWidth: number;
   private zoom: any;
 
   // Visual
   private angleShift = 25;
   private angleOffset = 2;
-  private scalingFactor = 1.5;
 
   // Referrer
   private readonly referredNumber: number;
   private readonly isReferred: boolean;
-  private referrer: Bubble;
+  private readonly referrer: Bubble;
 
   // References
   private referencesLoaded = false;
@@ -47,7 +45,7 @@ export class Bubble {
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(searchTerm, news, isReferred = false, referrer = null, radius = 100, container = '#graphContainer') {
+  constructor(searchTerm, news, isReferred = false, referrer = null, radius = BubbleUtil.radius, container = '#graphContainer') {
     this.searchTerm = searchTerm;
     this.isReferred = isReferred;
     this.referrer = referrer;
@@ -88,7 +86,7 @@ export class Bubble {
    * @param positionY - possible starting Y coordinate (uses centered y of svg when not given)
    */
   public spawn(positionX?, positionY?) {
-    Bubble.bubbles.push(this);
+    BubbleUtil.bubbles.push(this);
 
     this.group = this.container
       .append('g')
@@ -97,12 +95,16 @@ export class Bubble {
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0)
-      .style('z-index', 10)
-      .classed('bubble', true);
+      .style('opacity', this.isReferred ? 0.5 : 1)
+      .classed('bubble', true)
+      .classed('active', !this.isReferred)
+      .classed('inactive', this.isReferred);
 
     this.draw(this.redSegments, BubbleUtil.redColor, positionX, positionY)
       .draw(this.graySegments, BubbleUtil.grayColor, positionX, positionY)
       .draw(this.greenSegments, BubbleUtil.greenColor, positionX, positionY);
+
+    this.id = BubbleUtil.bubbles.length - 1;
 
     // Draw invisible circle for click event
     this.group
@@ -110,7 +112,7 @@ export class Bubble {
       .attr('cx', this.x)
       .attr('cy', this.y)
       .attr('fill-opacity', '0')
-      .attr('bubble-id', `${Bubble.bubbles.length - 1}`)
+      .attr('bubble-id', this.id)
       .attr('r', this.radius - this.strokeWidth / 2);
 
     for (const article of this.news) {
@@ -118,7 +120,7 @@ export class Bubble {
       const angle = newsId * this.getAngleDistance() + this.angleShift;
       const point = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius, angle);
 
-      article.draw(this.container, this.group, point[0], point[1], 200, 300, newsId, this.scalingFactor ** this.referredNumber);
+      article.draw(this.container, this.group, point[0], point[1], 200, 300, newsId, BubbleUtil.scalingFactor ** this.referredNumber);
     }
 
     this.handleZoom();
@@ -129,21 +131,19 @@ export class Bubble {
 
   private preloadReferences() {
     // Load references on initialization
-    BubbleUtil.referenceService.getReferences(this.searchTerm, (referenceNames) => {
-      this.referenceNames = referenceNames;
+    CacheUtil.getReferences(this.searchTerm).then( (referenceNames: string[]) => {
+       this.referenceNames = referenceNames;
 
       for (let referenceName of referenceNames) {
-        BubbleUtil.azureService.searchNews(referenceName, (news) => {
+        CacheUtil.getNews(referenceName).then((news: News[]) => {
           // We don't want those
           if (news.length <= 0) {
             return;
           }
 
-          this.references.push(new Bubble(this.searchTerm, news, true, this, this.radius / this.scalingFactor));
+          this.references.push(new Bubble(this.searchTerm, news, true, this, this.radius / BubbleUtil.scalingFactor));
         });
       }
-
-      this.referencesLoaded = true;
     });
   }
 
@@ -201,8 +201,6 @@ export class Bubble {
 
   private handleEvents() {
     const news = this.news;
-    const angleDistance = this.getAngleDistance();
-
     const strokeWidth = this.strokeWidth;
 
     // Path events for news
@@ -218,12 +216,13 @@ export class Bubble {
       const newsId = parseInt(d3.select(d3.event.srcElement).attr('news-id'), 10);
       news[newsId].show(this.container, this.group, newsId);
 
-      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.scalingFactor ** this.referredNumber);
+      BubbleUtil.focusBubble(this);
     });
 
     // Recenter button
     this.group.selectAll('circle').on('click', () => {
-      BubbleUtil.zoomToBubble(this.zoom, this.container, this.x, this.y, this.scalingFactor ** this.referredNumber, () => {
+      //this.spawnReferences();
+      BubbleUtil.focusBubble(this, () => {
         this.spawnReferences();
       });
     });
@@ -232,12 +231,6 @@ export class Bubble {
   private spawnReferences() {
     // Already queued or even spawned
     if (this.referencesSpawned) {
-      return;
-    }
-
-    // Spawn after loaded
-    if (!this.referencesLoaded) {
-      this.shouldLoad = true;
       return;
     }
 
@@ -253,9 +246,13 @@ export class Bubble {
         angle += 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
       }
 
-      const centerPoint = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius * (this.scalingFactor * 2), angle);
+      const centerPoint = BubbleUtil.getPointOnCircle(
+        this.x,
+        this.y,
+        this.radius * (BubbleUtil.scalingFactor * 2),
+        angle
+      );
       const bubble = this.references[i];
-
       bubble.spawn(centerPoint[0], centerPoint[1]);
 
       BubbleUtil.connect(this, bubble);

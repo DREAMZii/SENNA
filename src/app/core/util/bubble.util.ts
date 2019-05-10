@@ -1,9 +1,8 @@
 import * as d3 from 'd3';
-import {AzureService, ReferenceService} from "@app/services";
 
 export class BubbleUtil {
-  public static referenceService: ReferenceService;
-  public static azureService: AzureService;
+  // Storage
+  public static bubbles = [];
 
   // Standard values
   public static greenColor = '#8CA528';
@@ -14,18 +13,23 @@ export class BubbleUtil {
   public static readonly positiveThreshhold = 0.55;
   public static readonly negativeThreshhold = 0.4;
 
+  public static scalingFactor = 2;
   public static scale = 1;
   public static offsetX = 0;
   public static offsetY = 0;
 
-  public static zoomToBubble(zoom, container, cx, cy, scale, callback?: Function) {
-    const rect = container.node().getBoundingClientRect();
+  public static radius = 100;
+
+  public static focusBubble(bubble, callback?) {
+    const rect = bubble.container.node().getBoundingClientRect();
+
+    const scale = BubbleUtil.scalingFactor ** bubble.referredNumber;
 
     const kx = (rect.width / 2) * (scale - 1);
     const ky = (rect.height / 2) * (scale - 1);
 
-    const tx = (rect.width / 2 - cx) * scale;
-    const ty = (rect.height / 2 - cy) * scale;
+    const tx = (rect.width / 2 - bubble.x) * scale;
+    const ty = (rect.height / 2 - bubble.y) * scale;
 
     const graphContainer = d3.select('#graphContainer');
     graphContainer.selectAll('g')
@@ -40,12 +44,31 @@ export class BubbleUtil {
           -ky + ty
         ).scale(scale).toString())
       .on('end', function() {
-        graphContainer.call(zoom.transform, d3.zoomIdentity.translate(-kx + tx, -ky + ty).scale(scale));
+        graphContainer.call(bubble.zoom.transform, d3.zoomIdentity.translate(-kx + tx, -ky + ty).scale(scale));
+
+        BubbleUtil.markActiveBubble(bubble.container, bubble.group);
 
         if (callback instanceof Function) {
           callback();
         }
       });
+  }
+
+  private static markActiveBubble(container, group) {
+    container.select('.active')
+      .transition()
+      .style('opacity', '0.5');
+
+    container.selectAll('g')
+      .filter('.bubble')
+      .classed('active', false)
+      .classed('inactive', true);
+
+    group
+      .classed('active', true)
+      .classed('inactive', false)
+      .transition()
+      .style('opacity', '1');
   }
 
   /**

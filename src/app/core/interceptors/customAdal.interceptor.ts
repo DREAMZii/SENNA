@@ -25,7 +25,7 @@ export class CustomAdalInterceptor implements HttpInterceptor {
 
   /** avoid adding a bearer token or the requests will be blocked */
   private avoidBearerToken(request: HttpRequest<any>): boolean {
-    return  request.url === environment.azure.cognitiveServices.newsSearchUrl
+    return request.url === environment.azure.cognitiveServices.newsSearchUrl
       ||
       request.url === environment.azure.cognitiveServices.searchUrl;
   }

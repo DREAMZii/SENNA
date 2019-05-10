@@ -21,14 +21,18 @@ export class ReferenceService {
     };
   }
 
-  getReferences(searchTerm: string, callback) {
+  async getReferences(searchTerm: string) {
     const uri = environment.references.url;
     const headers = new HttpHeaders(this.headersJson());
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
 
-    this.http.get(uri, {headers: headers, params: params}).subscribe(response => {
-      callback(response['searchReferences']);
+    const response = await this.http.get(uri, {headers: headers, params: params});
+    let mappedResponse = [];
+    await response.toPromise().then((references) => {
+      mappedResponse = references['searchReferences'];
     });
+
+    return mappedResponse;
   }
 }

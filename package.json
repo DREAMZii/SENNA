@@ -28,6 +28,7 @@
     "d3": "^5.7.0",
     "messageformat": "^2.1.0",
     "ngx-translate-messageformat-compiler": "^4.4.0",
+    "node-ts-cache": "^2.0.0",
     "rxjs": "~6.3.3",
     "zone.js": "~0.8.26"
   },
