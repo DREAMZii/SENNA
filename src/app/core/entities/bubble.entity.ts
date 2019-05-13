@@ -2,6 +2,8 @@ import * as d3 from 'd3';
 import {News} from '@app/core/entities/news.entity';
 import {BubbleUtil} from "@app/core/util/bubble.util";
 import {CacheUtil} from "@app/core/util/cache.util";
+import {NewsUtil} from "@app/core/util/news.util";
+import {NewsGroup} from "@app/core/entities/newsgroup.entity";
 
 export class Bubble {
   // Relevant fields
@@ -15,7 +17,7 @@ export class Bubble {
   public radius: number;
   private x: number;
   private y: number;
-  private news: News[];
+  private newsGroup: NewsGroup;
   public strokeWidth: number;
   private zoom: any;
 
@@ -58,12 +60,12 @@ export class Bubble {
   }
 
   private applyNews(news) {
-    this.news = news;
-
     // Sort news (best one first)
-    this.news.sort((a, b) => {
+    news = news.sort((a, b) => {
       return a.sentiment > b.sentiment ? 1 : -1;
     });
+
+    this.newsGroup = new NewsGroup(this, news);
 
     this.greenSegments = 0;
     this.graySegments = 0;
@@ -89,9 +91,10 @@ export class Bubble {
     BubbleUtil.bubbles.push(this);
 
     this.group = this.container
-      .append('g')
+      .insert('g', ':first-child')
       .attr('width', '100%')
       .attr('height', '100%')
+      .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0)
@@ -119,29 +122,37 @@ export class Bubble {
       .append('text')
       .attr('x', this.x)
       .attr('y', this.y)
+      .attr('font-size', 16 / (BubbleUtil.scalingFactor ** this.referredNumber))
       .text(this.searchTerm);
 
-    for (const article of this.news) {
+    /*for (const article of this.news) {
       const newsId = this.group.selectAll('.news').size();
       const angle = newsId * this.getAngleDistance() + this.angleShift;
       const point = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius, angle);
 
       article.draw(this.container, this.group, point[0], point[1], 200, 300, newsId, BubbleUtil.scalingFactor ** this.referredNumber);
-    }
+    }*/
 
     this.handleZoom();
     this.handleEvents();
 
-    this.preloadReferences();
+    this.preloadReferences().then(() => {
+      this.referencesLoaded = true;
+
+      if (this.shouldLoad) {
+        this.shouldLoad = false;
+        this.spawnReferences();
+      }
+    });
   }
 
-  private preloadReferences() {
+  private async preloadReferences() {
     // Load references on initialization
-    CacheUtil.getReferences(this.searchTerm).then( (referenceNames: string[]) => {
+    await CacheUtil.getReferences(this.searchTerm).then( async (referenceNames: string[]) => {
        this.referenceNames = referenceNames;
 
       for (let referenceName of referenceNames) {
-        CacheUtil.getNews(referenceName).then((news: News[]) => {
+        await CacheUtil.getNews(referenceName).then((news: News[]) => {
           // We don't want those
           if (news.length <= 0) {
             return;
@@ -187,7 +198,7 @@ export class Bubble {
     const container = this.container;
 
     this.zoom = d3.zoom()
-      .scaleExtent([1 / 4, 6])
+      .scaleExtent([-Infinity, Infinity])
       .on('zoom', zoomed);
 
     function zoomed() {
@@ -196,17 +207,12 @@ export class Bubble {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
         })
         .attr('transform', d3.event.transform);
-
-      BubbleUtil.scale = d3.event.transform.k;
-      BubbleUtil.offsetX = d3.event.transform.x;
-      BubbleUtil.offsetY = d3.event.transform.y;
     }
 
     graphContainer.call(this.zoom);
   }
 
   private handleEvents() {
-    const news = this.news;
     const strokeWidth = this.strokeWidth;
 
     // Path events for news
@@ -219,21 +225,15 @@ export class Bubble {
         .attr('stroke-width', strokeWidth)
         .style('cursor', 'default');
     }).on('click', () =>  {
-      const newsId = parseInt(d3.select(d3.event.srcElement).attr('news-id'), 10);
-      news[newsId].show(this.container, this.group, newsId);
-
+      this.newsGroup.draw();
       BubbleUtil.focusBubble(this);
     });
 
     // Recenter button
     this.group.selectAll('circle').on('click', () => {
-      if (this.isReferred) {
-        BubbleUtil.focusBubble(this, () => {
-          this.spawnReferences();
-        });
-      } else {
+      BubbleUtil.focusBubble(this, () => {
         this.spawnReferences();
-      }
+      });
     });
   }
 
@@ -243,22 +243,28 @@ export class Bubble {
       return;
     }
 
+    if (!this.referencesLoaded || this.shouldLoad) {
+      this.shouldLoad = true;
+      return;
+    }
+
     // Spawn references
     this.referencesSpawned = true;
     for (let i = 0; i < this.references.length; i++) {
       const referencesCount = this.references.length;
       let angle = i * 360 / referencesCount;
+      const angleSum = 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
       // Add some fake dynamic
-      angle += 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
+      angle += angleSum;
 
       if (this.referrer !== null && referencesCount % 2 !== 0) {
-        angle += 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
+        angle += angleSum;
       }
 
       const centerPoint = BubbleUtil.getPointOnCircle(
         this.x,
         this.y,
-        this.radius * (BubbleUtil.scalingFactor * 2),
+        this.radius * (BubbleUtil.scalingFactor * 4),
         angle
       );
       const bubble = this.references[i];
@@ -268,8 +274,24 @@ export class Bubble {
     }
   }
 
+  public getId() {
+    return this.id;
+  }
+
+  public getContainer() {
+    return this.container;
+  }
+
+  public getGroup() {
+    return this.group;
+  }
+
   public getReferredNumber() {
     return this.referredNumber;
+  }
+
+  public getStrokeWidth() {
+    return this.strokeWidth;
   }
 
   public getAngleDistance() {

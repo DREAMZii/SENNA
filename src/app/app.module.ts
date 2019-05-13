@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {AppComponent} from './app.component';
 import {AppRouteModule} from './app.routing';
@@ -21,6 +21,8 @@ import {TranslateCompiler, TranslateLoader, TranslateModule} from '@ngx-translat
 import {TranslateMessageFormatCompiler} from 'ngx-translate-messageformat-compiler';
 import {BubbleUtil} from "@app/core/util/bubble.util";
 import {ServiceUtil} from "@app/core/util/service.util";
+import {SearchComponent} from "@app/views/search";
+import {SennaFormComponent} from "@app/core/components/senna-form/senna-form.component";
 
 @NgModule({
   imports: [
@@ -39,14 +41,17 @@ import {ServiceUtil} from "@app/core/util/service.util";
         deps: [HttpClient]
       }
     }),
-    AppRouteModule
+    AppRouteModule,
+    FormsModule
   ],
   declarations: [
     AppComponent,
     SennaHeaderComponent,
     SennaFooterComponent,
     HomeComponent,
-    LoginComponent
+    LoginComponent,
+    SearchComponent,
+    SennaFormComponent
   ],
   providers: [
     CustomAdalService,

@@ -13,7 +13,7 @@ export class BubbleUtil {
   public static readonly positiveThreshhold = 0.55;
   public static readonly negativeThreshhold = 0.4;
 
-  public static scalingFactor = 2;
+  public static scalingFactor = 1.5;
   public static scale = 1;
   public static offsetX = 0;
   public static offsetY = 0;
@@ -45,6 +45,10 @@ export class BubbleUtil {
         ).scale(scale).toString())
       .on('end', function() {
         graphContainer.call(bubble.zoom.transform, d3.zoomIdentity.translate(-kx + tx, -ky + ty).scale(scale));
+
+        BubbleUtil.scale = scale;
+        BubbleUtil.offsetX = -kx + tx;
+        BubbleUtil.offsetY = -ky + ty;
 
         BubbleUtil.markActiveBubble(bubble.container, bubble.group);
 
@@ -88,18 +92,19 @@ export class BubbleUtil {
     const angleInRad2 = Math.atan2(yDiff2, xDiff2);
 
     // Find point on circle relative to calculated angle
-    const x1 = bubble1.getCenterX() + bubble1.getRadius() * Math.cos(angleInRad1);
-    const y1 = bubble1.getCenterY() + bubble1.getRadius() * Math.sin(angleInRad1);
+    const x1 = bubble1.getCenterX() + (bubble1.getRadius() + bubble1.strokeWidth) * Math.cos(angleInRad1);
+    const y1 = bubble1.getCenterY() + (bubble1.getRadius() + bubble1.strokeWidth) * Math.sin(angleInRad1);
 
     // Find point on circle 2
-    const x2 = bubble2.getCenterX() + bubble2.getRadius() * Math.cos(angleInRad2);
-    const y2 = bubble2.getCenterY() + bubble2.getRadius() * Math.sin(angleInRad2);
+    const x2 = bubble2.getCenterX() + (bubble2.getRadius() + bubble2.strokeWidth) * Math.cos(angleInRad2);
+    const y2 = bubble2.getCenterY() + (bubble2.getRadius() + bubble2.strokeWidth) * Math.sin(angleInRad2);
 
     const group = d3.select('#graphContainer')
       .select('svg')
       .append('g')
       .attr('width', '100%')
       .attr('height', '100%')
+      .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0)
