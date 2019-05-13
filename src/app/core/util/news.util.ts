@@ -4,7 +4,9 @@ import {BubbleUtil} from "@app/core/util/bubble.util";
 export class NewsUtil {
   public static readonly width = 200;
 
-  public static openNews() {
+  public static openNews(news) {
+    this.prepareNews(news);
+
     if (NewsUtil.isNewsOpen()) {
       return;
     }
@@ -17,6 +19,18 @@ export class NewsUtil {
       .transition()
       .duration(1000)
       .style('width', '40%');
+  }
+
+  private static prepareNews(news) {
+    // Prepare data whether it is open or not
+    d3.select('#news-source div')
+      .text(news.getSource());
+
+    d3.select('#news-date div')
+      .text(news.getDatePublished());
+
+    d3.select('#news-score div')
+      .text(news.getScore());
   }
 
   public static closeNews() {

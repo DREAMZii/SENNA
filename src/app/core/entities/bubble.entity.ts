@@ -59,6 +59,7 @@ export class Bubble {
     this.applyNews(news);
   }
 
+
   private applyNews(news) {
     // Sort news (best one first)
     news = news.sort((a, b) => {
@@ -284,6 +285,10 @@ export class Bubble {
 
   public getGroup() {
     return this.group;
+  }
+
+  public getNews(newsId: number) {
+    return this.newsGroup.getNews()[newsId];
   }
 
   public getReferredNumber() {

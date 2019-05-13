@@ -50,7 +50,8 @@ export class AzureService {
       data['description'],
       data['category'],
       data['url'],
-      data['datePublished']
+      data['datePublished'],
+      data['provider'][0]['name']
     );
   }
 

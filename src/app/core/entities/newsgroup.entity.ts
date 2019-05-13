@@ -52,7 +52,7 @@ export class NewsGroup {
       const dy = (yOffset * ++newsCount) + dyOffset;
 
       const text = this.group.append('text')
-        .classed(`news-${newsCount}`, true)
+        .attr('news-id', newsCount - 1)
         .attr('x', x)
         .attr('y', y + height)
         .attr('dx', xOffset)
@@ -61,7 +61,12 @@ export class NewsGroup {
         .style('cursor', 'pointer')
         .text(news.getName())
         .call(NewsUtil.wrap, width, yOffset)
-        .on('click', NewsUtil.openNews)
+        .on('click', function() {
+          const text = d3.select(this);
+          const newsId = parseInt(text.attr('news-id'), 10);
+
+          NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
+        })
         .on('mouseenter', function() {
           d3.select(this)
             .attr('filter', 'url(#solid)');
@@ -116,5 +121,9 @@ export class NewsGroup {
       .transition()
       .duration(750)
       .style('opacity', '1');
+  }
+
+  public getNews() {
+    return this.news;
   }
 }

@@ -35,20 +35,23 @@ export class HomeComponent implements OnInit {
         const bubble = new Bubble(searchTerm, news);
         bubble.spawn();
 
-        const headlineHeight = (d3.select('#news-header').node() as HTMLElement).getBoundingClientRect().height;
-        const height = (d3.select('svg').node() as any).getBoundingClientRect().height;
-        d3.select('#news-content')
-          .style('height', height + 'px');
-
-        d3.select('svg')
-          .on('click', function() {
-            if (d3.event.srcElement.tagName !== 'svg') {
-              return;
-            }
-
-            NewsUtil.closeNews();
-          });
+        this.initSvgEvents();
       });
     });
+  }
+
+  initSvgEvents() {
+    const height = (d3.select('svg').node() as any).getBoundingClientRect().height;
+    d3.select('#news-content')
+      .style('height', height + 'px');
+
+    d3.select('svg')
+      .on('click', function() {
+        if (d3.event.srcElement.tagName !== 'svg') {
+          return;
+        }
+
+        NewsUtil.closeNews();
+      });
   }
 }
