@@ -115,6 +115,12 @@ export class Bubble {
       .attr('bubble-id', this.id)
       .attr('r', this.radius - this.strokeWidth / 2);
 
+    this.group
+      .append('text')
+      .attr('x', this.x)
+      .attr('y', this.y)
+      .text(this.searchTerm);
+
     for (const article of this.news) {
       const newsId = this.group.selectAll('.news').size();
       const angle = newsId * this.getAngleDistance() + this.angleShift;
@@ -141,7 +147,7 @@ export class Bubble {
             return;
           }
 
-          this.references.push(new Bubble(this.searchTerm, news, true, this, this.radius / BubbleUtil.scalingFactor));
+          this.references.push(new Bubble(referenceName, news, true, this, this.radius / BubbleUtil.scalingFactor));
         });
       }
     });
@@ -221,10 +227,13 @@ export class Bubble {
 
     // Recenter button
     this.group.selectAll('circle').on('click', () => {
-      //this.spawnReferences();
-      BubbleUtil.focusBubble(this, () => {
+      if (this.isReferred) {
+        BubbleUtil.focusBubble(this, () => {
+          this.spawnReferences();
+        });
+      } else {
         this.spawnReferences();
-      });
+      }
     });
   }
 
