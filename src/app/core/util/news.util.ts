@@ -1,7 +1,44 @@
 import * as d3 from 'd3';
+import {BubbleUtil} from "@app/core/util/bubble.util";
 
 export class NewsUtil {
   public static readonly width = 200;
+
+  public static openNews() {
+    if (NewsUtil.isNewsOpen()) {
+      return;
+    }
+
+    BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), () => {
+      d3.select('#graphContainer').style('width', '60%');
+    }, 0.6);
+
+    d3.select('#senna-news')
+      .transition()
+      .duration(1000)
+      .style('width', '40%');
+  }
+
+  public static closeNews() {
+    if (!NewsUtil.isNewsOpen()) {
+      return;
+    }
+
+    d3.select('#graphContainer').style('width', '100%');
+    BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
+
+    d3.select('#senna-news')
+      .transition()
+      .duration(1000)
+      .style('width', '0%');
+  }
+
+  public static isNewsOpen() {
+    return (d3.select('#senna-news')
+      .node() as HTMLElement)
+      .getBoundingClientRect()
+      .width > 0;
+  }
 
   public static wrap(textContainer, width, lineHeight) {
     textContainer.each(function() {

@@ -61,9 +61,7 @@ export class NewsGroup {
         .style('cursor', 'pointer')
         .text(news.getName())
         .call(NewsUtil.wrap, width, yOffset)
-        .on('click', function() {
-
-        })
+        .on('click', NewsUtil.openNews)
         .on('mouseenter', function() {
           d3.select(this)
             .attr('filter', 'url(#solid)');

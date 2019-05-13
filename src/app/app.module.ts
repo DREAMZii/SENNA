@@ -23,6 +23,7 @@ import {BubbleUtil} from "@app/core/util/bubble.util";
 import {ServiceUtil} from "@app/core/util/service.util";
 import {SearchComponent} from "@app/views/search";
 import {SennaFormComponent} from "@app/core/components/senna-form/senna-form.component";
+import {SennaNewsComponent} from "@app/core/components/senna-news/senna-news.component";
 
 @NgModule({
   imports: [
@@ -51,7 +52,8 @@ import {SennaFormComponent} from "@app/core/components/senna-form/senna-form.com
     HomeComponent,
     LoginComponent,
     SearchComponent,
-    SennaFormComponent
+    SennaFormComponent,
+    SennaNewsComponent
   ],
   providers: [
     CustomAdalService,

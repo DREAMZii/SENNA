@@ -20,15 +20,20 @@ export class BubbleUtil {
 
   public static radius = 100;
 
-  public static focusBubble(bubble, callback?) {
+  public static getActiveBubble() {
+    const activeBubbleId = parseInt(d3.select('.active').select('circle').attr('bubble-id'), 10);
+    return BubbleUtil.bubbles[activeBubbleId];
+  }
+
+  public static focusBubble(bubble, callback?, focusOnWidth = 1) {
     const rect = bubble.container.node().getBoundingClientRect();
 
     const scale = BubbleUtil.scalingFactor ** bubble.referredNumber;
 
-    const kx = (rect.width / 2) * (scale - 1);
+    const kx = ((rect.width * focusOnWidth) / 2) * (scale - 1);
     const ky = (rect.height / 2) * (scale - 1);
 
-    const tx = (rect.width / 2 - bubble.x) * scale;
+    const tx = ((rect.width * focusOnWidth) / 2 - bubble.x) * scale;
     const ty = (rect.height / 2 - bubble.y) * scale;
 
     const graphContainer = d3.select('#graphContainer');

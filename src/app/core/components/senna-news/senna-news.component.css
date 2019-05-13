@@ -1,0 +1,42 @@
+﻿#senna-news {
+  width: 0;
+  height: 100%;
+  float: right;
+}
+
+/* Header */
+
+#news-header {
+  border: 1px lightgray solid;
+  overflow: hidden;
+}
+
+.news-headline {
+  margin-left: 20px;
+  color: gray;
+}
+
+.news-header-grid {
+  float: left;
+  margin-left: 20px;
+  line-height: 5px;
+  margin-bottom: 40px;
+}
+
+/* Content */
+
+#news-content {
+  border: 1px lightgray solid;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.news-content-headline {
+  margin-left: 20px;
+}
+
+.news-content-text {
+  margin-left: 20px;
+}
+
+
