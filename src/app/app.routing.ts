@@ -6,8 +6,8 @@ import { CustomAdalGuard } from '@app/core/guards/customAdal.guard';
 import {SearchComponent} from "@app/views/search";
 
 const appRoutes: Routes = [
-  //{ path: 'search', component: SearchComponent },
-  { path: '', component: HomeComponent, canActivate: [CustomAdalGuard] },
+  { path: '', component: SearchComponent, canActivate: [CustomAdalGuard] },
+  { path: 'search/:q', component: HomeComponent, canActivate: [CustomAdalGuard] },
   { path: 'login', component: LoginComponent },
 
   // otherwise redirect to home

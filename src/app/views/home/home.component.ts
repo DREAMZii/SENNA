@@ -7,7 +7,6 @@ import {ActivatedRoute, Router} from "@angular/router";
 
 import * as d3 from 'd3';
 import {NewsUtil} from "@app/core/util/news.util";
-import {BubbleUtil} from "@app/core/util/bubble.util";
 
 @Component({
   templateUrl: './home.component.html',
@@ -17,12 +16,18 @@ export class HomeComponent implements OnInit {
   @ViewChild('graphContainer') graphContainer: ElementRef;
 
   constructor(
-    private configService: ConfigService
+    private configService: ConfigService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
   }
 
   ngOnInit() {
-    const searchTerm = 'kion';
+    const searchTerm = this.route.snapshot.paramMap.get('q');
+
+    if (searchTerm === '') {
+      this.router.navigate(['/']);
+    }
 
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {
@@ -35,10 +40,6 @@ export class HomeComponent implements OnInit {
   }
 
   initSvgEvents() {
-    const height = (d3.select('svg').node() as any).getBoundingClientRect().height;
-    d3.select('#news-content')
-      .style('height', height + 'px');
-
     d3.select('svg')
       .on('click', function() {
         if (d3.event.srcElement.tagName !== 'svg') {

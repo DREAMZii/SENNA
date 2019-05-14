@@ -30,7 +30,8 @@ export class AzureService {
       .set('count', '7')
       .set('offset', '0')
       .set('mkt', 'de-DE')
-      .set('sortBy', 'date');
+      .set('sortBy', 'date')
+      .set('freshness', 'week');
 
     const response = await this.http.get(uri, {headers: headers, params: params});
 
@@ -50,7 +51,7 @@ export class AzureService {
       data['description'],
       data['category'],
       data['url'],
-      data['datePublished'],
+      data['datePublished'].split('T')[0],
       data['provider'][0]['name']
     );
   }

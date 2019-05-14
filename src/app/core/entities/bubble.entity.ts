@@ -63,7 +63,7 @@ export class Bubble {
   private applyNews(news) {
     // Sort news (best one first)
     news = news.sort((a, b) => {
-      return a.sentiment > b.sentiment ? 1 : -1;
+      return a.sentiment > b.sentiment ? -1 : 1;
     });
 
     this.newsGroup = new NewsGroup(this, news);
@@ -93,8 +93,6 @@ export class Bubble {
 
     this.group = this.container
       .insert('g', ':first-child')
-      .attr('width', '100%')
-      .attr('height', '100%')
       .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)
       .style('position', 'absolute')
       .style('top', 0)

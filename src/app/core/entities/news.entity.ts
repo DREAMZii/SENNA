@@ -21,6 +21,10 @@ export class News {
     return this.name;
   }
 
+  public getUrl() {
+    return this.url;
+  }
+
   public getDatePublished() {
     return this.datePublished;
   }

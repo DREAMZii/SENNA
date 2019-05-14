@@ -5,6 +5,7 @@ export class NewsUtil {
   public static readonly width = 200;
 
   public static openNews(news) {
+    // Prepare data whether it is open or not
     this.prepareNews(news);
 
     if (NewsUtil.isNewsOpen()) {
@@ -12,25 +13,33 @@ export class NewsUtil {
     }
 
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), () => {
-      d3.select('#graphContainer').style('width', '60%');
+      d3.select('svg').style('width', '60%');
     }, 0.6);
 
     d3.select('#senna-news')
+      .classed('open', true)
       .transition()
       .duration(1000)
       .style('width', '40%');
   }
 
   private static prepareNews(news) {
-    // Prepare data whether it is open or not
     d3.select('#news-source div')
       .text(news.getSource());
 
+    const date = new Date(news.getDatePublished());
+
     d3.select('#news-date div')
-      .text(news.getDatePublished());
+      .text(date.toLocaleDateString('de-DE'));
 
     d3.select('#news-score div')
       .text(news.getScore());
+
+    d3.select('#news-headline h2')
+      .text(news.getName());
+
+    d3.select('#senna-news iframe')
+      .attr('src', news.getUrl());
   }
 
   public static closeNews() {
@@ -38,20 +47,18 @@ export class NewsUtil {
       return;
     }
 
-    d3.select('#graphContainer').style('width', '100%');
+    d3.select('svg').style('width', '100%');
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
 
     d3.select('#senna-news')
+      .classed('open', false)
       .transition()
       .duration(1000)
       .style('width', '0%');
   }
 
   public static isNewsOpen() {
-    return (d3.select('#senna-news')
-      .node() as HTMLElement)
-      .getBoundingClientRect()
-      .width > 0;
+    return d3.select('#senna-news').classed('open');
   }
 
   public static wrap(textContainer, width, lineHeight) {

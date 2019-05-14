@@ -1,42 +1,38 @@
 ﻿#senna-news {
   width: 0;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   float: right;
+  border-left: 1px lightgray solid;
 }
 
 /* Header */
 
 #news-header {
-  border: 1px lightgray solid;
   overflow: hidden;
 }
 
 .news-headline {
   margin-left: 20px;
   color: gray;
+  text-align: center;
 }
 
 .news-header-grid {
   float: left;
-  margin-left: 20px;
+  margin-left: 3%;
+  width: 30%;
   line-height: 5px;
   margin-bottom: 40px;
 }
 
 /* Content */
 
-#news-content {
-  border: 1px lightgray solid;
-  height: 100%;
-  overflow-y: scroll;
-}
-
-.news-content-headline {
-  margin-left: 20px;
-}
-
-.news-content-text {
-  margin-left: 20px;
+#senna-news iframe {
+  border-top: 1px lightgray solid;
+  flex-grow: 1;
+  overflow-x: auto;
 }
 
 

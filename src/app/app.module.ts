@@ -11,7 +11,7 @@ import {HomeComponent} from './views/home';
 import {LoginComponent} from './views/login';
 
 import {CustomAdalGuard} from '@app/core/guards/customAdal.guard';
-import {ConfigService, CustomAdalService, AzureService, ReferenceService} from '@app/services';
+import {ConfigService, CustomAdalService, AzureService, ReferenceService, NewsService} from '@app/services';
 import {CustomAdalInterceptor} from '@app/core/interceptors/customAdal.interceptor';
 
 import {SennaAlertModule} from '@app/core/modules';
@@ -60,6 +60,7 @@ import {SennaNewsComponent} from "@app/core/components/senna-news/senna-news.com
     CustomAdalGuard,
     ConfigService,
     AzureService,
+    NewsService,
     {provide: HTTP_INTERCEPTORS, useClass: CustomAdalInterceptor, multi: true}
   ],
   bootstrap: [AppComponent]
@@ -68,10 +69,12 @@ import {SennaNewsComponent} from "@app/core/components/senna-news/senna-news.com
 export class AppModule {
   constructor(
     private referenceService: ReferenceService,
-    private azureService: AzureService
+    private azureService: AzureService,
+    private newsService: NewsService
   ) {
     ServiceUtil.referenceService = referenceService;
     ServiceUtil.azureService = azureService;
+    ServiceUtil.newsService = newsService;
   }
 }
 

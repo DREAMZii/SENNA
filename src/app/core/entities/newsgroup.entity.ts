@@ -80,8 +80,8 @@ export class NewsGroup {
     }
 
     height += this.bubble.getStrokeWidth() * 2;
-    // 2.3 = indeed a magical number?
-    height += yOffset * this.group.selectAll('tspan').size() / 2.2;
+    // 3 = indeed a magical number?
+    height += yOffset * this.group.selectAll('tspan').size() / 3;
 
     this.group.selectAll('tspan')
       .attr('y', function() {
