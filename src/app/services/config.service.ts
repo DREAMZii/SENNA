@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { AsyncSubject } from 'rxjs';
 import { environment } from '@environments/environment';
+import {HTTP_HEADER_AUTHORIZATION} from "@app/core/constants/http.constants";
 
 @Injectable({ providedIn: 'root' })
 export class ConfigService {

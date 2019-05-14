@@ -14,9 +14,9 @@ export class AppComponent {
   ) {
     translate.setDefaultLang('en');
     this.adalService.init(environment.azure.adal);
-    /*if (!this.adalService.isAuthenticated()) {
+    if (!this.adalService.isAuthenticated()) {
       this.router.navigate(['/login']);
-    }*/
+    }
   }
 }
 

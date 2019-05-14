@@ -17,18 +17,12 @@ export class HomeComponent implements OnInit {
   @ViewChild('graphContainer') graphContainer: ElementRef;
 
   constructor(
-    private configService: ConfigService,
-    private router: Router,
-    private route: ActivatedRoute
+    private configService: ConfigService
   ) {
   }
 
   ngOnInit() {
-    const searchTerm = this.route.snapshot.paramMap.get('q');
-
-    if (searchTerm === '') {
-      this.router.navigate(['/']);
-    }
+    const searchTerm = 'kion';
 
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {

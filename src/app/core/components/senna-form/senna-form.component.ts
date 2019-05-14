@@ -1,6 +1,5 @@
 ﻿import {Component} from '@angular/core';
 import {SennaFormEntity} from "@app/core/components/senna-form/senna-form.entity";
-import {CustomAdalService} from "@app/services";
 import {Router} from "@angular/router";
 
 @Component({
@@ -10,7 +9,6 @@ import {Router} from "@angular/router";
 export class SennaFormComponent {
 
   constructor(
-    private adalService: CustomAdalService,
     private router: Router,
   ) {
 

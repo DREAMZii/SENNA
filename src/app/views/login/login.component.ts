@@ -9,22 +9,22 @@ import {CustomAdalService} from '@app/services';
 })
 export class LoginComponent implements OnInit {
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        private adalService: CustomAdalService
-    ) {
-        // redirect to home if already logged in
-        if (this.adalService.isAuthenticated()) {
-            this.router.navigate(['/']);
-        }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private adalService: CustomAdalService
+  ) {
+    // redirect to home if already logged in
+    if (this.adalService.isAuthenticated()) {
+      this.router.navigate(['/']);
     }
+  }
 
-    ngOnInit() {
-      this.adalService.handleWindowCallback();
-    }
+  ngOnInit() {
+    this.adalService.handleWindowCallback();
+  }
 
-    login() {
-      this.adalService.login();
-    }
+  login() {
+    this.adalService.login();
+  }
 }

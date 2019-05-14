@@ -40,12 +40,5 @@ export const environment = {
       textAnalysisSentimentUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment'
 
     }
-  },
-  google: {
-    search: {
-      googleSearchUrl: 'https://www.google.com/search',
-      userAgent: 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31',
-      resultCount: '5'
-    }
   }
 };
