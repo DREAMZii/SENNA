@@ -79,16 +79,10 @@ export class NewsGroup {
       height += text.node().getBBox().height;
     }
 
-    height += this.bubble.getStrokeWidth() * 2;
-    // 3 = indeed a magical number?
-    height += yOffset * this.group.selectAll('tspan').size() / 3;
+    height += this.bubble.getStrokeWidth();
+    height += yOffset * this.group.selectAll('text').size();
 
     this.group.selectAll('tspan')
-      .attr('y', function() {
-        return parseFloat(d3.select(this).attr('y')) - height;
-      });
-
-    this.group.selectAll('rect')
       .attr('y', function() {
         return parseFloat(d3.select(this).attr('y')) - height;
       });
