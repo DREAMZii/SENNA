@@ -40,6 +40,12 @@ export class HomeComponent implements OnInit {
   }
 
   initSvgEvents() {
+    d3.select('app-senna-news')
+      .append('div')
+      .attr('id', 'open-news-article')
+      .style('width', '3.5%')
+      .style('float', 'right');
+
     d3.select('svg')
       .on('click', function() {
         if (d3.event.srcElement.tagName !== 'svg') {

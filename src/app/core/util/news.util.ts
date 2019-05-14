@@ -2,11 +2,18 @@ import * as d3 from 'd3';
 import {BubbleUtil} from "@app/core/util/bubble.util";
 
 export class NewsUtil {
+  public static news = [];
+  public static openArticles = new Map();
+
+  public static openNewsId: number;
+
   public static readonly width = 200;
 
   public static openNews(news) {
     // Prepare data whether it is open or not
-    this.prepareNews(news);
+    if (this.openNewsId !== news.getId()) {
+      this.prepareNews(news);
+    }
 
     if (NewsUtil.isNewsOpen()) {
       return;
@@ -20,7 +27,7 @@ export class NewsUtil {
       .classed('open', true)
       .transition()
       .duration(1000)
-      .style('width', '40%');
+      .style('width', '36.5%');
   }
 
   private static prepareNews(news) {
@@ -40,6 +47,88 @@ export class NewsUtil {
 
     d3.select('#senna-news iframe')
       .attr('src', news.getUrl());
+
+    this.openNewsId = news.getId();
+
+    // Is not open
+    if (!this.openArticles.has(news.getId())) {
+      this.openNewsTab(news);
+    } else {
+      const selectedNewsBox = d3.selectAll('.news-article')
+        .filter(function() {
+          return parseInt(d3.select(this).attr('news-id'), 10) === news.getId();
+        });
+
+      selectedNewsBox.call(this.markBoxAsActive);
+    }
+  }
+
+  private static openNewsTab(news) {
+    const openArticleBox = d3.select('#open-news-article')
+      .append('div')
+      .attr('news-id', news.getId())
+      .classed('news-article', true)
+      .classed('open-article', true)
+      .style('width', '100%')
+      .style('height', '15vh')
+      .style('border', '1px gray solid')
+      .style('display', 'flex')
+      .style('justify-content', 'center')
+      .style('align-items', 'center')
+      .style('cursor', 'pointer')
+      .on('click', function() {
+        const newsBox = d3.select(this);
+        if (!newsBox.classed('open-article')) {
+          newsBox.call(NewsUtil.markBoxAsActive);
+        }
+
+        const newsId = parseInt(newsBox.attr('news-id'), 10);
+        NewsUtil.openNews(NewsUtil.news[newsId]);
+      })
+      .on('dblclick', function() {
+        const newsBox = d3.select(this);
+        const newsId = parseInt(newsBox.attr('news-id'), 10);
+
+        NewsUtil.openArticles.delete(newsId);
+        newsBox.remove();
+
+        if (NewsUtil.openArticles.size <= 0) {
+          NewsUtil.closeNews();
+        } else if (newsId === NewsUtil.openNewsId) {
+          const newActiveBox = d3.select('.news-article');
+          newActiveBox.call(NewsUtil.markBoxAsActive);
+
+          const newActiveNewsId = parseInt(newActiveBox.attr('news-id'), 10);
+          NewsUtil.openNews(NewsUtil.news[newActiveNewsId]);
+        }
+      });
+
+    openArticleBox.call(this.markBoxAsActive);
+
+    openArticleBox.append('div')
+      .style('text-align', 'center')
+      .style('writing-mode', 'vertical-rl')
+      .style('transform', 'rotate(180deg)')
+      .text(news.getName().substring(0, 25) + '...');
+
+    this.openArticles.set(news.getId(), news);
+  }
+
+  private static markBoxAsActive(newsBox) {
+    d3.selectAll('.news-article')
+      .classed('open-article', false)
+      .transition()
+      .duration(500)
+      .style('opacity', '0.5')
+      .style('color', 'black')
+      .on('end', () => {
+        newsBox
+          .classed('open-article', true)
+          .transition()
+          .duration(500)
+          .style('color', 'green')
+          .style('opacity', '1');
+      });
   }
 
   public static closeNews() {

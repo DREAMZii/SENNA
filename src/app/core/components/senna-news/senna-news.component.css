@@ -36,4 +36,22 @@
   overflow-x: auto;
 }
 
+/* Open articles */
+
+#open-news-article {
+  width: 5%;
+  display: flex;
+}
+
+.open-article {
+  width: 100%;
+  height: 10vh;
+  border: 1px gray solid;
+}
+
+.open-article-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
 
