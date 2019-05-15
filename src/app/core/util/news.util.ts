@@ -20,7 +20,7 @@ export class NewsUtil {
     }
 
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), () => {
-      d3.select('svg').style('width', '60%');
+      d3.select('svg').style('width', '63.5%');
     }, 0.6);
 
     d3.select('#senna-news')
@@ -76,6 +76,7 @@ export class NewsUtil {
       .style('justify-content', 'center')
       .style('align-items', 'center')
       .style('cursor', 'pointer')
+      .style('background-color', '#E1E1E1')
       .on('click', function() {
         const newsBox = d3.select(this);
         if (!newsBox.classed('open-article')) {
@@ -89,13 +90,16 @@ export class NewsUtil {
         const newsBox = d3.select(this);
         const newsId = parseInt(newsBox.attr('news-id'), 10);
 
+        const boxBefore = (newsBox.node() as HTMLElement).previousElementSibling;
+        const boxAfter = (newsBox.node() as HTMLElement).nextElementSibling;
+
         NewsUtil.openArticles.delete(newsId);
         newsBox.remove();
 
         if (NewsUtil.openArticles.size <= 0) {
           NewsUtil.closeNews();
         } else if (newsId === NewsUtil.openNewsId) {
-          const newActiveBox = d3.select('.news-article');
+          const newActiveBox = boxBefore === null ? d3.select(boxAfter) : d3.select(boxBefore);
           newActiveBox.call(NewsUtil.markBoxAsActive);
 
           const newActiveNewsId = parseInt(newActiveBox.attr('news-id'), 10);
@@ -115,20 +119,27 @@ export class NewsUtil {
   }
 
   private static markBoxAsActive(newsBox) {
+    d3.select('.open-article')
+      .classed('open-article', false);
+
+    newsBox
+      .classed('open-article', true);
+
     d3.selectAll('.news-article')
-      .classed('open-article', false)
+      .filter(function() {
+        return !d3.select(this).classed('open-article');
+      })
       .transition()
       .duration(500)
-      .style('opacity', '0.5')
-      .style('color', 'black')
-      .on('end', () => {
-        newsBox
-          .classed('open-article', true)
-          .transition()
-          .duration(500)
-          .style('color', 'green')
-          .style('opacity', '1');
-      });
+      .style('color', 'lightgray')
+      .style('background-color', '#f4f4f4');
+
+    newsBox
+      .classed('open-article', true)
+      .transition()
+      .duration(500)
+      .style('background-color', '#E1E1E1')
+      .style('color', 'green');
   }
 
   public static closeNews() {
