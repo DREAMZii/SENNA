@@ -15,6 +15,8 @@ export class NewsUtil {
       this.prepareNews(news);
     }
 
+    NewsUtil.openNewsId = news.getId();
+
     if (NewsUtil.isNewsOpen()) {
       return;
     }
@@ -47,8 +49,6 @@ export class NewsUtil {
 
     d3.select('#senna-news iframe')
       .attr('src', news.getUrl());
-
-    this.openNewsId = news.getId();
 
     // Is not open
     if (!this.openArticles.has(news.getId())) {
@@ -85,26 +85,6 @@ export class NewsUtil {
 
         const newsId = parseInt(newsBox.attr('news-id'), 10);
         NewsUtil.openNews(NewsUtil.news[newsId]);
-      })
-      .on('dblclick', function() {
-        const newsBox = d3.select(this);
-        const newsId = parseInt(newsBox.attr('news-id'), 10);
-
-        const boxBefore = (newsBox.node() as HTMLElement).previousElementSibling;
-        const boxAfter = (newsBox.node() as HTMLElement).nextElementSibling;
-
-        NewsUtil.openArticles.delete(newsId);
-        newsBox.remove();
-
-        if (NewsUtil.openArticles.size <= 0) {
-          NewsUtil.closeNews();
-        } else if (newsId === NewsUtil.openNewsId) {
-          const newActiveBox = boxBefore === null ? d3.select(boxAfter) : d3.select(boxBefore);
-          newActiveBox.call(NewsUtil.markBoxAsActive);
-
-          const newActiveNewsId = parseInt(newActiveBox.attr('news-id'), 10);
-          NewsUtil.openNews(NewsUtil.news[newActiveNewsId]);
-        }
       });
 
     openArticleBox.call(this.markBoxAsActive);
@@ -140,6 +120,28 @@ export class NewsUtil {
       .duration(500)
       .style('background-color', '#E1E1E1')
       .style('color', 'green');
+  }
+
+  public static removeActiveNews() {
+    const newsBox = d3.selectAll('.news-article')
+      .filter(function() {
+        return parseInt(d3.select(this).attr('news-id'), 10) === NewsUtil.openNewsId;
+      });
+
+    const boxBefore = (newsBox.node() as HTMLElement).previousElementSibling;
+    const boxAfter = (newsBox.node() as HTMLElement).nextElementSibling;
+
+    NewsUtil.openArticles.delete(this.openNewsId);
+    newsBox.remove();
+
+    if (NewsUtil.openArticles.size <= 0) {
+      NewsUtil.closeNews();
+    } else {
+      const newActiveBox = boxBefore === null ? d3.select(boxAfter) : d3.select(boxBefore);
+      const newActiveNewsId = parseInt(newActiveBox.attr('news-id'), 10);
+      NewsUtil.openNews(NewsUtil.news[newActiveNewsId]);
+      newActiveBox.call(NewsUtil.markBoxAsActive);
+    }
   }
 
   public static closeNews() {

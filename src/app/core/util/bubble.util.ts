@@ -26,6 +26,15 @@ export class BubbleUtil {
   }
 
   public static focusBubble(bubble, callback?, focusOnWidth = 1) {
+    if (bubble !== this.getActiveBubble()) {
+      bubble
+        .getContainer()
+        .selectAll('.news')
+        .transition()
+        .duration(750)
+        .style('opacity', '0');
+    }
+
     const rect = bubble.container.node().getBoundingClientRect();
 
     const scale = BubbleUtil.scalingFactor ** bubble.referredNumber;
