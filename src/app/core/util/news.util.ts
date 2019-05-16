@@ -23,7 +23,7 @@ export class NewsUtil {
 
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), () => {
       d3.select('#canvas').style('width', '63.5%');
-    }, 0.6);
+    }, 0.635);
 
     d3.select('#senna-news')
       .classed('open', true)
