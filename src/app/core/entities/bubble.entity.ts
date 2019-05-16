@@ -2,7 +2,6 @@ import * as d3 from 'd3';
 import {News} from '@app/core/entities/news.entity';
 import {BubbleUtil} from "@app/core/util/bubble.util";
 import {CacheUtil} from "@app/core/util/cache.util";
-import {NewsUtil} from "@app/core/util/news.util";
 import {NewsGroup} from "@app/core/entities/newsgroup.entity";
 
 export class Bubble {
@@ -94,6 +93,7 @@ export class Bubble {
    */
   public spawn(positionX?, positionY?) {
     BubbleUtil.bubbles.push(this);
+    BubbleUtil.bubblesByName.set(this.searchTerm, this);
 
     this.group = this.container
       .insert('g', ':first-child')
