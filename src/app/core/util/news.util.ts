@@ -22,14 +22,17 @@ export class NewsUtil {
     }
 
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), () => {
-      d3.select('svg').style('width', '63.5%');
+      d3.select('#canvas').style('width', '63.5%');
     }, 0.6);
 
     d3.select('#senna-news')
       .classed('open', true)
       .transition()
       .duration(1000)
-      .style('width', '36.5%');
+      .style('width', '36.5%')
+      .on('end', function() {
+        d3.select('#close-button').style('display', null);
+      });
   }
 
   private static prepareNews(news) {
@@ -149,14 +152,20 @@ export class NewsUtil {
       return;
     }
 
-    d3.select('svg').style('width', '100%');
+    d3.select('#canvas')
+      .transition()
+      .duration(750)
+      .style('width', '100%');
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
 
     d3.select('#senna-news')
       .classed('open', false)
       .transition()
-      .duration(1000)
-      .style('width', '0%');
+      .duration(750)
+      .style('width', '0%')
+      .on('start', function() {
+        d3.select('#close-button').style('display', 'none');
+      });
   }
 
   public static isNewsOpen() {

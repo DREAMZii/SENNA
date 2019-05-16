@@ -56,6 +56,10 @@ export class Bubble {
     this.radius = radius;
     this.strokeWidth = radius / 5;
 
+    if (!isReferred) {
+      this.spawnReferences();
+    }
+
     this.applyNews(news);
   }
 
@@ -124,25 +128,26 @@ export class Bubble {
       .attr('font-size', 16 / (BubbleUtil.scalingFactor ** this.referredNumber))
       .text(this.searchTerm);
 
-    /*for (const article of this.news) {
-      const newsId = this.group.selectAll('.news').size();
-      const angle = newsId * this.getAngleDistance() + this.angleShift;
-      const point = BubbleUtil.getPointOnCircle(this.x, this.y, this.radius, angle);
-
-      article.draw(this.container, this.group, point[0], point[1], 200, 300, newsId, BubbleUtil.scalingFactor ** this.referredNumber);
-    }*/
-
     this.handleZoom();
     this.handleEvents();
 
-    this.preloadReferences().then(() => {
-      this.referencesLoaded = true;
+    this.preloadReferences()
+      .then(() => {
+        this.referencesLoaded = true;
 
-      if (this.shouldLoad) {
-        this.shouldLoad = false;
-        this.spawnReferences();
-      }
-    });
+        if (this.shouldLoad) {
+          this.shouldLoad = false;
+          this.spawnReferences();
+        }
+      })
+      .catch(() => {
+        this.referencesLoaded = true;
+
+        if (this.shouldLoad) {
+          this.shouldLoad = false;
+          this.spawnReferences();
+        }
+      });
   }
 
   private async preloadReferences() {
@@ -158,7 +163,7 @@ export class Bubble {
           }
 
           this.references.push(new Bubble(referenceName, news, true, this, this.radius / BubbleUtil.scalingFactor));
-        });
+        })
       }
     });
   }

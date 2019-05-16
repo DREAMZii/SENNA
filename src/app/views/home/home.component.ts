@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit {
       .style('width', '3.5%')
       .style('float', 'right');
 
-    d3.select('svg')
+    d3.select('#canvas')
       .on('click', function() {
         if (d3.event.srcElement.tagName !== 'svg') {
           return;
