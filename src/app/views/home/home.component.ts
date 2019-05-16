@@ -34,8 +34,7 @@ export class HomeComponent implements OnInit {
 
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {
-        const bubble = new Bubble(searchTerm, news);
-        bubble.spawn();
+        new Bubble(searchTerm, news);
 
         this.initSvgEvents();
       });

@@ -56,12 +56,18 @@ export class Bubble {
     this.strokeWidth = radius / 5;
 
     if (!isReferred) {
-      this.spawnReferences();
+      this.preloadReferences()
+        .then(() => {
+          d3.select('#loading-gear').remove();
+          this.referencesLoaded = true;
+
+          this.spawn();
+          this.spawnReferences();
+        });
     }
 
     this.applyNews(news);
   }
-
 
   private applyNews(news) {
     // Sort news (best one first)
@@ -131,23 +137,25 @@ export class Bubble {
     this.handleZoom();
     this.handleEvents();
 
-    this.preloadReferences()
-      .then(() => {
-        this.referencesLoaded = true;
+    if (this.isReferred) {
+      this.preloadReferences()
+        .then(() => {
+          this.referencesLoaded = true;
 
-        if (this.shouldLoad) {
-          this.shouldLoad = false;
-          this.spawnReferences();
-        }
-      })
-      .catch(() => {
-        this.referencesLoaded = true;
+          if (this.shouldLoad) {
+            this.shouldLoad = false;
+            this.spawnReferences();
+          }
+        })
+        .catch(() => {
+          this.referencesLoaded = true;
 
-        if (this.shouldLoad) {
-          this.shouldLoad = false;
-          this.spawnReferences();
-        }
-      });
+          if (this.shouldLoad) {
+            this.shouldLoad = false;
+            this.spawnReferences();
+          }
+        });
+    }
   }
 
   private async preloadReferences() {
