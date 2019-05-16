@@ -153,8 +153,6 @@ export class NewsUtil {
     }
 
     d3.select('#canvas')
-      .transition()
-      .duration(750)
       .style('width', '100%');
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
 
