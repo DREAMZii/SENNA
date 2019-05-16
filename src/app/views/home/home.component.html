@@ -1,11 +1,14 @@
 <app-senna-news></app-senna-news>
 <div id="graphContainer" #graphContainer>
-    <svg id="canvas" width="100%" height="100%" style="position: absolute; top: 0; left: 0; z-index: -1;">
-      <defs>
-        <filter x="0" y="0" width="1" height="1" id="solid">
-          <feFlood flood-color="lightgray"/>
-          <feComposite in="SourceGraphic" operator="xor" />
-        </filter>
-      </defs>
-    </svg>
+  <svg id="canvas" width="100%" height="100%" style="position: absolute; top: 0; left: 0; z-index: -1;">
+    <defs>
+      <filter x="0" y="0" width="1" height="1" id="solid">
+        <feFlood flood-color="lightgray"/>
+        <feComposite in="SourceGraphic" operator="xor" />
+      </filter>
+    </defs>
+    <image id="back-button" class="quick-button" xlink:href="assets/images/back.svg" width="10vh" height="10vh" x="3vh" y="87vh"></image>
+    <image id="center-button" class="quick-button" xlink:href="assets/images/center.svg" width="10vh" height="10vh" x="13vh" y="87vh"></image>
+    <image id="search-button" class="quick-button" xlink:href="assets/images/search.svg" width="20vh" height="20vh" x="23vh" y="82vh"></image>
+  </svg>
 </div>

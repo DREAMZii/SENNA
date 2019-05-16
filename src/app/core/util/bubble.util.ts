@@ -115,8 +115,8 @@ export class BubbleUtil {
     const y2 = bubble2.getCenterY() + (bubble2.getRadius() + bubble2.strokeWidth) * Math.sin(angleInRad2);
 
     const group = d3.select('#graphContainer')
-      .select('svg')
-      .append('g')
+      .select('#canvas')
+      .insert('g', ':first-child')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)

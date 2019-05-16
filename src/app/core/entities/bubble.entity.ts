@@ -51,7 +51,7 @@ export class Bubble {
     this.isReferred = isReferred;
     this.referrer = referrer;
     this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
-    this.container = d3.select(container).select('svg');
+    this.container = d3.select(container).select('#canvas');
     this.radius = radius;
     this.strokeWidth = radius / 5;
 

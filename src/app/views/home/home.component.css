@@ -1,0 +1,19 @@
+/* Quick menu */
+
+.quick-button {
+  position: absolute;
+  bottom: 0;
+  cursor: pointer;
+}
+
+#back-button {
+  transform-origin: 8vh 92vh;
+}
+
+#center-button {
+  transform-origin: 18vh 92vh;
+}
+
+#search-button {
+  transform-origin: 33vh 92vh;
+}

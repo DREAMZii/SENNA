@@ -7,6 +7,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 
 import * as d3 from 'd3';
 import {NewsUtil} from "@app/core/util/news.util";
+import {BubbleUtil} from "@app/core/util/bubble.util";
 
 @Component({
   templateUrl: './home.component.html',
@@ -28,6 +29,8 @@ export class HomeComponent implements OnInit {
     if (searchTerm === '') {
       this.router.navigate(['/']);
     }
+
+    this.initButtonEvents();
 
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {
@@ -53,6 +56,35 @@ export class HomeComponent implements OnInit {
         }
 
         NewsUtil.closeNews();
+      });
+  }
+
+  initButtonEvents() {
+    d3.selectAll('.quick-button')
+      .on('mouseenter', function() {
+        const button = d3.select(this);
+
+        button.transition()
+          .attr('transform', 'scale(1.15)')
+      })
+      .on('mouseleave', function() {
+        const button = d3.select(this);
+
+        button.transition()
+          .attr('transform', 'scale(1)')
+      });
+
+    d3.select('#center-button')
+      .on('click', () => {
+        BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
+      });
+
+    d3.select('#search-button')
+      .on('click', () => {
+        BubbleUtil.offsetX = 0;
+        BubbleUtil.offsetY = 0;
+        BubbleUtil.scale = 1;
+        this.router.navigate(['/']);
       });
   }
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="53px" height="53px" viewBox="0 0 53 53" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54 (76480) - https://sketchapp.com -->
+    <title>First Search</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="88.0991293%" y1="72.2120671%" x2="15.5328616%" y2="8.85890384%" id="linearGradient-1">
+            <stop stop-color="#6C193F" offset="0%"></stop>
+            <stop stop-color="#AE0055" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-2" cx="20.5" cy="20.5" r="20.5"></circle>
+        <filter x="-20.7%" y="-18.3%" width="141.5%" height="141.5%" filterUnits="objectBoundingBox" id="filter-3">
+            <feMorphology radius="1.5" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+            <feOffset dx="0" dy="1" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.682352941   0 0 0 0 0   0 0 0 0 0.333333333  0 0 0 0.202524038 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD" transform="translate(-694.000000, -487.000000)">
+            <g id="First-Search" transform="translate(700.000000, 492.000000)">
+                <g id="Oval">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                    <use stroke="#FFFFFF" stroke-width="1" fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
+                </g>
+                <polygon id="+" fill="#FFFFFF" fill-rule="nonzero" points="22.4831683 19.5168317 28 19.5168317 28 22.4831683 22.4831683 22.4831683 22.4831683 28 19.5168317 28 19.5168317 22.4831683 14 22.4831683 14 19.5168317 19.5168317 19.5168317 19.5168317 14 22.4831683 14"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
