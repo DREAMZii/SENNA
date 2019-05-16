@@ -4,7 +4,8 @@ import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-senna-form',
-  templateUrl: 'senna-form.component.html'
+  templateUrl: 'senna-form.component.html',
+  styleUrls: ['senna-form.component.css']
 })
 export class SennaFormComponent {
 

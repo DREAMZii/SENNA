@@ -1,0 +1,15 @@
+#search-extend {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 37vh;
+  height: 7.5vh;
+  border: 2px solid black;
+  border-radius: 120px;
+  outline-width: 0;
+  font-size: 4vh;
+  text-indent: 10px;
+}
