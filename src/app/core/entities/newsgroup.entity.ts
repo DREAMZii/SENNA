@@ -62,8 +62,8 @@ export class NewsGroup {
         .text(news.getName())
         .call(NewsUtil.wrap, width, yOffset)
         .on('click', function() {
-          const text = d3.select(this);
-          const newsId = parseInt(text.attr('news-id'), 10);
+          const newsText = d3.select(this);
+          const newsId = parseInt(newsText.attr('news-id'), 10);
 
           NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
         })

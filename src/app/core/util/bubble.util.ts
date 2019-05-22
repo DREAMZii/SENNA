@@ -150,12 +150,12 @@ export class BubbleUtil {
   }
 
   public static describeArc(x, y, radius, startAngle, endAngle) {
-    function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+    function polarToCartesian(centerX, centerY, cartesianRadius, angleInDegrees) {
       const angleInRadians = BubbleUtil.getAngleInRadians(angleInDegrees);
 
       return {
-        x: centerX + (radius * Math.cos(angleInRadians)),
-        y: centerY + (radius * Math.sin(angleInRadians))
+        x: centerX + (cartesianRadius * Math.cos(angleInRadians)),
+        y: centerY + (cartesianRadius * Math.sin(angleInRadians))
       };
     }
 
@@ -171,6 +171,6 @@ export class BubbleUtil {
   }
 
   public static getAngleInRadians(angleInDegrees) {
-    return (angleInDegrees - 90) * Math.PI / 180.0
+    return (angleInDegrees - 90) * Math.PI / 180.0;
   }
 }

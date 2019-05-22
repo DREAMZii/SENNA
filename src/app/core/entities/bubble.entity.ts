@@ -214,7 +214,7 @@ export class Bubble {
           }
 
           this.references.push(new Bubble(referenceTitle, referenceImageUrl, news, true, this, this.radius / BubbleUtil.scalingFactor));
-        })
+        });
       }
     });
   }
@@ -316,7 +316,7 @@ export class Bubble {
       }*/
 
       const referencesCount = this.references.length;
-      const initialAngle = 360; //this.isReferred ? (this.angleSpawned + BubbleUtil.angleShift) : 360;
+      const initialAngle = 360; // this.isReferred ? (this.angleSpawned + BubbleUtil.angleShift) : 360;
       let angle = i * initialAngle / referencesCount;
       const angleSum = initialAngle / referencesCount / 2 * (this.referredNumber % referencesCount);
       // Add some fake dynamic
