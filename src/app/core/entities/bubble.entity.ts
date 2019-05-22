@@ -8,6 +8,7 @@ export class Bubble {
   // Relevant fields
   private id: number;
   private readonly searchTerm: any;
+  private readonly searchImage: any;
   private readonly container: any;
   private group: any;
   private greenSegments: number;
@@ -35,20 +36,23 @@ export class Bubble {
   public shouldLoad = false;
   private referencesSpawned = false;
   private referenceNames = [];
+  private referenceImages = [];
   private references = [];
 
   /**
    * Constructor for Bubble instance
    *
    * @param searchTerm    - search term that created the bubble
+   * @param searchImage   - search image to insert into the bubble
    * @param news          - news that will create bubble
    * @param isReferred    - whether this bubble is spawned by referring
    * @param referrer      - referrer bubble
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(searchTerm, news, isReferred = false, referrer = null, radius = BubbleUtil.radius, container = '#graphContainer') {
+  constructor(searchTerm, searchImage, news, isReferred = false, referrer = null, radius = BubbleUtil.radius, container = '#graphContainer') {
     this.searchTerm = searchTerm;
+    this.searchImage = searchImage;
     this.isReferred = isReferred;
     this.referrer = referrer;
     this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
@@ -121,6 +125,41 @@ export class Bubble {
 
     this.id = BubbleUtil.bubbles.length - 1;
 
+    /*this.group
+      .append('text')
+      .attr('x', this.x)
+      .attr('y', this.y)
+      .attr('font-size', 16 / (BubbleUtil.scalingFactor ** this.referredNumber))
+      .text(this.searchTerm);*/
+
+    const rectWH = this.radius + this.radius / 3.5;
+
+    this.group
+      .append('rect')
+      .attr('id', 'bubble-rect-' + this.id)
+      .attr('x', this.x - rectWH / 2)
+      .attr('y', this.y - rectWH / 2)
+      .attr('rx', 20 / (this.referredNumber + 1))
+      .attr('ry', 20 / (this.referredNumber + 1))
+      .attr('width', rectWH)
+      .attr('height', rectWH)
+      .attr('xlink:href', this.searchImage)
+      .attr('clip-path', 'url(#clip)');
+
+    this.container
+      .select('#clip')
+      .append('use')
+      .attr('xlink:href', '#bubble-rect-' + this.id);
+
+    this.group
+      .append('image')
+      .attr('x', this.x - rectWH / 2)
+      .attr('y', this.y - rectWH / 2)
+      .attr('width', rectWH)
+      .attr('height', rectWH)
+      .attr('xlink:href', this.searchImage)
+      .attr('clip-path', 'url(#clip)');
+
     // Draw invisible circle for click event
     this.group
       .append('circle')
@@ -129,13 +168,6 @@ export class Bubble {
       .attr('fill-opacity', '0')
       .attr('bubble-id', this.id)
       .attr('r', this.radius - this.strokeWidth / 2);
-
-    this.group
-      .append('text')
-      .attr('x', this.x)
-      .attr('y', this.y)
-      .attr('font-size', 16 / (BubbleUtil.scalingFactor ** this.referredNumber))
-      .text(this.searchTerm);
 
     this.handleZoom();
     this.handleEvents();
@@ -163,22 +195,25 @@ export class Bubble {
 
   private async preloadReferences() {
     // Load references on initialization
-    await CacheUtil.getReferences(this.searchTerm).then( async (referenceNames: string[]) => {
-       this.referenceNames = referenceNames;
+    await CacheUtil.getReferences(this.searchTerm).then( async (references: string[]) => {
+      for (let reference of references) {
+        const referenceTitle = reference['referenceTitle'];
+        const referenceImageUrl = reference['referenceImageUrl'];
 
-      for (let referenceName of referenceNames) {
+        this.referenceNames.push(referenceTitle);
+        this.referenceImages.push(referenceImageUrl);
         /*if (BubbleUtil.bubblesByName.has(referenceName.toLowerCase())) {
           this.references.push(BubbleUtil.bubblesByName.get(referenceName.toLowerCase()));
           continue;
         }*/
 
-        await CacheUtil.getNews(referenceName).then((news: News[]) => {
+        await CacheUtil.getNews(referenceTitle).then((news: News[]) => {
           // We don't want those
           if (news.length <= 0) {
             return;
           }
 
-          this.references.push(new Bubble(referenceName, news, true, this, this.radius / BubbleUtil.scalingFactor));
+          this.references.push(new Bubble(referenceTitle, referenceImageUrl, news, true, this, this.radius / BubbleUtil.scalingFactor));
         })
       }
     });
@@ -320,6 +355,10 @@ export class Bubble {
 
   public getNews(newsId: number) {
     return this.newsGroup.getNews()[newsId];
+  }
+
+  public getReferrer() {
+    return this.referrer;
   }
 
   public getReferredNumber() {

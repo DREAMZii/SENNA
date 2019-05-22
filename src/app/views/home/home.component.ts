@@ -34,7 +34,7 @@ export class HomeComponent implements OnInit {
 
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {
-        new Bubble(searchTerm, news);
+        new Bubble(searchTerm, '', news);
 
         this.initSvgEvents();
       });
@@ -71,6 +71,17 @@ export class HomeComponent implements OnInit {
 
         button.transition()
           .attr('transform', 'scale(1)');
+      });
+
+    d3.select('#back-button')
+      .on('click', () => {
+        const referrer = BubbleUtil.getActiveBubble().getReferrer();
+
+        if (referrer === null) {
+          return;
+        }
+
+        BubbleUtil.focusBubble(referrer);
       });
 
     d3.select('#center-button')
