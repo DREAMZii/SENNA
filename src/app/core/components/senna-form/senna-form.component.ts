@@ -15,9 +15,13 @@ export class SennaFormComponent {
 
   }
 
-  search = new SennaFormEntity();
+  searchTerm = '';
 
   onSubmit() {
-    this.router.navigate(['/search', this.search.searchTerm]);
+    if (this.searchTerm === '') {
+      return;
+    }
+
+    this.router.navigate(['/search', this.searchTerm]);
   }
 }

@@ -1,7 +1,9 @@
 import * as d3 from 'd3';
 
 export class BubbleUtil {
+
   // Storage
+  public static init = [];
   public static bubbles = [];
   public static bubblesByName = new Map();
 
@@ -13,6 +15,8 @@ export class BubbleUtil {
 
   public static readonly positiveThreshhold = 0.55;
   public static readonly negativeThreshhold = 0.4;
+
+  public static angleShift = 90;
 
   public static scalingFactor = 1.5;
   public static scale = 1;
@@ -116,7 +120,7 @@ export class BubbleUtil {
 
     const group = d3.select('#graphContainer')
       .select('#canvas')
-      .insert('g', ':first-child')
+      .insert('g', 'defs:first-child')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)

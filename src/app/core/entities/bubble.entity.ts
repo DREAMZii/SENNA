@@ -21,6 +21,7 @@ export class Bubble {
   private zoom: any;
 
   // Visual
+  private angleSpawned = 360;
   private angleShift = 25;
   private angleOffset = 2;
 
@@ -31,7 +32,7 @@ export class Bubble {
 
   // References
   private referencesLoaded = false;
-  private shouldLoad = false;
+  public shouldLoad = false;
   private referencesSpawned = false;
   private referenceNames = [];
   private references = [];
@@ -54,6 +55,7 @@ export class Bubble {
     this.container = d3.select(container).select('#canvas');
     this.radius = radius;
     this.strokeWidth = radius / 5;
+    this.applyNews(news);
 
     if (!isReferred) {
       this.preloadReferences()
@@ -63,10 +65,11 @@ export class Bubble {
 
           this.spawn();
           this.spawnReferences();
+        })
+        .catch(() => {
+          console.log('Someone is trying something fishy here! Try again fool!');
         });
     }
-
-    this.applyNews(news);
   }
 
   private applyNews(news) {
@@ -99,10 +102,10 @@ export class Bubble {
    */
   public spawn(positionX?, positionY?) {
     BubbleUtil.bubbles.push(this);
-    BubbleUtil.bubblesByName.set(this.searchTerm, this);
+    BubbleUtil.bubblesByName.set(this.searchTerm.toLowerCase(), this);
 
     this.group = this.container
-      .insert('g', ':first-child')
+      .insert('g', 'defs')
       .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)
       .style('position', 'absolute')
       .style('top', 0)
@@ -164,6 +167,11 @@ export class Bubble {
        this.referenceNames = referenceNames;
 
       for (let referenceName of referenceNames) {
+        if (BubbleUtil.bubblesByName.has(referenceName.toLowerCase())) {
+          this.references.push(BubbleUtil.bubblesByName.get(referenceName.toLowerCase()));
+          continue;
+        }
+
         await CacheUtil.getNews(referenceName).then((news: News[]) => {
           // We don't want those
           if (news.length <= 0) {
@@ -262,10 +270,20 @@ export class Bubble {
 
     // Spawn references
     this.referencesSpawned = true;
+
+    const spawnableBubbles = this.references.filter(bubble => BubbleUtil.bubbles.indexOf(bubble) < 0);
+
     for (let i = 0; i < this.references.length; i++) {
+      const bubble = this.references[i];
+      /*if (BubbleUtil.bubbles.indexOf(bubble) >= 0) {
+        BubbleUtil.connect(this, bubble);
+        continue;
+      }*/
+
       const referencesCount = this.references.length;
-      let angle = i * 360 / referencesCount;
-      const angleSum = 360 / referencesCount / 2 * (this.referredNumber % referencesCount);
+      const initialAngle = 360; //this.isReferred ? (this.angleSpawned + BubbleUtil.angleShift) : 360;
+      let angle = i * initialAngle / referencesCount;
+      const angleSum = initialAngle / referencesCount / 2 * (this.referredNumber % referencesCount);
       // Add some fake dynamic
       angle += angleSum;
 
@@ -276,10 +294,12 @@ export class Bubble {
       const centerPoint = BubbleUtil.getPointOnCircle(
         this.x,
         this.y,
-        this.radius * (BubbleUtil.scalingFactor * 4),
+        this.radius * (BubbleUtil.scalingFactor * 3.5),
         angle
       );
-      const bubble = this.references[i];
+
+      bubble.angleSpawned = angle;
+
       bubble.spawn(centerPoint[0], centerPoint[1]);
 
       BubbleUtil.connect(this, bubble);

@@ -80,10 +80,12 @@ export class HomeComponent implements OnInit {
 
     d3.select('#search-button')
       .on('click', () => {
+        BubbleUtil.bubbles = [];
+        BubbleUtil.bubblesByName = new Map();
         BubbleUtil.offsetX = 0;
         BubbleUtil.offsetY = 0;
         BubbleUtil.scale = 1;
-        this.router.navigate(['/']);
+        this.router.navigate(['/'], {queryParams: {open: 'true'}});
       });
   }
 }
