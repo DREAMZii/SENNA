@@ -34,6 +34,8 @@ export class HomeComponent implements OnInit {
 
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {
+        // TODO: Refactoring
+        // tslint:disable-next-line:no-unused-expression
         new Bubble(searchTerm, news);
 
         this.initSvgEvents();

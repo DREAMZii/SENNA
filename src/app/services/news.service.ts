@@ -13,6 +13,6 @@ export class NewsService {
     const uri = news.getUrl();
 
     const response = await this.http.get(uri, {responseType: 'text'});
-    return await response.toPromise()
+    return await response.toPromise();
   }
 }
