@@ -11,8 +11,8 @@ install:
 
 script:
   - npm run lint
-  - ng build --prod --base-href /senna/
-  - mv dist/senna/index.html dist/senna/404.html
+  - ng build --prod --base-href /SENNA/
+  - mv dist/SENNA/index.html dist/SENNA/404.html
 deploy:
   provider: pages
   skip_cleanup: true
