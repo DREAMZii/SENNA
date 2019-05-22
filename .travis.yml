@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+  - "9"
+
+branches:
+  except:
+    - gh-pages # will be deployed to, no need to build it
+
+install:
+  - npm install
+
+script:
+  - npm run lint
+  - ng build --prod --base-href /senna/
+  - mv dist/senna/index.html dist/senna/404.html
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: dist/yacovi
+  on:
+    branch: master
