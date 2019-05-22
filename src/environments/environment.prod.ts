@@ -3,10 +3,13 @@ export const environment = {
   disableAuthentication: false,
   snapshotIntervalInSeconds: 5,
   config: {
-    url: 'http://yacovi-config-service.azurewebsites.net/api/GetYaCoViConfig'
+    url: 'https://yacovi-config-service.azurewebsites.net/api/GetConfig'
   },
   references: {
-    url: 'http://localhost:7071/api/SearchReferences'
+    url: 'https://yacovi-config-service.azurewebsites.net/api/SearchReferences'
+  },
+  image: {
+    url: 'https://yacovi-config-service.azurewebsites.net/api/Image'
   },
   canvas: {
     font: {
