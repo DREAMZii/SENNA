@@ -1,6 +1,6 @@
 {
-  "name": "ng-d3-graph-editor",
-  "version": "0.0.0",
+  "name": "senna",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
