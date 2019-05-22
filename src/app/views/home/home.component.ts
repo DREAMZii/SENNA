@@ -24,10 +24,14 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    const searchTerm = this.route.snapshot.paramMap.get('q');
+    let searchTerm = this.route.snapshot.paramMap.get('q');
 
     if (searchTerm === '') {
       this.router.navigate(['/']);
+    }
+
+    if (searchTerm.toLowerCase().startsWith('kion')) {
+      searchTerm = 'kion group';
     }
 
     this.initButtonEvents();
@@ -86,7 +90,8 @@ export class HomeComponent implements OnInit {
 
     d3.select('#center-button')
       .on('click', () => {
-        BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
+        // Focus origin bubble
+        BubbleUtil.focusBubble(BubbleUtil.bubbles[0]);
       });
 
     d3.select('#search-button')
