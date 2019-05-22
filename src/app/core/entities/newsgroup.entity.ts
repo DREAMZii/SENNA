@@ -1,8 +1,8 @@
-import {News} from "@app/core/entities/news.entity";
-import {Bubble} from "@app/core/entities/bubble.entity";
-import {BubbleUtil} from "@app/core/util/bubble.util";
-import * as d3 from "d3";
-import {NewsUtil} from "@app/core/util/news.util";
+import {News} from '@app/core/entities/news.entity';
+import {Bubble} from '@app/core/entities/bubble.entity';
+import {BubbleUtil} from '@app/core/util/bubble.util';
+import * as d3 from 'd3';
+import {NewsUtil} from '@app/core/util/news.util';
 
 export class NewsGroup {
   private readonly bubble: Bubble;

@@ -2,12 +2,12 @@ import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
 import {Bubble} from '@app/core/entities/bubble.entity';
 import {ConfigService} from '@app/services';
 
-import {CacheUtil} from "@app/core/util/cache.util";
-import {ActivatedRoute, Router} from "@angular/router";
+import {CacheUtil} from '@app/core/util/cache.util';
+import {ActivatedRoute, Router} from '@angular/router';
 
 import * as d3 from 'd3';
-import {NewsUtil} from "@app/core/util/news.util";
-import {BubbleUtil} from "@app/core/util/bubble.util";
+import {NewsUtil} from '@app/core/util/news.util';
+import {BubbleUtil} from '@app/core/util/bubble.util';
 
 @Component({
   templateUrl: './home.component.html',
@@ -64,13 +64,13 @@ export class HomeComponent implements OnInit {
         const button = d3.select(this);
 
         button.transition()
-          .attr('transform', 'scale(1.15)')
+          .attr('transform', 'scale(1.15)');
       })
       .on('mouseleave', function() {
         const button = d3.select(this);
 
         button.transition()
-          .attr('transform', 'scale(1)')
+          .attr('transform', 'scale(1)');
       });
 
     d3.select('#center-button')

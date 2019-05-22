@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {BubbleUtil} from "@app/core/util/bubble.util";
+import {BubbleUtil} from '@app/core/util/bubble.util';
 
 export class NewsUtil {
   public static news = [];

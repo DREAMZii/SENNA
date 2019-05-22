@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {News} from "@app/core/entities/news.entity";
+import {News} from '@app/core/entities/news.entity';
 
 @Injectable({ providedIn: 'root' })
 export class NewsService {

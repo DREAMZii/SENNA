@@ -1,4 +1,4 @@
-import {AzureService, NewsService, ReferenceService} from "@app/services";
+import {AzureService, NewsService, ReferenceService} from '@app/services';
 
 export class ServiceUtil {
   public static referenceService: ReferenceService;

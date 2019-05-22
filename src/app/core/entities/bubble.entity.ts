@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
 import {News} from '@app/core/entities/news.entity';
-import {BubbleUtil} from "@app/core/util/bubble.util";
-import {CacheUtil} from "@app/core/util/cache.util";
-import {NewsGroup} from "@app/core/entities/newsgroup.entity";
+import {BubbleUtil} from '@app/core/util/bubble.util';
+import {CacheUtil} from '@app/core/util/cache.util';
+import {NewsGroup} from '@app/core/entities/newsgroup.entity';
 
 export class Bubble {
   // Relevant fields
@@ -167,10 +167,10 @@ export class Bubble {
        this.referenceNames = referenceNames;
 
       for (let referenceName of referenceNames) {
-        if (BubbleUtil.bubblesByName.has(referenceName.toLowerCase())) {
+        /*if (BubbleUtil.bubblesByName.has(referenceName.toLowerCase())) {
           this.references.push(BubbleUtil.bubblesByName.get(referenceName.toLowerCase()));
           continue;
-        }
+        }*/
 
         await CacheUtil.getNews(referenceName).then((news: News[]) => {
           // We don't want those

@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import * as d3 from 'd3';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   templateUrl: './search.component.html',

@@ -1,6 +1,6 @@
 import {ExpirationStrategy} from 'node-ts-cache/src/strategies/ExpirationStrategy';
 import {MemoryStorage} from 'node-ts-cache/src/storages/MemoryStorage';
-import {ServiceUtil} from "@app/core/util/service.util";
+import {ServiceUtil} from '@app/core/util/service.util';
 
 export class CacheUtil {
   private static cache = new ExpirationStrategy(new MemoryStorage());

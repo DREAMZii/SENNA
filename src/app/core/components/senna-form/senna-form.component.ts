@@ -1,6 +1,6 @@
 ﻿import {Component} from '@angular/core';
-import {SennaFormEntity} from "@app/core/components/senna-form/senna-form.entity";
-import {Router} from "@angular/router";
+import {SennaFormEntity} from '@app/core/components/senna-form/senna-form.entity';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-senna-form',

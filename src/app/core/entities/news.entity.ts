@@ -1,4 +1,4 @@
-import {NewsUtil} from "@app/core/util/news.util";
+import {NewsUtil} from '@app/core/util/news.util';
 
 export class News {
   private readonly id: number;

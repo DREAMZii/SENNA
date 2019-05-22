@@ -1,7 +1,7 @@
 ﻿import {Component, OnInit} from '@angular/core';
 
 import * as d3 from 'd3';
-import {NewsUtil} from "@app/core/util/news.util";
+import {NewsUtil} from '@app/core/util/news.util';
 
 @Component({
   selector: 'app-senna-news',
