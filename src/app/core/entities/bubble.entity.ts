@@ -50,7 +50,15 @@ export class Bubble {
    * @param radius        - radius of bubble
    * @param container     - container where the svg should be located
    */
-  constructor(searchTerm, searchImage, news, isReferred = false, referrer = null, radius = BubbleUtil.radius, container = '#graphContainer') {
+  constructor(
+    searchTerm,
+    searchImage,
+    news,
+    isReferred = false,
+    referrer = null,
+    radius = BubbleUtil.radius,
+    container = '#graphContainer'
+  ) {
     this.searchTerm = searchTerm;
     this.searchImage = searchImage;
     this.isReferred = isReferred;
@@ -196,7 +204,7 @@ export class Bubble {
   private async preloadReferences() {
     // Load references on initialization
     await CacheUtil.getReferences(this.searchTerm).then( async (references: string[]) => {
-      for (let reference of references) {
+      for (const reference of references) {
         const referenceTitle = reference['referenceTitle'];
         const referenceImageUrl = reference['referenceImageUrl'];
 

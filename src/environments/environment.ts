@@ -12,6 +12,9 @@ export const environment = {
   references: {
     url: 'http://localhost:7071/api/SearchReferences'
   },
+  image: {
+    url: 'http://localhost:7071/api/Image'
+  },
   canvas: {
     font: {
       size: '25px',

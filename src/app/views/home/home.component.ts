@@ -1,6 +1,6 @@
 import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
 import {Bubble} from '@app/core/entities/bubble.entity';
-import {ConfigService} from '@app/services';
+import {ConfigService, ReferenceService} from '@app/services';
 
 import {CacheUtil} from '@app/core/util/cache.util';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -19,7 +19,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private configService: ConfigService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private referenceService: ReferenceService
   ) {
   }
 
@@ -38,9 +39,14 @@ export class HomeComponent implements OnInit {
 
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {
-        new Bubble(searchTerm, '', news);
+        this.referenceService.getImage(searchTerm).then((imageUrl) => {
+          // TODO: Fix this
+          /* tslint:disable */
+          new Bubble(searchTerm, imageUrl, news);
+          /* tslint:enable */
 
-        this.initSvgEvents();
+          this.initSvgEvents();
+        });
       });
     });
   }

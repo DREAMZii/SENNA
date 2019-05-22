@@ -22,4 +22,18 @@ export class ReferenceService {
 
     return mappedResponse;
   }
+
+  async getImage(searchTerm: string) {
+    const uri = environment.image.url;
+    const params = new HttpParams()
+      .set('searchTerm', searchTerm);
+
+    const response = await this.http.get(uri, {params: params});
+    let imageUrl = '';
+    await response.toPromise().then((imageResult) => {
+      imageUrl = imageResult['referenceImageUrl'];
+    });
+
+    return imageUrl;
+  }
 }
