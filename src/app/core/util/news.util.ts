@@ -45,7 +45,7 @@ export class NewsUtil {
       .text(date.toLocaleDateString('de-DE'));
 
     d3.select('#news-score div')
-      .attr('title', Math.trunc(news.getScore() * 100) + "%")
+      .attr('title', Math.trunc(news.getScore() * 100) + '%')
       .style('width', '60%')
       .style('background-color', news.getScoreColor())
       .style('height', '18px');

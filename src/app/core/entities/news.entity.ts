@@ -1,5 +1,5 @@
 import {NewsUtil} from '@app/core/util/news.util';
-import {BubbleUtil} from "@app/core/util/bubble.util";
+import {BubbleUtil} from '@app/core/util/bubble.util';
 
 export class News {
   private readonly id: number;

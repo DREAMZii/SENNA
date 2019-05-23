@@ -59,7 +59,7 @@ export class AzureService {
   async determineNewsSentiment(news: News[]) {
     const texts = [];
     for (const single of news) {
-      texts.push(single.getName() + ". " + single.getDescription());
+      texts.push(single.getName() + '. ' + single.getDescription());
     }
 
     if (texts.length <= 0) {
