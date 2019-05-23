@@ -1,4 +1,5 @@
 import {NewsUtil} from '@app/core/util/news.util';
+import {BubbleUtil} from "@app/core/util/bubble.util";
 
 export class News {
   private readonly id: number;
@@ -32,6 +33,10 @@ export class News {
     return this.name;
   }
 
+  public getDescription() {
+    return this.description;
+  }
+
   public getUrl() {
     return this.url;
   }
@@ -46,5 +51,15 @@ export class News {
 
   public getScore() {
     return this.sentiment;
+  }
+
+  public getScoreColor() {
+    if (this.sentiment >= BubbleUtil.positiveThreshhold) {
+      return BubbleUtil.greenColor;
+    } else if (this.sentiment > BubbleUtil.negativeThreshhold && this.sentiment < BubbleUtil.positiveThreshhold) {
+      return BubbleUtil.grayColor;
+    } else {
+      return BubbleUtil.redColor;
+    }
   }
 }

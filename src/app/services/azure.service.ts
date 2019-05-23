@@ -26,7 +26,7 @@ export class AzureService {
     const uri = environment.azure.cognitiveServices.newsSearchUrl;
     const headers = new HttpHeaders(this.headersJson());
     const params = new HttpParams()
-      .set('q', query)
+      .set('q', '"' + query + '"')
       .set('count', '7')
       .set('offset', '0')
       .set('mkt', 'de-DE')
@@ -59,7 +59,7 @@ export class AzureService {
   async determineNewsSentiment(news: News[]) {
     const texts = [];
     for (const single of news) {
-      texts.push(single.getName());
+      texts.push(single.getName() + ". " + single.getDescription());
     }
 
     if (texts.length <= 0) {

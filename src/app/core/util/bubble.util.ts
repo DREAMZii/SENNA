@@ -1,9 +1,7 @@
 import * as d3 from 'd3';
 
 export class BubbleUtil {
-
   // Storage
-  public static init = [];
   public static bubbles = [];
   public static bubblesByName = new Map();
 

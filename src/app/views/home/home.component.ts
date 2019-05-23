@@ -107,6 +107,7 @@ export class HomeComponent implements OnInit {
         BubbleUtil.offsetX = 0;
         BubbleUtil.offsetY = 0;
         BubbleUtil.scale = 1;
+
         this.router.navigate(['/'], {queryParams: {open: 'true'}});
       });
   }

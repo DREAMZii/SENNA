@@ -7,7 +7,7 @@ export const environment = {
   disableAuthentication: false,
   snapshotIntervalInSeconds: 5,
   config: {
-    url: 'http://yacovi-config-service.azurewebsites.net/api/GetYaCoViConfig'
+    url: 'http://yacovi-config-service.azurewebsites.net/api/GetConfig'
   },
   references: {
     url: 'http://localhost:7071/api/SearchReferences'

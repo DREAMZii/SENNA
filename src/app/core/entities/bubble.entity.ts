@@ -72,8 +72,9 @@ export class Bubble {
     if (!isReferred) {
       this.preloadReferences()
         .then(() => {
-          d3.select('#loading-gear').remove();
           this.referencesLoaded = true;
+
+          d3.select('#loading-gear').remove();
 
           this.spawn();
           this.spawnReferences();
@@ -183,14 +184,6 @@ export class Bubble {
     if (this.isReferred) {
       this.preloadReferences()
         .then(() => {
-          this.referencesLoaded = true;
-
-          if (this.shouldLoad) {
-            this.shouldLoad = false;
-            this.spawnReferences();
-          }
-        })
-        .catch(() => {
           this.referencesLoaded = true;
 
           if (this.shouldLoad) {
