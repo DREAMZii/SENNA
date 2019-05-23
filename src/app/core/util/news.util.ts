@@ -137,11 +137,12 @@ export class NewsUtil {
     const boxBefore = (newsBox.node() as HTMLElement).previousElementSibling;
     const boxAfter = (newsBox.node() as HTMLElement).nextElementSibling;
 
-    NewsUtil.openArticles.delete(this.openNewsId);
+    NewsUtil.openArticles.delete(NewsUtil.openNewsId);
     newsBox.remove();
 
     if (NewsUtil.openArticles.size <= 0) {
       NewsUtil.closeNews();
+      NewsUtil.openNewsId = -1;
     } else {
       const newActiveBox = boxBefore === null ? d3.select(boxAfter) : d3.select(boxBefore);
       const newActiveNewsId = parseInt(newActiveBox.attr('news-id'), 10);

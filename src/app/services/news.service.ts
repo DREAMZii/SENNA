@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {News} from '@app/core/entities/news.entity';
 
 @Injectable({ providedIn: 'root' })
@@ -9,10 +9,8 @@ export class NewsService {
   ) {
   }
 
-  async getNewsContent(news: News) {
+  public async isEmbedabble(news: News) {
     const uri = news.getUrl();
-
-    const response = await this.http.get(uri, {responseType: 'text'});
-    return await response.toPromise();
+    return await this.http.get(uri, {responseType: 'text', observe: 'response'});
   }
 }

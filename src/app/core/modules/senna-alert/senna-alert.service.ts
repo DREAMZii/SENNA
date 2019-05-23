@@ -1,11 +1,11 @@
 ﻿import { Injectable } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
 import {SENNA_ALERT_TYPES} from 'src/app/core/modules/senna-alert/senna-alert.enum';
+import * as d3 from 'd3';
 
 @Injectable({ providedIn: 'root' })
 export class SennaAlertService {
-    private subject = new Subject<any>();
+    private message: any;
     private keepAfterNavigationChange = false;
 
     constructor(private router: Router) {
@@ -17,34 +17,57 @@ export class SennaAlertService {
                     this.keepAfterNavigationChange = false;
                 } else {
                     // clear alert
-                    this.subject.next();
+                    d3.select('#alert-box')
+                      .style('opacity', '0');
                 }
             }
         });
     }
 
-    async success(message: string, messageDuratinMs = 3000) {
-      await this.showMessage(message, SENNA_ALERT_TYPES.SUCCESS, messageDuratinMs);
+    success(message: string, messageDurationMs = 3000) {
+      this.showMessage(message, SENNA_ALERT_TYPES.SUCCESS, messageDurationMs);
     }
 
-    async error(message: string, messageDuratinMs = 3000) {
-        await this.showMessage(message, SENNA_ALERT_TYPES.ERROR, messageDuratinMs);
+    warning(message: string, messageDurationMs = 3000) {
+      this.showMessage(message, SENNA_ALERT_TYPES.WARNING, messageDurationMs);
     }
 
-  private async showMessage(message: string, messageType = SENNA_ALERT_TYPES.ERROR, messageDuratinMs = 3000) {
-      this.keepAfterNavigationChange = messageDuratinMs === 0;
-      this.subject.next({ type: messageType, text: message });
+    error(message: string, messageDurationMs = 3000) {
+      this.showMessage(message, SENNA_ALERT_TYPES.ERROR, messageDurationMs);
+    }
+
+  private showMessage(message: string, messageType, messageDurationMs) {
+      this.message = {message: message, messageType: messageType};
+      const alertBox = d3.select('#alert-boxes')
+        .append('div')
+        .classed('alert-top', true)
+        .classed('alert', true)
+        .classed(messageType, true);
+
+
+        alertBox.text(message)
+          .style('opacity', '0')
+          .transition()
+          .duration(750)
+          .style('opacity', '1');
 
       if (!this.keepAfterNavigationChange) {
-        await new Promise(resolve => setTimeout(() => resolve(), messageDuratinMs)).then(() => this.reset());
+        new Promise(resolve => setTimeout(() => resolve(), messageDurationMs))
+          .then(() => this.reset(alertBox));
       }
   }
 
-  reset() {
-    this.subject.next();
+  reset(alertBox) {
+      alertBox
+        .transition()
+        .duration(750)
+        .style('opacity', '0')
+        .on('end', () => {
+          alertBox.remove();
+        });
   }
 
-  getMessage(): Observable<any> {
-        return this.subject.asObservable();
+  getMessage(): string {
+      return this.message;
   }
 }

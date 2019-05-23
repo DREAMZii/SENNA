@@ -1,5 +1,4 @@
-﻿import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+﻿import { Component, OnInit } from '@angular/core';
 
 import { SennaAlertService } from 'src/app/core/modules/senna-alert/senna-alert.service';
 import { SennaAlertTypesAware } from 'src/app/core/modules/senna-alert/senna-alert.enum';
@@ -10,19 +9,11 @@ import { SennaAlertTypesAware } from 'src/app/core/modules/senna-alert/senna-ale
     styleUrls: ['senna-alert.component.css']
 })
 @SennaAlertTypesAware
-export class SennaAlertComponent implements OnInit, OnDestroy {
-    private subscription: Subscription;
-    message: any;
+export class SennaAlertComponent implements OnInit {
 
     constructor(private alertService: SennaAlertService) { }
 
     ngOnInit() {
-        this.subscription = this.alertService.getMessage().subscribe(message => {
-            this.message = message;
-        });
-    }
 
-    ngOnDestroy() {
-        this.subscription.unsubscribe();
     }
 }

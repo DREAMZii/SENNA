@@ -3,6 +3,7 @@ import {News} from '@app/core/entities/news.entity';
 import {BubbleUtil} from '@app/core/util/bubble.util';
 import {CacheUtil} from '@app/core/util/cache.util';
 import {NewsGroup} from '@app/core/entities/newsgroup.entity';
+import {ServiceUtil} from "@app/core/util/service.util";
 
 export class Bubble {
   // Relevant fields
@@ -80,7 +81,7 @@ export class Bubble {
           this.spawnReferences();
         })
         .catch(() => {
-          console.log('Someone is trying something fishy here! Try again fool!');
+          ServiceUtil.alertService.error('Initial references could not be loaded!');
         });
     }
   }
@@ -134,40 +135,42 @@ export class Bubble {
 
     this.id = BubbleUtil.bubbles.length - 1;
 
-    /*this.group
+    if (this.searchImage === '') {
+      this.group
       .append('text')
       .attr('x', this.x)
       .attr('y', this.y)
       .attr('font-size', 16 / (BubbleUtil.scalingFactor ** this.referredNumber))
-      .text(this.searchTerm);*/
+      .text(this.searchTerm);
+    } else {
+      const rectWH = this.radius + this.radius / 3.5;
 
-    const rectWH = this.radius + this.radius / 3.5;
+      this.group
+        .append('rect')
+        .attr('id', 'bubble-rect-' + this.id)
+        .attr('x', this.x - rectWH / 2)
+        .attr('y', this.y - rectWH / 2)
+        .attr('rx', 20 / (this.referredNumber + 1))
+        .attr('ry', 20 / (this.referredNumber + 1))
+        .attr('width', rectWH)
+        .attr('height', rectWH)
+        .attr('xlink:href', this.searchImage)
+        .attr('clip-path', 'url(#clip)');
 
-    this.group
-      .append('rect')
-      .attr('id', 'bubble-rect-' + this.id)
-      .attr('x', this.x - rectWH / 2)
-      .attr('y', this.y - rectWH / 2)
-      .attr('rx', 20 / (this.referredNumber + 1))
-      .attr('ry', 20 / (this.referredNumber + 1))
-      .attr('width', rectWH)
-      .attr('height', rectWH)
-      .attr('xlink:href', this.searchImage)
-      .attr('clip-path', 'url(#clip)');
+      this.container
+        .select('#clip')
+        .append('use')
+        .attr('xlink:href', '#bubble-rect-' + this.id);
 
-    this.container
-      .select('#clip')
-      .append('use')
-      .attr('xlink:href', '#bubble-rect-' + this.id);
-
-    this.group
-      .append('image')
-      .attr('x', this.x - rectWH / 2)
-      .attr('y', this.y - rectWH / 2)
-      .attr('width', rectWH)
-      .attr('height', rectWH)
-      .attr('xlink:href', this.searchImage)
-      .attr('clip-path', 'url(#clip)');
+      this.group
+        .append('image')
+        .attr('x', this.x - rectWH / 2)
+        .attr('y', this.y - rectWH / 2)
+        .attr('width', rectWH)
+        .attr('height', rectWH)
+        .attr('xlink:href', this.searchImage)
+        .attr('clip-path', 'url(#clip)');
+    }
 
     // Draw invisible circle for click event
     this.group
@@ -286,7 +289,11 @@ export class Bubble {
     });
 
     // Recenter button
-    this.group.selectAll('circle').on('click', () => {
+    this.group.select('circle').on('click', () => {
+      if (this.referencesSpawned && this.references.length <= 0) {
+        ServiceUtil.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
+      }
+
       BubbleUtil.focusBubble(this, () => {
         this.spawnReferences();
       });
@@ -301,6 +308,12 @@ export class Bubble {
 
     if (!this.referencesLoaded || this.shouldLoad) {
       this.shouldLoad = true;
+      return;
+    }
+
+    if (this.references.length <= 0) {
+      this.referencesSpawned = true;
+      ServiceUtil.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
       return;
     }
 

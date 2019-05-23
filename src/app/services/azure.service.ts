@@ -36,7 +36,7 @@ export class AzureService {
     const response = await this.http.get(uri, {headers: headers, params: params});
 
     const newsEntities = [];
-    await response.toPromise().then((news) => {
+    await response.toPromise().then(async (news) => {
       for (const single of news['value']) {
         newsEntities.push(this.buildNews(single));
       }

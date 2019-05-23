@@ -1,7 +1,8 @@
-﻿.alert-top {
+﻿#alert-boxes {
   position: absolute;
-  top: 5px;
-  left:2%;
-  width: 96%;
+  text-align: center;
+  top: 2%;
+  right: 2%;
+  width: 25%;
   z-index: 9999;
 }
