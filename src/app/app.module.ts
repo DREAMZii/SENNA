@@ -23,8 +23,7 @@ import {ServiceUtil} from '@app/core/util/service.util';
 import {SearchComponent} from '@app/views/search';
 import {SennaFormComponent} from '@app/core/components/senna-form/senna-form.component';
 import {SennaNewsComponent} from '@app/core/components/senna-news/senna-news.component';
-import {ActivatedRoute, Router} from '@angular/router';
-import {SennaAlertService} from "@app/core/modules/senna-alert/senna-alert.service";
+import {SennaAlertService} from '@app/core/modules/senna-alert/senna-alert.service';
 
 @NgModule({
   imports: [

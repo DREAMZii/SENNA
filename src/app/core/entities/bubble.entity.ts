@@ -3,7 +3,7 @@ import {News} from '@app/core/entities/news.entity';
 import {BubbleUtil} from '@app/core/util/bubble.util';
 import {CacheUtil} from '@app/core/util/cache.util';
 import {NewsGroup} from '@app/core/entities/newsgroup.entity';
-import {ServiceUtil} from "@app/core/util/service.util";
+import {ServiceUtil} from '@app/core/util/service.util';
 
 export class Bubble {
   // Relevant fields

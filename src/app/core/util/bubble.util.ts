@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-import {ServiceUtil} from "@app/core/util/service.util";
 
 export class BubbleUtil {
   // Storage

@@ -1,5 +1,5 @@
 import {AzureService, NewsService, ReferenceService} from '@app/services';
-import {SennaAlertService} from "@app/core/modules/senna-alert/senna-alert.service";
+import {SennaAlertService} from '@app/core/modules/senna-alert/senna-alert.service';
 
 export class ServiceUtil {
   public static referenceService: ReferenceService;
