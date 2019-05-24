@@ -11,7 +11,6 @@ export class SennaHeaderComponent implements OnInit {
   constructor(
     private adalService: CustomAdalService,
   ) {
-
   }
 
   ngOnInit() {

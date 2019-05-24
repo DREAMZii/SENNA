@@ -30,12 +30,7 @@ export class BubbleUtil {
 
   public static focusBubble(bubble, callback?, focusOnWidth = 1) {
     if (bubble !== this.getActiveBubble()) {
-      bubble
-        .getContainer()
-        .selectAll('.news')
-        .transition()
-        .duration(750)
-        .style('opacity', '0');
+      this.getActiveBubble().newsGroup.remove();
     }
 
     const rect = bubble.container.node().getBoundingClientRect();

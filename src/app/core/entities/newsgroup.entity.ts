@@ -16,7 +16,9 @@ export class NewsGroup {
     this.news = news;
   }
 
-  public draw() {
+  public draw(single) {
+    this.isDrawn = true;
+
     this.bubble
       .getContainer()
       .selectAll('.news')
@@ -24,13 +26,19 @@ export class NewsGroup {
       .duration(750)
       .style('opacity', '0');
 
-    if (this.isDrawn) {
-      this.show();
-      return;
-    }
+    this.group = this.bubble.getGroup()
+      .append('g')
+      .attr('class', `news`)
+      .style('opacity', '0');
 
+    const angle = 360 / this.news.length * (this.news.indexOf(single) + 1);
     const factor = BubbleUtil.scalingFactor ** this.bubble.getReferredNumber();
-    const point = BubbleUtil.getPointOnCircle(this.bubble.getCenterX(), this.bubble.getCenterY(), this.bubble.getRadius(), 345);
+    const point = BubbleUtil.getPointOnCircle(
+      this.bubble.getCenterX(),
+      this.bubble.getCenterY(),
+      this.bubble.getRadius(),
+      angle
+    );
     const x = point[0];
     const y = point[1];
 
@@ -41,46 +49,35 @@ export class NewsGroup {
     const xOffset = 12 / factor;
     const yOffset = 15 / factor;
 
-    this.group = this.bubble.getGroup().insert('g', ':first-child')
-      .attr('class', `news`)
-      .style('opacity', '0');
+    const dyOffset = 7 / factor;
+    const dy = yOffset + dyOffset;
 
-    let height = 0;
-    let newsCount = 0;
-    for (const news of this.news) {
-      const dyOffset = 7 / factor;
-      const dy = (yOffset * ++newsCount) + dyOffset;
+    const text = this.group.append('text')
+      .attr('news-id', this.news.indexOf(single))
+      .attr('x', x)
+      .attr('y', y)
+      .attr('dx', xOffset)
+      .attr('dy', dy)
+      .attr('font-size', fontSize)
+      .style('cursor', 'pointer')
+      .text(single.getName())
+      .call(NewsUtil.wrap, width, yOffset)
+      .on('click', function() {
+        const newsText = d3.select(this);
+        const newsId = parseInt(newsText.attr('news-id'), 10);
 
-      const text = this.group.append('text')
-        .attr('news-id', newsCount - 1)
-        .attr('x', x)
-        .attr('y', y + height)
-        .attr('dx', xOffset)
-        .attr('dy', dy)
-        .attr('font-size', fontSize)
-        .style('cursor', 'pointer')
-        .text(news.getName())
-        .call(NewsUtil.wrap, width, yOffset)
-        .on('click', function() {
-          const newsText = d3.select(this);
-          const newsId = parseInt(newsText.attr('news-id'), 10);
+        NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
+      })
+      .on('mouseenter', function() {
+        d3.select(this)
+          .attr('filter', 'url(#solid)');
+      })
+      .on('mouseleave', function() {
+        d3.select(this)
+          .attr('filter', '');
+      });
 
-          NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
-        })
-        .on('mouseenter', function() {
-          d3.select(this)
-            .attr('filter', 'url(#solid)');
-        })
-        .on('mouseleave', function() {
-          d3.select(this)
-            .attr('filter', '');
-        });
-
-      height += text.node().getBBox().height;
-    }
-
-    height += this.bubble.getStrokeWidth();
-    height += yOffset * this.group.selectAll('text').size();
+    const height = text.node().getBBox().height * 2;
 
     this.group.selectAll('tspan')
       .attr('y', function() {
@@ -106,15 +103,21 @@ export class NewsGroup {
     this.group.transition()
       .duration(750)
       .style('opacity', '1');
-
-    this.isDrawn = true;
   }
 
-  public show() {
-    this.group
+  public remove() {
+    this.isDrawn = false;
+
+    this.bubble.getGroup()
+      .selectAll('.news')
       .transition()
       .duration(750)
-      .style('opacity', '1');
+      .style('opacity', '0')
+      .on('end', () => {
+        this.bubble.getGroup()
+          .selectAll('.news')
+          .remove();
+      });
   }
 
   public getNews() {

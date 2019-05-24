@@ -89,7 +89,7 @@ export class Bubble {
   private applyNews(news) {
     // Sort news (best one first)
     news = news.sort((a, b) => {
-      return a.sentiment > b.sentiment ? -1 : 1;
+      return a.sentiment > b.sentiment ? 1 : -1;
     });
 
     this.newsGroup = new NewsGroup(this, news);
@@ -284,7 +284,10 @@ export class Bubble {
         .attr('stroke-width', strokeWidth)
         .style('cursor', 'default');
     }).on('click', () =>  {
-      this.newsGroup.draw();
+      this.newsGroup.remove();
+
+      const clicked = d3.select(d3.event.srcElement);
+      this.newsGroup.draw(this.getNews(parseInt(clicked.attr('news-id'), 10)));
       BubbleUtil.focusBubble(this);
     });
 

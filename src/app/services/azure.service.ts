@@ -26,7 +26,7 @@ export class AzureService {
     const uri = environment.azure.cognitiveServices.newsSearchUrl;
     const headers = new HttpHeaders(this.headersJson());
     const params = new HttpParams()
-      .set('q', '"' + query + '"')
+      .set('q', '+"' + query + '"')
       .set('count', '7')
       .set('offset', '0')
       .set('mkt', 'de-DE')

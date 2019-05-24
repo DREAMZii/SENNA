@@ -1,8 +1,8 @@
 ﻿#alert-boxes {
   position: absolute;
   text-align: center;
-  top: 2%;
-  right: 2%;
+  top: 6.5%;
+  right: 6.5%;
   width: 25%;
   z-index: 9999;
 }

@@ -17,7 +17,8 @@ export class ReferenceService {
     const response = await this.http.get(uri, {params: params});
     let mappedResponse = [];
     await response.toPromise().then((references) => {
-      mappedResponse = references['searchReferences'];
+      mappedResponse = (references['searchReferences'] as string[]);
+      mappedResponse = mappedResponse.slice(0, mappedResponse.length > 5 ? 5 : mappedResponse.length);
     });
 
     return mappedResponse;

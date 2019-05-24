@@ -21,6 +21,7 @@ export class NewsUtil {
       return;
     }
 
+    d3.select('#alert-boxes').style('right', '42.5%');
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), () => {
       d3.select('#canvas').style('width', '63.5%');
     }, 0.635);
@@ -55,6 +56,10 @@ export class NewsUtil {
 
     d3.select('#senna-news iframe')
       .attr('src', news.getUrl());
+
+    setTimeout(function() {
+      console.log(d3.select('iframe').html());
+    }, 2000);
 
     // Is not open
     if (!this.openArticles.has(news.getId())) {
@@ -156,6 +161,7 @@ export class NewsUtil {
       return;
     }
 
+    d3.select('#alert-boxes').style('right', '6.5%');
     d3.select('#canvas')
       .style('width', '100%');
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
