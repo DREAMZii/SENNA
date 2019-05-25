@@ -40,6 +40,9 @@ export class Bubble {
   private referenceImages = [];
   private references = [];
 
+  // Loading
+  private rotationInterval: any;
+
   /**
    * Constructor for Bubble instance
    *
@@ -136,12 +139,15 @@ export class Bubble {
     this.id = BubbleUtil.bubbles.length - 1;
 
     if (this.searchImage === '') {
-      this.group
+      const text = this.group
       .append('text')
-      .attr('x', this.x)
-      .attr('y', this.y)
       .attr('font-size', 16 / (BubbleUtil.scalingFactor ** this.referredNumber))
       .text(this.searchTerm);
+
+      const width = text.node().getComputedTextLength();
+      text
+        .attr('x', this.x - width / 2)
+        .attr('y', this.y);
     } else {
       const rectWH = this.radius + this.radius / 3.5;
 
@@ -150,8 +156,8 @@ export class Bubble {
         .attr('id', 'bubble-rect-' + this.id)
         .attr('x', this.x - rectWH / 2)
         .attr('y', this.y - rectWH / 2)
-        .attr('rx', 20 / (this.referredNumber + 1))
-        .attr('ry', 20 / (this.referredNumber + 1))
+        .attr('rx', 20 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('ry', 20 / BubbleUtil.scalingFactor ** this.referredNumber)
         .attr('width', rectWH)
         .attr('height', rectWH)
         .attr('xlink:href', this.searchImage)
@@ -170,6 +176,18 @@ export class Bubble {
         .attr('height', rectWH)
         .attr('xlink:href', this.searchImage)
         .attr('clip-path', 'url(#clip)');
+
+      const nameW = this.radius + this.radius / 4;
+
+      this.group
+        .append('rect')
+        .attr('x', this.x - nameW / 2)
+        .attr('y', this.y + this.radius + this.radius / 2)
+        .attr('rx', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('ry', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('width', nameW)
+        .attr('height', nameW * 0.2)
+        .attr('fill', 'lightgray');
     }
 
     // Draw invisible circle for click event
@@ -206,10 +224,10 @@ export class Bubble {
 
         this.referenceNames.push(referenceTitle);
         this.referenceImages.push(referenceImageUrl);
-        /*if (BubbleUtil.bubblesByName.has(referenceName.toLowerCase())) {
-          this.references.push(BubbleUtil.bubblesByName.get(referenceName.toLowerCase()));
+        if (BubbleUtil.bubblesByName.has(referenceTitle.toLowerCase())) {
+          this.references.push(BubbleUtil.bubblesByName.get(referenceTitle.toLowerCase()));
           continue;
-        }*/
+        }
 
         await CacheUtil.getNews(referenceTitle).then((news: News[]) => {
           // We don't want those
@@ -261,6 +279,10 @@ export class Bubble {
       .on('zoom', zoomed);
 
     function zoomed() {
+      if (BubbleUtil.zoomDisabled) {
+        return;
+      }
+
       container.selectAll('g')
         .filter(function() {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
@@ -276,6 +298,10 @@ export class Bubble {
 
     // Path events for news
     this.group.selectAll('path').on('mouseover', function() {
+      if (BubbleUtil.zoomDisabled) {
+        return;
+      }
+
       d3.select(this).transition()
         .attr('stroke-width', strokeWidth * 2)
         .style('cursor', 'pointer');
@@ -284,7 +310,9 @@ export class Bubble {
         .attr('stroke-width', strokeWidth)
         .style('cursor', 'default');
     }).on('click', () =>  {
-      this.newsGroup.remove();
+      if (BubbleUtil.zoomDisabled) {
+        return;
+      }
 
       const clicked = d3.select(d3.event.srcElement);
       this.newsGroup.draw(this.getNews(parseInt(clicked.attr('news-id'), 10)));
@@ -298,9 +326,45 @@ export class Bubble {
       }
 
       BubbleUtil.focusBubble(this, () => {
+        if (!this.referencesSpawned) {
+          BubbleUtil.zoomDisabled = true;
+
+          if (!this.referencesLoaded) {
+            this.startRotating();
+          }
+        }
+
         this.spawnReferences();
       });
     });
+  }
+
+  private startRotating() {
+    if (!this.isReferred) {
+      return;
+    }
+
+    let i = 0;
+    const timeInterval = 10;
+
+    this.rotationInterval = setInterval(() => {
+      i += 1;
+      this.group
+        .selectAll('path')
+        .attr('transform', `rotate(${i}, ${this.x}, ${this.y})`);
+    }, timeInterval);
+  }
+
+  private stopRotation() {
+    if (!this.isReferred) {
+      return;
+    }
+
+    clearInterval(this.rotationInterval);
+
+    this.group
+      .selectAll('path')
+      .attr('transform', null);
   }
 
   private spawnReferences() {
@@ -317,6 +381,10 @@ export class Bubble {
     if (this.references.length <= 0) {
       this.referencesSpawned = true;
       ServiceUtil.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
+
+      this.stopRotation();
+      BubbleUtil.zoomDisabled = false;
+      BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), null, 1, 0);
       return;
     }
 
@@ -324,23 +392,33 @@ export class Bubble {
     this.referencesSpawned = true;
 
     const spawnableBubbles = this.references.filter(bubble => BubbleUtil.bubbles.indexOf(bubble) < 0);
+    const alreadyExisting = this.references.filter(bubble => BubbleUtil.bubbles.indexOf(bubble) >= 0);
 
-    for (let i = 0; i < this.references.length; i++) {
-      const bubble = this.references[i];
-      /*if (BubbleUtil.bubbles.indexOf(bubble) >= 0) {
-        BubbleUtil.connect(this, bubble);
-        continue;
-      }*/
+    for (const bubble of alreadyExisting) {
+      BubbleUtil.connect(this, bubble);
+    }
 
-      const referencesCount = this.references.length;
-      const initialAngle = 360; // this.isReferred ? (this.angleSpawned + BubbleUtil.angleShift) : 360;
-      let angle = i * initialAngle / referencesCount;
-      const angleSum = initialAngle / referencesCount / 2 * (this.referredNumber % referencesCount);
-      // Add some fake dynamic
-      angle += angleSum;
+    for (let i = 0; i < spawnableBubbles.length; i++) {
+      const bubble = spawnableBubbles[i];
 
-      if (this.referrer !== null && referencesCount % 2 !== 0) {
-        angle += angleSum;
+      const referencesCount = spawnableBubbles.length;
+      let initialAngle = bubble.angleSpawned;
+      let angle = 0;
+      if (this.isReferred) {
+        initialAngle = bubble.getReferrer().angleSpawned;
+        console.log(initialAngle);
+        const range = 120;
+        const min = initialAngle - 90 + 30;
+
+        if (referencesCount === 1) {
+          angle = min + (range / 2);
+        } else {
+          angle = min + (i * range / (referencesCount - 1));
+        }
+
+        console.log('Min: ' + min + ', Angle: ' + angle);
+      } else {
+        angle = i * initialAngle / referencesCount;
       }
 
       const centerPoint = BubbleUtil.getPointOnCircle(
@@ -356,6 +434,10 @@ export class Bubble {
 
       BubbleUtil.connect(this, bubble);
     }
+
+    this.stopRotation();
+    BubbleUtil.zoomDisabled = false;
+    BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), null, 1, 0);
   }
 
   public getId() {

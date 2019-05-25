@@ -4,6 +4,8 @@ import { environment } from '@environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReferenceService {
+  private static REFERENCE_COUNT = 4;
+
   constructor(
     private http: HttpClient
   ) {
@@ -18,7 +20,11 @@ export class ReferenceService {
     let mappedResponse = [];
     await response.toPromise().then((references) => {
       mappedResponse = (references['searchReferences'] as string[]);
-      mappedResponse = mappedResponse.slice(0, mappedResponse.length > 5 ? 5 : mappedResponse.length);
+      mappedResponse = mappedResponse.slice(
+        0,
+        mappedResponse.length > ReferenceService.REFERENCE_COUNT ?
+          ReferenceService.REFERENCE_COUNT : mappedResponse.length
+      );
     });
 
     return mappedResponse;

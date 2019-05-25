@@ -19,15 +19,10 @@ export class NewsGroup {
   public draw(single) {
     this.isDrawn = true;
 
-    this.bubble
-      .getContainer()
-      .selectAll('.news')
-      .transition()
-      .duration(750)
-      .style('opacity', '0');
+    this.remove();
 
     this.group = this.bubble.getGroup()
-      .append('g')
+      .insert('g', ':first-child')
       .attr('class', `news`)
       .style('opacity', '0');
 
@@ -54,43 +49,86 @@ export class NewsGroup {
 
     const text = this.group.append('text')
       .attr('news-id', this.news.indexOf(single))
-      .attr('x', x)
+      .attr('x', angle > 180 && angle !== 360 ? x - width : x)
       .attr('y', y)
       .attr('dx', xOffset)
       .attr('dy', dy)
       .attr('font-size', fontSize)
       .style('cursor', 'pointer')
-      .text(single.getName())
-      .call(NewsUtil.wrap, width, yOffset)
+      .call(NewsUtil.wrap, single, width, yOffset)
       .on('click', function() {
         const newsText = d3.select(this);
         const newsId = parseInt(newsText.attr('news-id'), 10);
 
         NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
       })
+      .on('mouseenter', () => {
+        const rect = this.group.select('rect');
+        if (rect.node() === null) {
+          return;
+        }
+
+        rect
+          .transition()
+          .duration(500)
+          .attr('fill-opacity', 1);
+      })
+      .on('mouseleave', () => {
+        const rect = this.group.select('rect');
+        if (rect.node() === null) {
+          return;
+        }
+
+        rect
+          .transition()
+          .duration(500)
+          .attr('fill-opacity', 0);
+      });
+
+    const height = text.node().getBBox().height * 1.15;
+
+    const rectW = width;
+    const rectH = height;
+    this.group
+      .insert('rect', 'text')
+      .attr('x', angle > 180 && angle !== 360 ? x - width : x)
+      .attr('y', angle > 90 && angle < 270 ? y : y - rectH)
+      .attr('width', rectW)
+      .attr('height', rectH)
+      .attr('fill-opacity', '0')
+      .attr('fill', 'lightgray')
+      .style('cursor', 'pointer')
+      .on('click', () => {
+        const newsText = this.group.select('text');
+        const newsId = parseInt(newsText.attr('news-id'), 10);
+
+        NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
+      })
       .on('mouseenter', function() {
         d3.select(this)
-          .attr('filter', 'url(#solid)');
+          .transition()
+          .duration(500)
+          .attr('fill-opacity', 1);
       })
       .on('mouseleave', function() {
         d3.select(this)
-          .attr('filter', '');
+          .transition()
+          .duration(500)
+          .attr('fill-opacity', 0);
       });
-
-    const height = text.node().getBBox().height * 2;
 
     this.group.selectAll('tspan')
       .attr('y', function() {
-        return parseFloat(d3.select(this).attr('y')) - height;
+        return angle > 90 && angle < 270 ? y : y - height;
       });
 
     this.group.append('line')
       .style('stroke', 'green')
       .style('stroke-width', 1 / factor)
       .attr('x1', x)
-      .attr('y1', y - height)
-      .attr('x2', x + width)
-      .attr('y2', y - height);
+      .attr('y1', angle > 90 && angle < 270 ? y + height : y - height)
+      .attr('x2', angle > 180 && angle !== 360 ? x - width : x + width)
+      .attr('y2', angle > 90 && angle < 270 ? y + height : y - height);
 
     this.group.append('line')
       .style('stroke', 'green')
@@ -98,7 +136,7 @@ export class NewsGroup {
       .attr('x1', x)
       .attr('y1', y)
       .attr('x2', x)
-      .attr('y2', y - height);
+      .attr('y2', angle > 90 && angle < 270 ? y + height : y - height);
 
     this.group.transition()
       .duration(750)
@@ -113,9 +151,8 @@ export class NewsGroup {
       .transition()
       .duration(750)
       .style('opacity', '0')
-      .on('end', () => {
-        this.bubble.getGroup()
-          .selectAll('.news')
+      .on('end', function() {
+        d3.select(this)
           .remove();
       });
   }

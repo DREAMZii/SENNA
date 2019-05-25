@@ -23,12 +23,19 @@ export class BubbleUtil {
 
   public static radius = 100;
 
+  // Settings
+  public static zoomDisabled = false;
+
   public static getActiveBubble() {
     const activeBubbleId = parseInt(d3.select('.active').select('circle').attr('bubble-id'), 10);
     return BubbleUtil.bubbles[activeBubbleId];
   }
 
-  public static focusBubble(bubble, callback?, focusOnWidth = 1) {
+  public static focusBubble(bubble, callback?, focusOnWidth = 1, duration = 750) {
+    if (this.zoomDisabled) {
+      return;
+    }
+
     if (bubble !== this.getActiveBubble()) {
       this.getActiveBubble().newsGroup.remove();
     }
@@ -44,18 +51,24 @@ export class BubbleUtil {
     const ty = (rect.height / 2 - bubble.y) * scale;
 
     const graphContainer = d3.select('#graphContainer');
+    let blockedCallback = false;
     graphContainer.selectAll('g')
       .filter(function() {
         return d3.select(this).classed('bubble') || d3.select(this).classed('line');
       })
       .transition()
-      .duration(750)
+      .duration(duration)
       .attr('transform', d3.zoomIdentity
         .translate(
           -kx + tx,
           -ky + ty
         ).scale(scale).toString())
       .on('end', function() {
+        // Only use callback once instead, not for every circle
+        if (blockedCallback) {
+          return;
+        }
+
         graphContainer.call(bubble.zoom.transform, d3.zoomIdentity.translate(-kx + tx, -ky + ty).scale(scale));
 
         BubbleUtil.scale = scale;
@@ -64,21 +77,22 @@ export class BubbleUtil {
 
         BubbleUtil.markActiveBubble(bubble.container, bubble.group);
 
+
         if (callback instanceof Function) {
           callback();
         }
+
+        blockedCallback = true;
       });
   }
 
   private static markActiveBubble(container, group) {
-    container.select('.active')
-      .transition()
-      .style('opacity', '0.5');
-
     container.selectAll('g')
       .filter('.bubble')
       .classed('active', false)
-      .classed('inactive', true);
+      .classed('inactive', true)
+      .transition()
+      .style('opacity', '0.5');
 
     group
       .classed('active', true)
