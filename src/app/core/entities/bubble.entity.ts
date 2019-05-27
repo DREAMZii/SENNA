@@ -340,11 +340,6 @@ export class Bubble {
         fingerCount = srcEvent.touches.length;
       }
 
-      if (fingerCount === 3) {
-        // 3 fingers for clicking
-        return;
-      }
-
       container.selectAll('g')
         .filter(function() {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
