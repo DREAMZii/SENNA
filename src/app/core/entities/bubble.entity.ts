@@ -380,7 +380,7 @@ export class Bubble {
     }
 
     graphContainer.call(this.zoom);
-    graphContainer.on("dblclick.zoom", null);
+    graphContainer.on('dblclick.zoom', null);
   }
 
   private handleEvents() {
