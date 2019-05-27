@@ -119,7 +119,7 @@ export class Bubble {
    */
   public spawn(positionX?, positionY?) {
     BubbleUtil.bubbles.push(this);
-    BubbleUtil.bubblesByName.set(this.searchTerm.toLowerCase(), this);
+    BubbleUtil.bubblesByName.set(this.searchTerm.toLowerCase().split(' ').join('-'), this);
 
     this.group = this.container
       .insert('g', 'defs')
@@ -188,6 +188,21 @@ export class Bubble {
         .attr('width', nameW)
         .attr('height', nameW * 0.2)
         .attr('fill', 'lightgray');
+
+      const nameText = this.group
+        .append('text')
+        .attr('y', this.y + this.radius + this.radius / 2)
+        .attr('font-size', 14 / (BubbleUtil.scalingFactor ** this.referredNumber))
+        .text(this.searchTerm);
+
+      const nameTextWidth = nameText.node().getComputedTextLength();
+
+      nameText
+        .attr('x', this.x - nameTextWidth / 2)
+        .attr('y',
+          (this.y + this.radius + this.radius / 2 + nameW * 0.2) -
+          (14 / BubbleUtil.scalingFactor ** this.referredNumber / 2)
+        );
     }
 
     // Draw invisible circle for click event
@@ -216,16 +231,20 @@ export class Bubble {
   }
 
   private async preloadReferences() {
+    const amount = this.isReferred ? 3 : 4;
+
     // Load references on initialization
-    await CacheUtil.getReferences(this.searchTerm).then( async (references: string[]) => {
+    await CacheUtil.getReferences(this.searchTerm, amount).then( async (references: string[]) => {
       for (const reference of references) {
         const referenceTitle = reference['referenceTitle'];
         const referenceImageUrl = reference['referenceImageUrl'];
 
         this.referenceNames.push(referenceTitle);
         this.referenceImages.push(referenceImageUrl);
-        if (BubbleUtil.bubblesByName.has(referenceTitle.toLowerCase())) {
-          this.references.push(BubbleUtil.bubblesByName.get(referenceTitle.toLowerCase()));
+
+        const formattedTitle = referenceTitle.split(' ').join('-').toLowerCase();
+        if (BubbleUtil.bubblesByName.has(formattedTitle)) {
+          this.references.push(BubbleUtil.bubblesByName.get(formattedTitle));
           continue;
         }
 
@@ -407,8 +426,8 @@ export class Bubble {
       if (this.isReferred) {
         initialAngle = bubble.getReferrer().angleSpawned;
         console.log(initialAngle);
-        const range = 120;
-        const min = initialAngle - 90 + 30;
+        const range = 90;
+        const min = initialAngle - 90 + 45;
 
         if (referencesCount === 1) {
           angle = min + (range / 2);

@@ -32,7 +32,7 @@ export class HomeComponent implements OnInit {
     }
 
     if (searchTerm.toLowerCase().startsWith('kion')) {
-      searchTerm = 'kion group';
+      searchTerm = 'Kion Group';
     }
 
     this.initButtonEvents();

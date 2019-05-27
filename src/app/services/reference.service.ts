@@ -4,14 +4,12 @@ import { environment } from '@environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReferenceService {
-  private static REFERENCE_COUNT = 4;
-
   constructor(
     private http: HttpClient
   ) {
   }
 
-  async getReferences(searchTerm: string) {
+  async getReferences(searchTerm: string, amount = 4) {
     const uri = environment.references.url;
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
@@ -22,8 +20,8 @@ export class ReferenceService {
       mappedResponse = (references['searchReferences'] as string[]);
       mappedResponse = mappedResponse.slice(
         0,
-        mappedResponse.length > ReferenceService.REFERENCE_COUNT ?
-          ReferenceService.REFERENCE_COUNT : mappedResponse.length
+        mappedResponse.length > amount ?
+          amount : mappedResponse.length
       );
     });
 

@@ -10,10 +10,10 @@ export const environment = {
     url: 'http://yacovi-config-service.azurewebsites.net/api/GetConfig'
   },
   references: {
-    url: 'http://localhost:7071/api/SearchReferences'
+    url: 'http://yacovi-config-service.azurewebsites.net/api/SearchReferences'
   },
   image: {
-    url: 'http://localhost:7071/api/Image'
+    url: 'http://yacovi-config-service.azurewebsites.net/api/Image'
   },
   canvas: {
     font: {
