@@ -336,9 +336,10 @@ export class Bubble {
 
       // Disable 1 finger dragging and zooming
       console.log(d3.event.sourceEvent);
-      if (d3.event.sourceEvent !== null && d3.event.sourceEvent.type.toLowerCase() === 'touchevent') {
-        console.log(d3.event.sourceEvent.touches.length);
-        return;
+      if (d3.event.sourceEvent !== null && d3.event.sourceEvent.type.toLowerCase() === 'touchmove') {
+        if (d3.event.sourceEvent.touches.length !== 2) {
+          return;
+        }
       }
 
       console.log(d3.event);
