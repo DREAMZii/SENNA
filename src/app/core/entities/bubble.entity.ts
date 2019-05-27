@@ -19,7 +19,6 @@ export class Bubble {
   private x: number;
   private y: number;
   private newsGroup: NewsGroup;
-  private oldNews: News[];
   public strokeWidth: number;
   private zoom: any;
 
@@ -43,6 +42,13 @@ export class Bubble {
 
   // Loading
   private rotationInterval: any;
+
+  // Statistics
+  private oldNews: News[];
+  private amount: number;
+  private posAmount: number;
+  private neutAmount: number;
+  private negAmount: number;
 
   /**
    * Constructor for Bubble instance
@@ -75,7 +81,15 @@ export class Bubble {
     this.applyNews(news);
 
     ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
-      console.log(oldNews);
+      this.oldNews = oldNews;
+
+      this.amount = oldNews.length;
+      this.posAmount = oldNews.filter((single) => single.sentiment >= BubbleUtil.positiveThreshhold).length;
+      this.neutAmount = oldNews.filter(
+        (single) =>
+          single.sentiment > BubbleUtil.negativeThreshhold && single.sentiment < BubbleUtil.positiveThreshhold
+      ).length;
+      this.negAmount = oldNews.filter((single) => single.sentiment <= BubbleUtil.negativeThreshhold).length;
     });
 
     if (!isReferred) {
@@ -318,6 +332,8 @@ export class Bubble {
       if (BubbleUtil.zoomDisabled) {
         return;
       }
+
+      console.log(d3.event);
 
       container.selectAll('g')
         .filter(function() {
