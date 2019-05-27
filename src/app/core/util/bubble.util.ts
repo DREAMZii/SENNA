@@ -127,7 +127,7 @@ export class BubbleUtil {
 
     const group = d3.select('#graphContainer')
       .select('#canvas')
-      .insert('g', 'g:first-child')
+      .insert('g', 'g:first-of-type')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)

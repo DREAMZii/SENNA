@@ -184,7 +184,7 @@ export class NewsUtil {
     textContainer.each(function() {
       const text = d3.select(this);
       const titleWords = news.getName().split(/\s+/).reverse();
-      const score = 'Meta Score: ' + Math.trunc(news.getScore() * 100) + '%';
+      const score = 'Sentiment - Score: ' + Math.trunc(news.getScore() * 100) + '%';
       const scoreWords = score.split(/\s+/).reverse();
       const sourceWords = news.getSource().split(/\s+/).reverse();
       const dateWords = news.getDatePublished().split(/\s+/).reverse();

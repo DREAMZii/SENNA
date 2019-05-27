@@ -29,7 +29,7 @@ export class AzureService {
       .set('q', '+"' + query + '"')
       .set('count', '7')
       .set('offset', '0')
-      .set('mkt', 'de-DE')
+      .set('mkt', 'en-GB')
       .set('sortBy', 'date')
       .set('freshness', 'week');
 
@@ -82,7 +82,7 @@ export class AzureService {
 
   private mappingFunction(currentValue: string, index: number) {
     return {
-      'language': 'de',
+      'language': 'en',
       'id': index + 1,
       'text': currentValue
     };

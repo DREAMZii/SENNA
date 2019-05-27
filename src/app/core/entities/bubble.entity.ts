@@ -121,8 +121,13 @@ export class Bubble {
     BubbleUtil.bubbles.push(this);
     BubbleUtil.bubblesByName.set(this.searchTerm.toLowerCase().split(' ').join('-'), this);
 
+    let query = '.active';
+    if (d3.select(query).node() === null) {
+      query = '#canvas image:first-of-type'
+    }
+
     this.group = this.container
-      .insert('g', 'defs')
+      .insert('g', query)
       .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)
       .style('position', 'absolute')
       .style('top', 0)
@@ -180,7 +185,7 @@ export class Bubble {
       const nameW = this.radius + this.radius / 4;
 
       this.group
-        .append('rect')
+        .insert('rect', ':first-child')
         .attr('x', this.x - nameW / 2)
         .attr('y', this.y + this.radius + this.radius / 2)
         .attr('rx', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
@@ -190,8 +195,7 @@ export class Bubble {
         .attr('fill', 'lightgray');
 
       const nameText = this.group
-        .append('text')
-        .attr('y', this.y + this.radius + this.radius / 2)
+        .insert('text', 'rect:first-child + *')
         .attr('font-size', 14 / (BubbleUtil.scalingFactor ** this.referredNumber))
         .text(this.searchTerm);
 

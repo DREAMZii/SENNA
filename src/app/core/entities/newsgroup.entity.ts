@@ -22,7 +22,7 @@ export class NewsGroup {
     this.remove();
 
     this.group = this.bubble.getGroup()
-      .insert('g', ':first-child')
+      .insert('g', 'path:first-of-type')
       .attr('class', `news`)
       .style('opacity', '0');
 
@@ -47,7 +47,8 @@ export class NewsGroup {
     const dyOffset = 7 / factor;
     const dy = yOffset + dyOffset;
 
-    const text = this.group.append('text')
+    const text = this.group
+      .append('text')
       .attr('news-id', this.news.indexOf(single))
       .attr('x', angle > 180 && angle !== 360 ? x - width : x)
       .attr('y', y)
@@ -71,7 +72,7 @@ export class NewsGroup {
         rect
           .transition()
           .duration(500)
-          .attr('fill-opacity', 1);
+          .attr('fill', 'lightgray');
       })
       .on('mouseleave', () => {
         const rect = this.group.select('rect');
@@ -82,7 +83,7 @@ export class NewsGroup {
         rect
           .transition()
           .duration(500)
-          .attr('fill-opacity', 0);
+          .attr('fill', 'white');
       });
 
     const height = text.node().getBBox().height * 1.15;
@@ -95,8 +96,7 @@ export class NewsGroup {
       .attr('y', angle > 90 && angle < 270 ? y : y - rectH)
       .attr('width', rectW)
       .attr('height', rectH)
-      .attr('fill-opacity', '0')
-      .attr('fill', 'lightgray')
+      .attr('fill', 'white')
       .style('cursor', 'pointer')
       .on('click', () => {
         const newsText = this.group.select('text');
@@ -108,13 +108,13 @@ export class NewsGroup {
         d3.select(this)
           .transition()
           .duration(500)
-          .attr('fill-opacity', 1);
+          .attr('fill', 'lightgray');
       })
       .on('mouseleave', function() {
         d3.select(this)
           .transition()
           .duration(500)
-          .attr('fill-opacity', 0);
+          .attr('fill', 'white');
       });
 
     this.group.selectAll('tspan')
