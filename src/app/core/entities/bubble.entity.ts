@@ -305,9 +305,9 @@ export class Bubble {
     this.zoom = d3.zoom()
       .touchable(true)
       .scaleExtent([-Infinity, Infinity])
-      .on('zoomstart', zoomstart)
+      .on('start', zoomstart)
       .on('zoom', zoomed)
-      .on('zoomend', zoomend);
+      .on('end', zoomend);
 
     function zoomstart() {
       d3.select('#canvas')
