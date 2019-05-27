@@ -334,22 +334,44 @@ export class Bubble {
         return;
       }
 
-      // Disable 1 finger dragging and zooming
-      console.log(d3.event.sourceEvent);
-      if (d3.event.sourceEvent !== null && d3.event.sourceEvent.type.toLowerCase() === 'touchmove') {
-        if (d3.event.sourceEvent.touches.length !== 2) {
-          console.log(d3.event.sourceEvent.touches.length);
-          return;
-        }
+      const srcEvent = d3.event.sourceEvent;
+      let fingerCount = 0;
+      if (srcEvent !== null && srcEvent.type.toLowerCase() === 'touchmove') {
+        fingerCount = srcEvent.touches.length;
       }
 
-      console.log(d3.event);
+      let x = BubbleUtil.offsetX;
+      let y = BubbleUtil.offsetY;
+      let scale = BubbleUtil.scale;
+
+      if (fingerCount === 1) {
+        // 1 finger is used for clicking
+        return;
+      } else if (fingerCount === 0) {
+        // 2 fingers are used to zoom
+        x = d3.event.transform.x;
+        y = d3.event.transform.y;
+        scale = d3.event.transform.k;
+      } else if (fingerCount === 3) {
+        // 3 fingers are for dragging
+        x = d3.event.transform.x;
+        y = d3.event.transform.y;
+      } else {
+        // Mobile and normal webbrowser support
+        x = d3.event.transform.x;
+        y = d3.event.transform.y;
+        scale = d3.event.transform.k;
+      }
+
+      BubbleUtil.offsetX = x;
+      BubbleUtil.offsetY = y;
+      BubbleUtil.scale = scale;
 
       container.selectAll('g')
         .filter(function() {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
         })
-        .attr('transform', d3.event.transform);
+        .attr('transform', `translate(${x}, ${y}) scale(${scale})`);
     }
 
     function zoomend() {
