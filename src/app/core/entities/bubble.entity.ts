@@ -223,7 +223,6 @@ export class Bubble {
       .attr('bubble-id', this.id)
       .attr('r', this.radius - this.strokeWidth / 2);
 
-    this.handleDrag();
     this.handleZoom();
     this.handleEvents();
 
@@ -299,30 +298,6 @@ export class Bubble {
     return this;
   }
 
-  private handleDrag() {
-    const graphContainer = d3.select('#graphContainer');
-    const container = this.container;
-
-    const drag = d3.drag()
-      .on('drag', dragged);
-
-    function dragged() {
-      if (BubbleUtil.zoomDisabled) {
-        return;
-      }
-
-      console.log(d3.event);
-
-      container.selectAll('g')
-        .filter(function() {
-          return d3.select(this).classed('bubble') || d3.select(this).classed('line');
-        })
-        .attr('transform', d3.event.translate);
-    }
-
-    graphContainer.call(drag);
-  }
-
   private handleZoom() {
     const graphContainer = d3.select('#graphContainer');
     const container = this.container;
@@ -335,8 +310,6 @@ export class Bubble {
       if (BubbleUtil.zoomDisabled) {
         return;
       }
-
-      console.log('zoom');
 
       container.selectAll('g')
         .filter(function() {
