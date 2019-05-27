@@ -329,7 +329,14 @@ export class Bubble {
     }
 
     function zoomed() {
+      // Loading
       if (BubbleUtil.zoomDisabled) {
+        return;
+      }
+
+      // Disable 1 finger dragging and zooming
+      const srcEvent = d3.event.sourceEvent;
+      if (srcEvent instanceof TouchEvent && srcEvent.touches.length !== 2) {
         return;
       }
 
