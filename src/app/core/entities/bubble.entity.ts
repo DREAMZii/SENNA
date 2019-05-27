@@ -223,6 +223,7 @@ export class Bubble {
       .attr('bubble-id', this.id)
       .attr('r', this.radius - this.strokeWidth / 2);
 
+    this.handleDrag();
     this.handleZoom();
     this.handleEvents();
 
