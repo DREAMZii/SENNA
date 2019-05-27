@@ -347,7 +347,7 @@ export class Bubble {
       if (fingerCount === 1) {
         // 1 finger is used for clicking
         return;
-      } else if (fingerCount === 0) {
+      } else if (fingerCount === 2) {
         // 2 fingers are used to zoom
         x = d3.event.transform.x;
         y = d3.event.transform.y;
@@ -356,6 +356,7 @@ export class Bubble {
         // 3 fingers are for dragging
         x = d3.event.transform.x;
         y = d3.event.transform.y;
+        scale = BubbleUtil.scale;
       } else {
         // Mobile and normal webbrowser support
         x = d3.event.transform.x;
