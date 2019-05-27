@@ -305,7 +305,14 @@ export class Bubble {
     this.zoom = d3.zoom()
       .touchable(true)
       .scaleExtent([-Infinity, Infinity])
-      .on('zoom', zoomed);
+      .on('zoomstart', zoomstart)
+      .on('zoom', zoomed)
+      .on('zoomend', zoomend);
+
+    function zoomstart() {
+      d3.select('#canvas')
+        .style('cursor', 'move');
+    }
 
     function zoomed() {
       if (BubbleUtil.zoomDisabled) {
@@ -317,6 +324,11 @@ export class Bubble {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
         })
         .attr('transform', d3.event.transform);
+    }
+
+    function zoomend() {
+      d3.select('#canvas')
+        .style('cursor', 'default');
     }
 
     graphContainer.call(this.zoom);
