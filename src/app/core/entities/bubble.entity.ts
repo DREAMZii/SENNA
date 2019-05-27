@@ -338,6 +338,7 @@ export class Bubble {
       console.log(d3.event.sourceEvent);
       if (d3.event.sourceEvent !== null && d3.event.sourceEvent.type.toLowerCase() === 'touchmove') {
         if (d3.event.sourceEvent.touches.length !== 2) {
+          console.log(d3.event.sourceEvent.touches.length);
           return;
         }
       }
