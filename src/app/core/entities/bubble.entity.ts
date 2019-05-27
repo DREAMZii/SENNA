@@ -74,8 +74,8 @@ export class Bubble {
     this.strokeWidth = radius / 5;
     this.applyNews(news);
 
-    ServiceUtil.azureService.searchOldNews(this.searchTerm).then((news) => {
-      console.log(news);
+    ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
+      console.log(oldNews);
     });
 
     if (!isReferred) {
