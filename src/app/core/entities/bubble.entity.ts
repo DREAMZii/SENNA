@@ -123,7 +123,7 @@ export class Bubble {
 
     let query = '.active';
     if (d3.select(query).node() === null) {
-      query = '#canvas image:first-of-type'
+      query = '#canvas image:first-of-type';
     }
 
     this.group = this.container
