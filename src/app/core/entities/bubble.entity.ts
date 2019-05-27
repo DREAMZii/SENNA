@@ -340,34 +340,16 @@ export class Bubble {
         fingerCount = srcEvent.touches.length;
       }
 
-      let x = BubbleUtil.offsetX;
-      let y = BubbleUtil.offsetY;
-      let scale = BubbleUtil.scale;
-
-      if (fingerCount === 1) {
-        // 1 finger is used for clicking
+      if (fingerCount === 3) {
+        // 3 fingers for clicking
         return;
-      } else if (fingerCount === 2) {
-        // 2 fingers are used to zoom
-        x = d3.event.transform.x;
-        y = d3.event.transform.y;
-        scale = d3.event.transform.k;
-      } else if (fingerCount === 3) {
-        // 3 fingers are for dragging
-        x = d3.event.transform.x;
-        y = d3.event.transform.y;
-      } else {
-        // Mobile and normal webbrowser support
-        x = d3.event.transform.x;
-        y = d3.event.transform.y;
-        scale = d3.event.transform.k;
       }
 
       container.selectAll('g')
         .filter(function() {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
         })
-        .attr('transform', `translate(${x}, ${y}) scale(${scale})`);
+        .attr('transform', d3.event.transform);
     }
 
     function zoomend() {
