@@ -19,6 +19,7 @@ export class Bubble {
   private x: number;
   private y: number;
   private newsGroup: NewsGroup;
+  private oldNews: News[];
   public strokeWidth: number;
   private zoom: any;
 
@@ -72,6 +73,10 @@ export class Bubble {
     this.radius = radius;
     this.strokeWidth = radius / 5;
     this.applyNews(news);
+
+    ServiceUtil.azureService.searchOldNews(this.searchTerm).then((news) => {
+      console.log(news);
+    });
 
     if (!isReferred) {
       this.preloadReferences()
@@ -293,6 +298,30 @@ export class Bubble {
     return this;
   }
 
+  private handleDrag() {
+    const graphContainer = d3.select('#graphContainer');
+    const container = this.container;
+
+    const drag = d3.drag()
+      .on('drag', dragged);
+
+    function dragged() {
+      if (BubbleUtil.zoomDisabled) {
+        return;
+      }
+
+      console.log(d3.event);
+
+      container.selectAll('g')
+        .filter(function() {
+          return d3.select(this).classed('bubble') || d3.select(this).classed('line');
+        })
+        .attr('transform', d3.event.translate);
+    }
+
+    graphContainer.call(drag);
+  }
+
   private handleZoom() {
     const graphContainer = d3.select('#graphContainer');
     const container = this.container;
@@ -305,6 +334,8 @@ export class Bubble {
       if (BubbleUtil.zoomDisabled) {
         return;
       }
+
+      console.log('zoom');
 
       container.selectAll('g')
         .filter(function() {

@@ -23,6 +23,24 @@ export class CacheUtil {
     return news;
   }
 
+  public static async getOldNews(term: string) {
+    const key = 'news-old-' + term.split(' ').join('-').toLowerCase();
+    const cachedNews = await this.cache.getItem(key);
+    if (cachedNews) {
+      return cachedNews;
+    }
+
+    let news = await ServiceUtil.azureService.searchOldNews(term);
+    if (!news) {
+      news = [];
+    }
+    await this.cache.setItem(key, news, {isCachedForever: true});
+
+    console.log('Cached old news (' + news.length + ') for ' + key);
+
+    return news;
+  }
+
   public static async getReferences(term: string, amount = 4) {
     const key = 'references-' + term.split(' ').join('-').toLowerCase();
     const cachedReferences = await this.cache.getItem(key);

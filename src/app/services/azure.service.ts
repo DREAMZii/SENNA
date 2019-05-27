@@ -45,6 +45,27 @@ export class AzureService {
     return await this.determineNewsSentiment(newsEntities);
   }
 
+  async searchOldNews(query: string) {
+    const uri = environment.azure.cognitiveServices.newsSearchUrl;
+    const headers = new HttpHeaders(this.headersJson());
+    const params = new HttpParams()
+      .set('q', query)
+      .set('count', '100')
+      .set('offset', '0')
+      .set('mkt', 'en-US');
+
+    const response = await this.http.get(uri, {headers: headers, params: params});
+
+    const newsEntities = [];
+    await response.toPromise().then(async (news) => {
+      for (const single of news['value']) {
+        newsEntities.push(this.buildNews(single));
+      }
+    });
+
+    return await this.determineNewsSentiment(newsEntities);
+  }
+
   private buildNews(data): News {
     return new News(
       data['name'],
