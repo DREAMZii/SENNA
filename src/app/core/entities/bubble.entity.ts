@@ -356,17 +356,12 @@ export class Bubble {
         // 3 fingers are for dragging
         x = d3.event.transform.x;
         y = d3.event.transform.y;
-        scale = BubbleUtil.scale;
       } else {
         // Mobile and normal webbrowser support
         x = d3.event.transform.x;
         y = d3.event.transform.y;
         scale = d3.event.transform.k;
       }
-
-      BubbleUtil.offsetX = x;
-      BubbleUtil.offsetY = y;
-      BubbleUtil.scale = scale;
 
       container.selectAll('g')
         .filter(function() {
