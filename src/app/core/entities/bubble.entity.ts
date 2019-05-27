@@ -303,6 +303,7 @@ export class Bubble {
     const container = this.container;
 
     this.zoom = d3.zoom()
+      .touchable(true)
       .scaleExtent([-Infinity, Infinity])
       .on('zoom', zoomed);
 
