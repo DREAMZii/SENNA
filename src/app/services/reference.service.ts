@@ -8,6 +8,7 @@ export class ReferenceService {
   constructor(
     private http: HttpClient
   ) {
+
   }
 
   async getReferences(searchTerm: string, amount = 4) {
