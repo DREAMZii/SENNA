@@ -203,30 +203,34 @@ export class Bubble {
         .attr('xlink:href', this.searchImage)
         .attr('clip-path', 'url(#clip)');
 
-      const nameW = this.radius + this.radius / 4;
-
-      this.group
-        .insert('rect', ':first-child')
-        .attr('x', this.x - nameW / 2)
-        .attr('y', this.y + this.radius + this.radius / 2)
-        .attr('rx', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
-        .attr('ry', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
-        .attr('width', nameW)
-        .attr('height', nameW * 0.2)
-        .attr('fill', 'lightgray');
+      const fontSize = 14 / (BubbleUtil.scalingFactor ** this.referredNumber);
 
       const nameText = this.group
         .insert('text', 'rect:first-child + *')
-        .attr('font-size', 14 / (BubbleUtil.scalingFactor ** this.referredNumber))
+        .attr('font-size', fontSize)
         .text(this.searchTerm);
 
-      const nameTextWidth = nameText.node().getComputedTextLength();
+      const nameW = nameText.node().getBBox().width;
+      const nameH = nameText.node().getBBox().height;
+
+      this.group
+        .insert('rect', ':first-child')
+        .attr('x', this.x - nameW * 1.5 / 2)
+        .attr('y', this.y + this.radius + this.radius / 2)
+        .attr('rx', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('ry', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('width', nameW * 1.5)
+        .attr('height', nameH * 1.5)
+        .attr('fill', 'lightgray');
+
+
 
       nameText
-        .attr('x', this.x - nameTextWidth / 2)
+        .attr('x',
+          (this.x - nameW * 1.5 / 2) + (nameW / 4) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+        )
         .attr('y',
-          (this.y + this.radius + this.radius / 2 + nameW * 0.2) -
-          (14 / BubbleUtil.scalingFactor ** this.referredNumber / 2)
+          (this.y + this.radius * 1.5) + (nameH * 1.5 / 1.5) + (1 / BubbleUtil.scalingFactor ** this.referredNumber)
         );
     }
 
