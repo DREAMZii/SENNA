@@ -48,7 +48,7 @@ export class CacheUtil {
       return cachedReferences;
     }
 
-    const references = await ServiceUtil.referenceService.getReferences(term, amount);
+    const references = await ServiceUtil.referenceService.getReferences(term, amount, searchUrl);
     await this.cache.setItem(key, references, {isCachedForever: true});
 
     console.log('Cached references for ' + term);

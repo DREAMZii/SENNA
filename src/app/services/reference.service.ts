@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { environment } from '@environments/environment';
 import * as d3 from 'd3';
+import {encode} from "punycode";
 
 @Injectable({ providedIn: 'root' })
 export class ReferenceService {
@@ -131,12 +132,14 @@ export class ReferenceService {
     return references.slice(0, amount);
   }*/
 
-  async getReferences(searchTerm: string, amount = 4) {
-    const uri = environment.references.url;
-    const params = new HttpParams()
-      .set('searchTerm', searchTerm);
+  async getReferences(searchTerm: string, amount = 4, searchUrl = null) {
+    let uri = environment.references.url + "?searchTerm=" + searchTerm;
 
-    const response = await this.http.get(uri, {params: params});
+    if (searchUrl !== null) {
+      uri += "&searchUrl=?" + encodeURI(searchUrl.split('?')[1]).replace(/&/g, '%26');
+    }
+
+    const response = await this.http.get(uri);
     let mappedResponse = [];
     await response.toPromise().then((references) => {
       mappedResponse = (references['searchReferences'] as string[]);
