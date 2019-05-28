@@ -15,13 +15,11 @@ export class ReferenceService {
       .set('searchTerm', searchTerm);
 
     const response = await this.http.get(uri, {responseType: 'text'});
-    console.log('AMK');
-    let mappedResponse = [];
-    await response.subscribe((response) => {
-      console.log(response);
+    await response.subscribe((htmlResponse) => {
+      console.log(htmlResponse);
     });
 
-    return mappedResponse;
+    return [];
   }
 
   /*async getReferences(searchTerm: string, amount = 4) {
