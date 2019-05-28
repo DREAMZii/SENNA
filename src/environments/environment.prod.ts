@@ -11,6 +11,10 @@ export const environment = {
   image: {
     url: 'https://yacovi-config-service.azurewebsites.net/api/Image'
   },
+  bing: {
+    url: 'https://bing.com',
+    searchUrl: 'https://bing.com/search'
+  },
   canvas: {
     font: {
       size: '25px',
