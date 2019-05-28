@@ -7,13 +7,13 @@ export const environment = {
   disableAuthentication: false,
   snapshotIntervalInSeconds: 5,
   config: {
-    url: 'http://yacovi-config-service.azurewebsites.net/api/GetConfig'
+    url: 'https://yacovi-config-service.azurewebsites.net/api/GetConfig'
   },
   references: {
-    url: 'http://yacovi-config-service.azurewebsites.net/api/SearchReferences'
+    url: 'http://0.0.0.0:7071/api/SearchReferences'
   },
   image: {
-    url: 'http://yacovi-config-service.azurewebsites.net/api/Image'
+    url: 'http://0.0.0.0:7071/api/Image'
   },
   canvas: {
     font: {

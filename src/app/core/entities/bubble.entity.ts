@@ -334,12 +334,6 @@ export class Bubble {
         return;
       }
 
-      const srcEvent = d3.event.sourceEvent;
-      let fingerCount = 0;
-      if (srcEvent !== null && srcEvent.type.toLowerCase() === 'touchmove') {
-        fingerCount = srcEvent.touches.length;
-      }
-
       container.selectAll('g')
         .filter(function() {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
