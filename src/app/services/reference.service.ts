@@ -10,22 +10,77 @@ export class ReferenceService {
   ) {
   }
 
-  async getReferences(searchTerm: string, amount = 4) {
-    const uri = environment.bing.searchUrl + '?q=' + searchTerm;
+  async getImage(searchTerm: string, searchUrl = null) {
+    let uri = environment.bing.searchUrl + '?q=' + searchTerm + '&cc=de';
+    if (searchUrl !== null) {
+      uri = environment.bing.url + searchUrl;
+    }
 
-    let carouselLink = '';
+    let imageUrl = '';
     await d3.html(uri).then((document) => {
-      carouselLink = d3.select(document)
-        .select('.b_entityTP:first-of-type .b_moreLink:last-of-type')
-        .attr('href');
+      const imageElement = d3.select(document).select('.b_entityTP').select('img');
+
+      if (imageElement.node() !== null) {
+        const sourceLink = imageElement.attr('data-src-hq');
+
+        if (sourceLink !== null) {
+          if (sourceLink.startsWith('http')) {
+            imageUrl = sourceLink;
+          } else {
+            imageUrl = environment.bing.url + sourceLink;
+          }
+        }
+      }
+
+      const alternativeElement = d3.select(document).select('.b_entityTP').select('.b_float_img');
+      if (alternativeElement.node() !== null) {
+        const sourceLink = alternativeElement.select('.rms_iac').attr('data-src');
+
+        if (sourceLink !== null) {
+          if (sourceLink.startsWith('http')) {
+            imageUrl = sourceLink;
+          } else {
+            imageUrl = environment.bing.url + sourceLink;
+          }
+        }
+      }
     });
 
-    return await this.getCarouselReferences(carouselLink, amount);
+    return imageUrl;
+  }
+
+  async getReferences(searchTerm: string, amount = 4, searchUrl = null) {
+    let uri = environment.bing.searchUrl + '?q=' + searchTerm + '&cc=de';
+    if (searchUrl !== null) {
+      uri = environment.bing.url + searchUrl;
+    }
+
+    let carouselLink = '';
+    let references = [];
+    await d3.html(uri).then((document) => {
+      const buttons = d3.select(document)
+        .select('.b_entityTP')
+        .selectAll('.b_moreLink').nodes();
+      const moreButton = buttons[buttons.length - 1];
+
+      if (moreButton !== undefined) {
+        carouselLink = d3.select(moreButton).attr('href')
+      }
+    });
+
+    if (carouselLink !== '') {
+      references = await this.getCarouselReferences(carouselLink, amount);
+    } else {
+      references = this.getInitialReferences(document, amount);
+    }
+
+    return references;
   }
 
   private async getCarouselReferences(carouselLink: string, amount) {
+    const uri = environment.bing.url + carouselLink + '&cc=de';
     const references = [];
-    await d3.html(environment.bing.url + carouselLink).then((plainDocument) => {
+    await d3.html(uri).then((plainDocument) => {
       const document =  d3.select(plainDocument);
 
       document.selectAll('.carousel-content a.cardToggle').each(function() {
@@ -39,17 +94,41 @@ export class ReferenceService {
         references.push(
           {
             referenceTitle: element.attr('title'),
-            referenceImageUrl: imageUrl
+            referenceImageUrl: imageUrl,
+            referenceUrl: element.attr('href')
           }
         );
       });
     });
 
-    return references.slice(
-      0,
-      references.length > amount ?
-        amount : references.length
-    );
+    return references.slice(0, amount);
+  }
+
+  private getInitialReferences(document, amount) {
+    const references = [];
+    const modules = d3.select(document)
+      .select('.b_entityTP:first-of-type')
+      .selectAll('.b_subModule')
+      .nodes();
+    const imageSelection = d3.select(modules[modules.length - 1]).selectAll('.rms_iac');
+
+    imageSelection.each(function() {
+      const element = d3.select(this);
+      let imageUrl = '';
+      if (element.node() !== null) {
+        imageUrl = environment.bing.url + element.attr('data-src');
+      }
+
+      references.push(
+        {
+          referenceTitle: element.attr('data-title'),
+          referenceImageUrl: imageUrl,
+          referenceUrl: element.attr('data-href')
+        }
+      );
+    });
+
+    return references.slice(0, amount);
   }
 
   /*async getReferences(searchTerm: string, amount = 4) {
@@ -71,7 +150,7 @@ export class ReferenceService {
     return mappedResponse;
   }*/
 
-  async getImage(searchTerm: string) {
+  /*async getImage(searchTerm: string) {
     const uri = environment.image.url;
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
@@ -83,5 +162,5 @@ export class ReferenceService {
     });
 
     return imageUrl;
-  }
+  }*/
 }

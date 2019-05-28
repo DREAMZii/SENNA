@@ -41,14 +41,14 @@ export class CacheUtil {
     return news;
   }
 
-  public static async getReferences(term: string, amount = 4) {
+  public static async getReferences(term: string, amount = 4, searchUrl = null) {
     const key = 'references-' + term.split(' ').join('-').toLowerCase();
     const cachedReferences = await this.cache.getItem(key);
     if (cachedReferences) {
       return cachedReferences;
     }
 
-    const references = await ServiceUtil.referenceService.getReferences(term, amount);
+    const references = await ServiceUtil.referenceService.getReferences(term, amount, searchUrl);
     await this.cache.setItem(key, references, {isCachedForever: true});
 
     console.log('Cached references for ' + term);

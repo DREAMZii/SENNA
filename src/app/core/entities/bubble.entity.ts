@@ -10,6 +10,7 @@ export class Bubble {
   private id: number;
   private readonly searchTerm: any;
   private readonly searchImage: any;
+  private searchUrl = null;
   private readonly container: any;
   private group: any;
   private greenSegments: number;
@@ -102,7 +103,8 @@ export class Bubble {
           this.spawn();
           this.spawnReferences();
         })
-        .catch(() => {
+        .catch((e) => {
+          console.log(e);
           ServiceUtil.alertService.error('Initial references could not be loaded!');
         });
     }
@@ -257,10 +259,11 @@ export class Bubble {
     const amount = this.isReferred ? 3 : 4;
 
     // Load references on initialization
-    await CacheUtil.getReferences(this.searchTerm, amount).then( async (references: string[]) => {
+    await CacheUtil.getReferences(this.searchTerm, amount, this.searchUrl).then( async (references: string[]) => {
       for (const reference of references) {
         const referenceTitle = reference['referenceTitle'];
         const referenceImageUrl = reference['referenceImageUrl'];
+        const referenceSearchUrl = reference['referenceUrl'];
 
         this.referenceNames.push(referenceTitle);
         this.referenceImages.push(referenceImageUrl);
@@ -277,7 +280,16 @@ export class Bubble {
             return;
           }
 
-          this.references.push(new Bubble(referenceTitle, referenceImageUrl, news, true, this, this.radius / BubbleUtil.scalingFactor));
+          const refBubble = new Bubble(
+            referenceTitle,
+            referenceImageUrl,
+            news,
+            true,
+            this,
+            this.radius / BubbleUtil.scalingFactor
+          );
+          refBubble.searchUrl = referenceSearchUrl;
+          this.references.push(refBubble);
         });
       }
     });

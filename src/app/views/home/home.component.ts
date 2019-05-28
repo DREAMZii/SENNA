@@ -40,6 +40,8 @@ export class HomeComponent implements OnInit {
     this.configService.fetch(() => {
       CacheUtil.getNews(searchTerm).then((news) => {
         this.referenceService.getImage(searchTerm).then((imageUrl) => {
+          console.log(imageUrl);
+
           // TODO: Fix this
           /* tslint:disable */
           new Bubble(searchTerm, imageUrl, news);
