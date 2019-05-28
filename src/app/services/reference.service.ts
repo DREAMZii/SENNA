@@ -10,7 +10,7 @@ export class ReferenceService {
   ) {
   }
 
-  async getImage(searchTerm: string, searchUrl = null) {
+  /*async getImage(searchTerm: string, searchUrl = null) {
     let uri = environment.bing.searchUrl + '?q=' + searchTerm + '&cc=de';
     if (searchUrl !== null) {
       uri = environment.bing.url + searchUrl;
@@ -47,9 +47,9 @@ export class ReferenceService {
     });
 
     return imageUrl;
-  }
+  }*/
 
-  async getReferences(searchTerm: string, amount = 4, searchUrl = null) {
+  /*async getReferences(searchTerm: string, amount = 4, searchUrl = null) {
     let uri = environment.bing.searchUrl + '?q=' + searchTerm + '&cc=de';
     if (searchUrl !== null) {
       uri = environment.bing.url + searchUrl;
@@ -129,9 +129,9 @@ export class ReferenceService {
     });
 
     return references.slice(0, amount);
-  }
+  }*/
 
-  /*async getReferences(searchTerm: string, amount = 4) {
+  async getReferences(searchTerm: string, amount = 4) {
     const uri = environment.references.url;
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
@@ -148,9 +148,9 @@ export class ReferenceService {
     });
 
     return mappedResponse;
-  }*/
+  }
 
-  /*async getImage(searchTerm: string) {
+  async getImage(searchTerm: string) {
     const uri = environment.image.url;
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
@@ -162,5 +162,5 @@ export class ReferenceService {
     });
 
     return imageUrl;
-  }*/
+  }
 }
