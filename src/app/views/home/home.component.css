@@ -28,13 +28,22 @@
 }
 
 #search-button {
-  -webkit-transform-origin: 5.5% 91%;
+  -ms-transform-origin: 6% 91%;
+  -moz-transform-origin: 6% 91%;
+  -webkit-transform-origin: 6% 91%;
+  transform-origin: 6% 91%;
 }
 
 #center-button {
-  -webkit-transform-origin: 12% 91%;
+  -ms-transform-origin: 13% 91%;
+  -moz-transform-origin: 13% 91%;
+  -webkit-transform-origin: 13% 91%;
+  transform-origin: 13% 91%;
 }
 
 #back-button {
-  -webkit-transform-origin: 16.5% 91%;
+  -ms-transform-origin: 18% 91%;
+  -moz-transform-origin: 18% 91%;
+  -webkit-transform-origin: 18% 91%;
+  transform-origin: 18% 91%;
 }
