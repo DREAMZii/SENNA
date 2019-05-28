@@ -10,6 +10,21 @@ export class ReferenceService {
   }
 
   async getReferences(searchTerm: string, amount = 4) {
+    const uri = 'https://bing.com/search?q=Kion+Group';
+    const params = new HttpParams()
+      .set('searchTerm', searchTerm);
+
+    const response = await this.http.get(uri, {responseType: 'text'});
+    console.log('AMK');
+    let mappedResponse = [];
+    await response.subscribe((response) => {
+      console.log(response);
+    });
+
+    return mappedResponse;
+  }
+
+  /*async getReferences(searchTerm: string, amount = 4) {
     const uri = environment.references.url;
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
@@ -26,7 +41,7 @@ export class ReferenceService {
     });
 
     return mappedResponse;
-  }
+  }*/
 
   async getImage(searchTerm: string) {
     const uri = environment.image.url;

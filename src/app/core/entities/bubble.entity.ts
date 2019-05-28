@@ -80,7 +80,7 @@ export class Bubble {
     this.strokeWidth = radius / 5;
     this.applyNews(news);
 
-    ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
+    /*ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
       this.oldNews = oldNews;
 
       this.amount = oldNews.length;
@@ -90,7 +90,7 @@ export class Bubble {
           single.sentiment > BubbleUtil.negativeThreshhold && single.sentiment < BubbleUtil.positiveThreshhold
       ).length;
       this.negAmount = oldNews.filter((single) => single.sentiment <= BubbleUtil.negativeThreshhold).length;
-    });
+    });*/
 
     if (!isReferred) {
       this.preloadReferences()
