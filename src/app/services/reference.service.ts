@@ -10,7 +10,7 @@ export class ReferenceService {
   ) {
   }
 
-  /*async getReferences(searchTerm: string, amount = 4) {
+  async getReferences(searchTerm: string, amount = 4) {
     const uri = environment.bing.searchUrl + '?q=' + searchTerm;
 
     let carouselLink = '';
@@ -21,9 +21,9 @@ export class ReferenceService {
     });
 
     return await this.getCarouselReferences(carouselLink, amount);
-  }*/
+  }
 
-  /*private async getCarouselReferences(carouselLink: string, amount) {
+  private async getCarouselReferences(carouselLink: string, amount) {
     const references = [];
     await d3.html(environment.bing.url + carouselLink).then((plainDocument) => {
       const document =  d3.select(plainDocument);
@@ -50,9 +50,9 @@ export class ReferenceService {
       references.length > amount ?
         amount : references.length
     );
-  }*/
+  }
 
-  async getReferences(searchTerm: string, amount = 4) {
+  /*async getReferences(searchTerm: string, amount = 4) {
     const uri = environment.references.url;
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
@@ -69,7 +69,7 @@ export class ReferenceService {
     });
 
     return mappedResponse;
-  }
+  }*/
 
   async getImage(searchTerm: string) {
     const uri = environment.image.url;
