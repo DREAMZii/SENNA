@@ -15,6 +15,10 @@ export const environment = {
   image: {
     url: 'http://0.0.0.0:7071/api/Image'
   },
+  bing: {
+    url: 'https://bing.com',
+    searchUrl: 'https://bing.com/search'
+  },
   canvas: {
     font: {
       size: '25px',

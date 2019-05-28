@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { environment } from '@environments/environment';
+import * as d3 from 'd3';
 
 @Injectable({ providedIn: 'root' })
 export class ReferenceService {
@@ -9,20 +10,49 @@ export class ReferenceService {
   ) {
   }
 
-  async getReferences(searchTerm: string, amount = 4) {
-    const uri = 'https://bing.com/search?q=Kion+Group';
-    const params = new HttpParams()
-      .set('searchTerm', searchTerm);
+  /*async getReferences(searchTerm: string, amount = 4) {
+    const uri = environment.bing.searchUrl + '?q=' + searchTerm;
 
-    const response = await this.http.get(uri, {responseType: 'text'});
-    await response.subscribe((htmlResponse) => {
-      console.log(htmlResponse);
+    let carouselLink = '';
+    await d3.html(uri).then((document) => {
+      carouselLink = d3.select(document)
+        .select('.b_entityTP:first-of-type .b_moreLink:last-of-type')
+        .attr('href');
     });
 
-    return [];
-  }
+    return await this.getCarouselReferences(carouselLink, amount);
+  }*/
 
-  /*async getReferences(searchTerm: string, amount = 4) {
+  /*private async getCarouselReferences(carouselLink: string, amount) {
+    const references = [];
+    await d3.html(environment.bing.url + carouselLink).then((plainDocument) => {
+      const document =  d3.select(plainDocument);
+
+      document.selectAll('.carousel-content a.cardToggle').each(function() {
+        const element = d3.select(this);
+        const image = element.select('img');
+        let imageUrl = '';
+        if (image.node() !== null) {
+          imageUrl = environment.bing.url + image.attr('src');
+        }
+
+        references.push(
+          {
+            referenceTitle: element.attr('title'),
+            referenceImageUrl: imageUrl
+          }
+        );
+      });
+    });
+
+    return references.slice(
+      0,
+      references.length > amount ?
+        amount : references.length
+    );
+  }*/
+
+  async getReferences(searchTerm: string, amount = 4) {
     const uri = environment.references.url;
     const params = new HttpParams()
       .set('searchTerm', searchTerm);
@@ -39,7 +69,7 @@ export class ReferenceService {
     });
 
     return mappedResponse;
-  }*/
+  }
 
   async getImage(searchTerm: string) {
     const uri = environment.image.url;
