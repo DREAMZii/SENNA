@@ -64,7 +64,7 @@ export class ReferenceService {
       const moreButton = buttons[buttons.length - 1];
 
       if (moreButton !== undefined) {
-        carouselLink = d3.select(moreButton).attr('href')
+        carouselLink = d3.select(moreButton).attr('href');
       }
     });
 
