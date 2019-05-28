@@ -69,20 +69,6 @@ export class HomeComponent implements OnInit {
   }
 
   initButtonEvents() {
-    d3.selectAll('.quick-button')
-      .on('mouseenter', function() {
-        const button = d3.select(this);
-
-        button.transition()
-          .attr('transform', 'scale(1.15)');
-      })
-      .on('mouseleave', function() {
-        const button = d3.select(this);
-
-        button.transition()
-          .attr('transform', 'scale(1)');
-      });
-
     d3.select('#back-button')
       .on('click', () => {
         const referrer = BubbleUtil.getActiveBubble().getReferrer();
