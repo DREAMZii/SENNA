@@ -28,13 +28,13 @@
 }
 
 #search-button {
-  transform-origin: 5.5% 91%;
+  -webkit-transform-origin: 5.5% 91%;
 }
 
 #center-button {
-  transform-origin: 12% 91%;
+  -webkit-transform-origin: 12% 91%;
 }
 
 #back-button {
-  transform-origin: 16.5% 91%;
+  -webkit-transform-origin: 16.5% 91%;
 }
