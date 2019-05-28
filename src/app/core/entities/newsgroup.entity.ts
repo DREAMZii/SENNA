@@ -123,7 +123,7 @@ export class NewsGroup {
       });
 
     this.group.append('line')
-      .style('stroke', 'green')
+      .style('stroke', single.getScoreColor())
       .style('stroke-width', 1 / factor)
       .attr('x1', x)
       .attr('y1', angle > 90 && angle < 270 ? y + height : y - height)
@@ -131,7 +131,7 @@ export class NewsGroup {
       .attr('y2', angle > 90 && angle < 270 ? y + height : y - height);
 
     this.group.append('line')
-      .style('stroke', 'green')
+      .style('stroke', single.getScoreColor())
       .style('stroke-width', 1 / factor)
       .attr('x1', x)
       .attr('y1', y)

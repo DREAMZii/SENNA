@@ -164,4 +164,19 @@ export class ReferenceService {
 
     return imageUrl;
   }
+
+  async isContentAvailable(contentUrl: string) {
+    const uri = environment.contentAvailable.url;
+    const params = new HttpParams()
+      .set('contentUrl', encodeURIComponent(contentUrl));
+
+    const response = await this.http.get(uri, {params: params});
+
+    let contentAvailable = '';
+    await response.toPromise().then((responseAvailable) => {
+      contentAvailable = responseAvailable['contentAvailable'];
+    });
+
+    return contentAvailable;
+  }
 }

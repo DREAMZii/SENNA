@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import {BubbleUtil} from '@app/core/util/bubble.util';
+import {ServiceUtil} from "@app/core/util/service.util";
 
 export class NewsUtil {
   public static news = [];
@@ -8,6 +9,9 @@ export class NewsUtil {
   public static openNewsId: number;
 
   public static readonly width = 400;
+
+  public static locale = 'en-US';
+  public static languageCode = 'en';
 
   public static openNews(news) {
     // Prepare data whether it is open or not
@@ -45,21 +49,38 @@ export class NewsUtil {
     d3.select('#news-date div')
       .text(date.toLocaleDateString('de-DE'));
 
-    d3.select('#news-score div')
+    d3.select('#news-score div.sentiment-score')
+      .text(Math.trunc(news.getScore() * 100));
+
+    d3.select('#news-score div.score-indicator')
       .attr('title', Math.trunc(news.getScore() * 100) + '%')
-      .style('width', '60%')
-      .style('background-color', news.getScoreColor())
-      .style('height', '18px');
+      .style('background-color', news.getScoreColor());
 
     d3.select('#news-headline h2')
       .text(news.getName());
 
-    d3.select('#senna-news iframe')
-      .attr('src', news.getUrl());
+    ServiceUtil.referenceService.isContentAvailable(news.getUrl()).then((result) => {
+      // Dont know why this doesnt work as boolean, works as string tho
+      if (result === 'true') {
+        d3.select('#senna-news iframe')
+          .attr('src', news.getUrl())
+          .style('display', 'block');
 
-    setTimeout(function() {
-      console.log(d3.select('iframe').html());
-    }, 2000);
+        d3.select('#senna-news .news-fallback')
+          .style('display', 'none')
+          .select('a')
+          .attr('href', null);
+      } else {
+        d3.select('#senna-news iframe')
+          .attr('src', null)
+          .style('display', 'none');
+
+        d3.select('#senna-news .news-fallback')
+          .style('display', 'block')
+          .select('a')
+          .attr('href', news.getUrl());
+      }
+    });
 
     // Is not open
     if (!this.openArticles.has(news.getId())) {
@@ -184,7 +205,7 @@ export class NewsUtil {
     textContainer.each(function() {
       const text = d3.select(this);
       const titleWords = news.getName().split(/\s+/).reverse();
-      const score = 'Sentiment - Score: ' + Math.trunc(news.getScore() * 100) + '%';
+      const score = 'Sentiment - Score: ' + Math.trunc(news.getScore() * 100);
       const scoreWords = score.split(/\s+/).reverse();
       const sourceWords = news.getSource().split(/\s+/).reverse();
       const dateWords = news.getDatePublished().split(/\s+/).reverse();

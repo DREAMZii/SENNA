@@ -81,7 +81,7 @@ export class Bubble {
     this.strokeWidth = radius / 5;
     this.applyNews(news);
 
-    /*ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
+    ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
       this.oldNews = oldNews;
 
       this.amount = oldNews.length;
@@ -91,7 +91,7 @@ export class Bubble {
           single.sentiment > BubbleUtil.negativeThreshhold && single.sentiment < BubbleUtil.positiveThreshhold
       ).length;
       this.negAmount = oldNews.filter((single) => single.sentiment <= BubbleUtil.negativeThreshhold).length;
-    });*/
+    });
 
     if (!isReferred) {
       this.preloadReferences()
@@ -206,7 +206,7 @@ export class Bubble {
       const fontSize = 14 / (BubbleUtil.scalingFactor ** this.referredNumber);
 
       const nameText = this.group
-        .insert('text', 'rect:first-child + *')
+        .insert('text', 'path:first-child')
         .attr('font-size', fontSize)
         .text(this.searchTerm);
 
@@ -221,16 +221,14 @@ export class Bubble {
         .attr('ry', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
         .attr('width', nameW * 1.5)
         .attr('height', nameH * 1.5)
-        .attr('fill', 'lightgray');
-
-
+        .attr('fill', BubbleUtil.grayColor);
 
       nameText
         .attr('x',
           (this.x - nameW * 1.5 / 2) + (nameW / 4) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
         )
         .attr('y',
-          (this.y + this.radius * 1.5) + (nameH * 1.5 / 1.5) + (1 / BubbleUtil.scalingFactor ** this.referredNumber)
+          (this.y + this.radius * 1.5) + (nameH * 1.5 / 1.5) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
         );
     }
 
@@ -473,13 +471,11 @@ export class Bubble {
 
     for (let i = 0; i < spawnableBubbles.length; i++) {
       const bubble = spawnableBubbles[i];
-
       const referencesCount = spawnableBubbles.length;
       let initialAngle = bubble.angleSpawned;
       let angle = 0;
       if (this.isReferred) {
         initialAngle = bubble.getReferrer().angleSpawned;
-        console.log(initialAngle);
         const range = 90;
         const min = initialAngle - 90 + 45;
 
@@ -491,7 +487,12 @@ export class Bubble {
 
         console.log('Min: ' + min + ', Angle: ' + angle);
       } else {
-        angle = i * initialAngle / referencesCount;
+        let angleOffset = 0;
+        if (spawnableBubbles.length === 4) {
+          angleOffset = 45;
+        }
+
+        angle = i * initialAngle / referencesCount + angleOffset;
       }
 
       const centerPoint = BubbleUtil.getPointOnCircle(

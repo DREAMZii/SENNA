@@ -6,6 +6,8 @@ import {
   HTTP_HEADER_AZ_CS_SUBSCRIPTION_API_KEY_NAME
 } from '@app/core/constants/http.constants';
 import {News} from '@app/core/entities/news.entity';
+import {ServiceUtil} from "@app/core/util/service.util";
+import {NewsUtil} from "@app/core/util/news.util";
 
 
 @Injectable({ providedIn: 'root' })
@@ -29,7 +31,7 @@ export class AzureService {
       .set('q', '+"' + query + '"')
       .set('count', '7')
       .set('offset', '0')
-      .set('mkt', 'en-GB')
+      .set('mkt', NewsUtil.locale)
       .set('sortBy', 'date')
       .set('freshness', 'week');
 
@@ -38,7 +40,9 @@ export class AzureService {
     const newsEntities = [];
     await response.toPromise().then(async (news) => {
       for (const single of news['value']) {
-        newsEntities.push(this.buildNews(single));
+        newsEntities.push(
+          this.buildNews(single)
+        );
       }
     });
 
@@ -52,7 +56,7 @@ export class AzureService {
       .set('q', '+"' + query + '"')
       .set('count', '100')
       .set('offset', '0')
-      .set('mkt', 'en-US');
+      .set('mkt', NewsUtil.locale);
 
     const response = await this.http.get(uri, {headers: headers, params: params});
 
@@ -103,7 +107,7 @@ export class AzureService {
 
   private mappingFunction(currentValue: string, index: number) {
     return {
-      'language': 'en',
+      'language': NewsUtil.languageCode,
       'id': index + 1,
       'text': currentValue
     };

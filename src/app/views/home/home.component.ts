@@ -24,25 +24,34 @@ export class HomeComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
-    let searchTerm = this.route.snapshot.paramMap.get('q');
+  private searchTerm = '';
 
-    if (searchTerm === '') {
+  ngOnInit() {
+    this.searchTerm = this.route.snapshot.paramMap.get('q');
+    let localeParam = this.route.snapshot.queryParamMap.get('l');
+
+    if (this.searchTerm === '') {
       this.router.navigate(['/']);
     }
 
-    if (searchTerm.toLowerCase().startsWith('kion')) {
-      searchTerm = 'Kion Group';
+    const allowedLocales = ['de-DE', 'en-US'];
+    if (localeParam !== '' && allowedLocales.indexOf(localeParam) >= 0) {
+      NewsUtil.locale = localeParam;
+      NewsUtil.languageCode = localeParam.split('-')[0];
+    }
+
+    if (this.searchTerm.toLowerCase().startsWith('kion')) {
+      this.searchTerm = 'Kion Group';
     }
 
     this.initButtonEvents();
 
     this.configService.fetch(() => {
-      CacheUtil.getNews(searchTerm).then((news) => {
-        this.referenceService.getImage(searchTerm).then((imageUrl) => {
+      CacheUtil.getNews(this.searchTerm).then((news) => {
+        this.referenceService.getImage(this.searchTerm).then((imageUrl) => {
           // TODO: Fix this
           /* tslint:disable */
-          new Bubble(searchTerm, imageUrl, news);
+          new Bubble(this.searchTerm, imageUrl, news);
           /* tslint:enable */
 
           this.initSvgEvents();
@@ -69,6 +78,16 @@ export class HomeComponent implements OnInit {
   }
 
   initButtonEvents() {
+    d3.select('#german-button')
+      .on('click', () => {
+        window.open('/search/' + this.searchTerm + '?l=de-DE', '_self');
+      });
+
+    d3.select('#english-button')
+      .on('click', () => {
+        window.open('/search/' + this.searchTerm + '?l=en-US', '_self');
+      });
+
     d3.select('#back-button')
       .on('click', () => {
         const referrer = BubbleUtil.getActiveBubble().getReferrer();
@@ -88,13 +107,7 @@ export class HomeComponent implements OnInit {
 
     d3.select('#search-button')
       .on('click', () => {
-        BubbleUtil.bubbles = [];
-        BubbleUtil.bubblesByName = new Map();
-        BubbleUtil.offsetX = 0;
-        BubbleUtil.offsetY = 0;
-        BubbleUtil.scale = 1;
-
-        this.router.navigate(['/'], {queryParams: {open: 'true'}});
+        window.open('?open=true', '_self');
       });
   }
 }

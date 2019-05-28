@@ -11,6 +11,7 @@ export class News {
   private readonly datePublished: string;
   private readonly source: string;
 
+  public contentAvailable = false;
   public sentiment = 0.5;
 
   constructor(name, description, category, url, datePublished, source) {
@@ -51,6 +52,10 @@ export class News {
 
   public getScore() {
     return this.sentiment;
+  }
+
+  public isContentAvailable() {
+    return this.contentAvailable;
   }
 
   public getScoreColor() {
