@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  markLanguageButton() {
+  static markLanguageButton() {
     if (NewsUtil.languageCode === 'en') {
       d3.select('#english-button')
         .attr('xlink:href', 'assets/images/en_active.svg');
@@ -98,11 +98,19 @@ export class HomeComponent implements OnInit {
   initButtonEvents() {
     d3.select('#german-button')
       .on('click', () => {
+        if (NewsUtil.locale === 'de-DE') {
+          return;
+        }
+
         window.open(environment.url + '/search/' + this.searchTerm + '?l=de-DE', '_self');
       });
 
     d3.select('#english-button')
       .on('click', () => {
+        if (NewsUtil.locale === 'en-US') {
+          return;
+        }
+
         window.open(environment.url + '/search/' + this.searchTerm + '?l=en-US', '_self');
       });
 
