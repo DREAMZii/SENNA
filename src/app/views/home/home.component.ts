@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  static markLanguageButton() {
+  markLanguageButton() {
     if (NewsUtil.languageCode === 'en') {
       d3.select('#english-button')
         .attr('xlink:href', 'assets/images/en_active.svg');
