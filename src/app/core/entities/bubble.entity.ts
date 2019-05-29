@@ -489,7 +489,7 @@ export class Bubble {
       .attr('fill', color)
       .transition()
       .duration(500)
-      .attr('height', height + 1);
+      .attr('height', height + 1 / (BubbleUtil.scalingFactor ** this.referredNumber));
 
     const statText = this.group
       .insert('text', '#green-stat + *')
