@@ -318,25 +318,39 @@ export class Bubble {
 
     let selection = d3.select('#statistics-' + this.id);
 
+    // When not open, create the general things
+    let initRectX;
+    let initRectY;
     if (selection.node() === null) {
+      initRectX = this.x - nameW / 2 - statisticsButtonWidth * 1.5 / 2;
+      initRectY = this.y + this.radius + this.radius / 2 + nameH + (nameH * 0.2);
+
       selection = this.group
         .insert('rect', ':first-child')
         .attr('id', 'statistics-' + this.id)
         .classed('stats', true)
         .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
         .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
-        .attr('x', this.x - nameW / 2 - statisticsButtonWidth * 1.5 / 2)
-        .attr('y', this.y + this.radius + this.radius / 2 + nameH + (nameH * 0.2))
+        .attr('x', initRectX)
+        .attr('y', initRectY)
         .attr('width', nameW + statisticsButtonWidth + statisticsButtonWidth / 4)
         .attr('full-height', nameH * 10)
         .attr('height', 0)
         .attr('fill', BubbleUtil.grayColor);
     } else {
-      d3.selectAll('.stats')
+      d3.selectAll('text.stats')
+        .transition()
+        .duration(750)
+        .style('opacity', 0)
+        .on('end', function () {
+          d3.select(this).remove();
+        });
+
+      d3.selectAll('rect.stats')
         .transition()
         .duration(750)
         .attr('height', 0)
-        .on('end', function() {
+        .on('end', function () {
           d3.select(this).remove();
         });
 
@@ -347,15 +361,15 @@ export class Bubble {
     const width = nameW + statisticsButtonWidth + statisticsButtonWidth / 4;
 
     const greenPercent = this.posAmount * 100 / this.oldNews.length;
-    const greenHeight = nameH * 10 * 0.8 * greenPercent / 100;
+    const greenHeight = nameH * 10 * 0.6 * greenPercent / 100;
     const greenDiff = estimatedHeight - greenHeight - estimatedHeight * 0.1;
 
     const grayPercent = this.neutAmount * 100 / this.oldNews.length;
-    const grayHeight = nameH * 10 * 0.8 * grayPercent / 100;
+    const grayHeight = nameH * 10 * 0.6 * grayPercent / 100;
     const grayDiff = estimatedHeight - grayHeight - estimatedHeight * 0.1;
 
     const redPercent = this.negAmount * 100 / this.oldNews.length;
-    const redHeight = nameH * 10 * 0.8 * redPercent / 100;
+    const redHeight = nameH * 10 * 0.6 * redPercent / 100;
     const redDiff = estimatedHeight - redHeight - estimatedHeight * 0.1;
 
     BubbleUtil.focusBubble(this, () => {
@@ -369,6 +383,48 @@ export class Bubble {
 
       this.spawnReferences();
     }, 1, 750);
+
+    const fontSize = 14 / BubbleUtil.scalingFactor ** this.referredNumber;
+    const averageText = this.group
+      .insert('text', '#statistics-' + this.id + ' + *')
+      .classed('stats', true)
+      .attr('x', initRectX)
+      .attr('y', initRectY + fontSize * 1.5)
+      .attr('font-size', fontSize)
+      .attr('font-weight', 'bold')
+      .style('opacity', 0)
+      .text('Average sentiment')
+      .transition()
+      .duration(750)
+      .style('opacity', 1);
+
+    const amountText = this.group
+      .insert('text', '#statistics-' + this.id + ' + *')
+      .classed('stats', true)
+      .attr('x', initRectX)
+      .attr('y', initRectY + fontSize * 2.5)
+      .attr('font-size', fontSize / 1.5)
+      .style('opacity', 0)
+      .text('This month | ' + this.oldNews.length + ' News')
+      .transition()
+      .duration(750)
+      .style('opacity', 1);
+
+    averageText
+      .attr('x', function() {
+        const element = d3.select(this);
+        return initRectX
+          + (selection.node() as SVGGraphicsElement).getBBox().width / 2
+          - (element.node().getBBox().width / 2);
+      });
+
+    amountText
+      .attr('x', function() {
+        const element = d3.select(this);
+        return initRectX
+          + (selection.node() as SVGGraphicsElement).getBBox().width / 2
+          - (element.node().getBBox().width / 2);
+      });
 
     selection.transition()
       .duration(750)
@@ -441,6 +497,7 @@ export class Bubble {
       .attr('x', rectX)
       .attr('y', y + diff - fullHeight * 0.05)
       .attr('font-size', fontSize)
+      .style('opacity', 0)
       .text(Math.round(percent) + '%');
 
     statText
@@ -449,7 +506,10 @@ export class Bubble {
         return rectX
           + (rect.node().getBBox().width / 2)
           - (element.node().getBBox().width / 2);
-      });
+      })
+      .transition()
+      .duration(750)
+      .style('opacity', 1);
   }
 
   private async preloadReferences() {

@@ -37,11 +37,19 @@ export class BubbleUtil {
     }
 
     if (bubble !== this.getActiveBubble()) {
-      d3.selectAll('.stats')
+      d3.selectAll('text.stats')
+        .transition()
+        .duration(750)
+        .style('opacity', 0)
+        .on('end', function () {
+          d3.select(this).remove();
+        });
+
+      d3.selectAll('rect.stats')
         .transition()
         .duration(750)
         .attr('height', 0)
-        .on('end', function() {
+        .on('end', function () {
           d3.select(this).remove();
         });
 
