@@ -11,6 +11,9 @@ export const environment = {
   image: {
     url: 'https://yacovi-config-service.azurewebsites.net/api/Image'
   },
+  contentAvailable: {
+    url: 'https://yacovi-config-service.azurewebsites.net/api/ContentAvailable'
+  },
   bing: {
     url: 'https://bing.com',
     searchUrl: 'https://bing.com/search'
