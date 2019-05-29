@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="43px" height="43px" viewBox="0 0 43 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55 (78076) - https://sketchapp.com -->
+    <title>EN_Active</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="88.0991293%" y1="72.2120671%" x2="15.5328616%" y2="8.85890384%" id="linearGradient-1">
+            <stop stop-color="#6C193F" offset="0%"></stop>
+            <stop stop-color="#AE0055" offset="100%"></stop>
+        </linearGradient>
+        <path d="M1.5545558,4.29 L9.5645558,4.29 L9.5645558,6.27 L3.9095558,6.27 L3.9095558,8.565 L9.0995558,8.565 L9.0995558,10.395 L3.9095558,10.395 L3.9095558,13.02 L9.6845558,13.02 L9.6845558,15 L1.5545558,15 L1.5545558,4.29 Z M11.2745558,4.29 L13.6145558,4.29 L18.0845558,11.475 L18.1145558,11.475 L18.1145558,4.29 L20.3195558,4.29 L20.3195558,15 L17.9645558,15 L13.5095558,7.83 L13.4795558,7.83 L13.4795558,15 L11.2745558,15 L11.2745558,4.29 Z" id="path-2"></path>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="EN_Active" transform="translate(1.000000, 1.000000)" fill-rule="nonzero">
+            <circle id="Oval-Copy-6" stroke="#FFFFFF" fill="url(#linearGradient-1)" cx="20.5" cy="20.5" r="20.5"></circle>
+            <g id="EN" transform="translate(10.000000, 11.000000)">
+                <g>
+                    <use fill="#000000" xlink:href="#path-2"></use>
+                    <use fill="#FFFFFF" xlink:href="#path-2"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
