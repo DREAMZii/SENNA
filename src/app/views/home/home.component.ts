@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.searchTerm = this.route.snapshot.paramMap.get('q');
-    let localeParam = this.route.snapshot.queryParamMap.get('l');
+    const localeParam = this.route.snapshot.queryParamMap.get('l');
 
     if (this.searchTerm === '') {
       this.router.navigate(['/']);

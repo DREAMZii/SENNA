@@ -242,7 +242,7 @@ export class Bubble {
           - statisticsButtonWidth * 1.5 / 2
         )
         .attr('y',
-          (this.y + this.radius * 1.5) + (nameH/ 1.5) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          (this.y + this.radius * 1.5) + (nameH / 1.5) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
         );
 
       this.group

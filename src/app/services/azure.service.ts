@@ -6,8 +6,7 @@ import {
   HTTP_HEADER_AZ_CS_SUBSCRIPTION_API_KEY_NAME
 } from '@app/core/constants/http.constants';
 import {News} from '@app/core/entities/news.entity';
-import {ServiceUtil} from "@app/core/util/service.util";
-import {NewsUtil} from "@app/core/util/news.util";
+import {NewsUtil} from '@app/core/util/news.util';
 
 
 @Injectable({ providedIn: 'root' })
