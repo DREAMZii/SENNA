@@ -84,6 +84,10 @@ export class Bubble {
     ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
       this.oldNews = oldNews;
 
+      if (oldNews === undefined) {
+        return;
+      }
+
       this.amount = oldNews.length;
       this.posAmount = oldNews.filter((single) => single.sentiment >= BubbleUtil.positiveThreshhold).length;
       this.neutAmount = oldNews.filter(
@@ -210,26 +214,64 @@ export class Bubble {
         .attr('font-size', fontSize)
         .text(this.searchTerm);
 
-      const nameW = nameText.node().getBBox().width;
-      const nameH = nameText.node().getBBox().height;
+      const mindWidth = 100 / BubbleUtil.scalingFactor ** this.referredNumber;
+      let nameW = nameText.node().getBBox().width;
+      if (nameW * 1.5 <= mindWidth) {
+        nameW = mindWidth;
+      } else {
+        nameW *= 1.5;
+      }
+      const nameH = nameText.node().getBBox().height * 1.5;
 
+      const statisticsButtonWidth = nameW / 2;
       this.group
         .insert('rect', ':first-child')
-        .attr('x', this.x - nameW * 1.5 / 2)
+        .attr('x', this.x - nameW  / 2 - statisticsButtonWidth * 1.5 / 2)
         .attr('y', this.y + this.radius + this.radius / 2)
         .attr('rx', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
         .attr('ry', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
-        .attr('width', nameW * 1.5)
-        .attr('height', nameH * 1.5)
+        .attr('width', nameW)
+        .attr('height', nameH)
         .attr('fill', BubbleUtil.grayColor);
 
       nameText
         .attr('x',
-          (this.x - nameW * 1.5 / 2) + (nameW / 4) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          (this.x - nameW / 2)
+          + (nameW / 1.5 / 4)
+          + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          - statisticsButtonWidth * 1.5 / 2
         )
         .attr('y',
-          (this.y + this.radius * 1.5) + (nameH * 1.5 / 1.5) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          (this.y + this.radius * 1.5) + (nameH/ 1.5) + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
         );
+
+      this.group
+        .insert('rect', ':first-child')
+        .classed('stats-button', true)
+        .attr('x', this.x - nameW / 2 + statisticsButtonWidth * 1.5)
+        .attr('y', this.y + this.radius + this.radius / 2)
+        .attr('rx', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('ry', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('width', statisticsButtonWidth)
+        .attr('height', nameH)
+        .attr('fill', BubbleUtil.grayColor)
+        .style('cursor', 'pointer')
+        .on('click', () => {
+          this.openStatistics(nameW, nameH, statisticsButtonWidth);
+        });
+
+      this.group
+        .insert('image', 'rect:first-child + *')
+        .classed('stats-button', true)
+        .attr('xlink:href', 'assets/images/statistics.svg')
+        .attr('x', this.x - nameW / 2 + statisticsButtonWidth * 1.5)
+        .attr('y', this.y + this.radius + this.radius / 2)
+        .attr('width', statisticsButtonWidth)
+        .attr('height', nameH)
+        .style('cursor', 'pointer')
+        .on('click', () => {
+          this.openStatistics(nameW, nameH, statisticsButtonWidth);
+        });
     }
 
     // Draw invisible circle for click event
@@ -255,6 +297,166 @@ export class Bubble {
           }
         });
     }
+  }
+
+  private openStatistics(nameW, nameH, statisticsButtonWidth) {
+    if (BubbleUtil.zoomDisabled && BubbleUtil.getActiveBubble() !== this) {
+      return;
+    }
+
+    if (this.referencesSpawned && this.references.length <= 0) {
+      ServiceUtil.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
+    }
+
+    let selection = d3.select('#statistics-' + this.id);
+
+    if (selection.node() === null) {
+      selection = this.group
+        .insert('rect', ':first-child')
+        .attr('id', 'statistics-' + this.id)
+        .classed('stats', true)
+        .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+        .attr('x', this.x - nameW / 2 - statisticsButtonWidth * 1.5 / 2)
+        .attr('y', this.y + this.radius + this.radius / 2 + nameH + (nameH * 0.2))
+        .attr('width', nameW + statisticsButtonWidth + statisticsButtonWidth / 4)
+        .attr('full-height', nameH * 10)
+        .attr('height', 0)
+        .attr('fill', BubbleUtil.grayColor);
+    } else {
+      d3.selectAll('.stats')
+        .transition()
+        .duration(750)
+        .attr('height', 0)
+        .on('end', function() {
+          d3.select(this).remove();
+        });
+
+      return;
+    }
+
+    const estimatedHeight = parseFloat(selection.attr('full-height'));
+    const width = nameW + statisticsButtonWidth + statisticsButtonWidth / 4;
+
+    const greenPercent = this.posAmount * 100 / this.oldNews.length;
+    const greenHeight = nameH * 10 * 0.8 * greenPercent / 100;
+    const greenDiff = estimatedHeight - greenHeight - estimatedHeight * 0.1;
+
+    const grayPercent = this.neutAmount * 100 / this.oldNews.length;
+    const grayHeight = nameH * 10 * 0.8 * grayPercent / 100;
+    const grayDiff = estimatedHeight - grayHeight - estimatedHeight * 0.1;
+
+    const redPercent = this.negAmount * 100 / this.oldNews.length;
+    const redHeight = nameH * 10 * 0.8 * redPercent / 100;
+    const redDiff = estimatedHeight - redHeight - estimatedHeight * 0.1;
+
+    BubbleUtil.focusBubble(this, () => {
+      if (!this.referencesSpawned) {
+        BubbleUtil.zoomDisabled = true;
+
+        if (!this.referencesLoaded) {
+          this.startRotating();
+        }
+      }
+
+      this.spawnReferences();
+    }, 1, 750);
+
+    selection.transition()
+      .duration(750)
+      .attr('height', estimatedHeight)
+      .on('end', () => {
+        const fontSize = 14 / BubbleUtil.scalingFactor ** this.referredNumber;
+        const x = this.x - nameW / 2 - statisticsButtonWidth * 1.5 / 2;
+        const y = this.y + this.radius + this.radius / 2 + nameH + (nameH * 0.2);
+
+        this.group
+          .insert('rect', '#statistics-' + this.id + ' + *')
+          .attr('id', 'green-stat')
+          .classed('stats', true)
+          .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          .attr('x', x + width / 5)
+          .attr('y', y + greenDiff)
+          .attr('width', width / 5)
+          .attr('height', 0)
+          .attr('fill', BubbleUtil.greenColor)
+          .transition()
+          .duration(500)
+          .attr('height', greenHeight + 1);
+
+        const greenStatText = this.group
+          .insert('text', '#green-stat + *')
+          .classed('stats', true)
+          .attr('x', x + width / 5)
+          .attr('y', y + greenDiff - estimatedHeight * 0.05)
+          .attr('font-size', fontSize)
+          .text(Math.trunc(greenPercent) + '%');
+
+        greenStatText
+          .attr('x', function() {
+            const element = d3.select(this);
+            return parseFloat(element.attr('x')) + element.node().getBBox().width / 4;
+          });
+
+        this.group
+          .insert('rect', '#statistics-' + this.id + ' + *')
+          .attr('id', 'gray-stat')
+          .classed('stats', true)
+          .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          .attr('x', x + width / 5 * 2)
+          .attr('y', y + grayDiff)
+          .attr('width', width / 5)
+          .attr('height', 0)
+          .attr('fill', 'darkgray')
+          .transition()
+          .duration(500)
+          .attr('height', grayHeight + 1);
+
+        const grayStatText = this.group
+          .insert('text', '#gray-stat + *')
+          .classed('stats', true)
+          .attr('x', x + width / 5 * 2)
+          .attr('y', y + grayDiff - estimatedHeight * 0.05)
+          .attr('font-size', fontSize)
+          .text(Math.trunc(grayPercent) + '%');
+
+        grayStatText
+          .attr('x', function() {
+            const element = d3.select(this);
+            return parseFloat(element.attr('x')) + element.node().getBBox().width / 4;
+          });
+
+        this.group
+          .insert('rect', '#statistics-' + this.id + ' + *')
+          .attr('id', 'red-stat')
+          .classed('stats', true)
+          .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          .attr('x', x + width / 5 * 3)
+          .attr('y', y + redDiff)
+          .attr('width', width / 5)
+          .attr('height', 0)
+          .attr('fill', BubbleUtil.redColor)
+          .transition()
+          .duration(500)
+          .attr('height', redHeight + 1);
+
+        const redStatText = this.group
+          .insert('text', '#red-stat + *')
+          .classed('stats', true)
+          .attr('x', x + width / 5 * 3)
+          .attr('y', y + redDiff - estimatedHeight * 0.05)
+          .attr('font-size', fontSize)
+          .text(Math.trunc(redPercent) + '%');
+
+        redStatText
+          .attr('x', function() {
+            const element = d3.select(this);
+            return parseFloat(element.attr('x')) + element.node().getBBox().width / 4;
+          });
+      });
   }
 
   private async preloadReferences() {

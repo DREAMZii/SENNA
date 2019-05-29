@@ -37,6 +37,14 @@ export class BubbleUtil {
     }
 
     if (bubble !== this.getActiveBubble()) {
+      d3.selectAll('.stats')
+        .transition()
+        .duration(750)
+        .attr('height', 0)
+        .on('end', function() {
+          d3.select(this).remove();
+        });
+
       this.getActiveBubble().newsGroup.remove();
     }
 
