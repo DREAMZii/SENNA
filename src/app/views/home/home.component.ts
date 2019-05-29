@@ -8,6 +8,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import * as d3 from 'd3';
 import {NewsUtil} from '@app/core/util/news.util';
 import {BubbleUtil} from '@app/core/util/bubble.util';
+import {environment} from '@environments/environment.prod';
 
 @Component({
   templateUrl: './home.component.html',
@@ -80,12 +81,12 @@ export class HomeComponent implements OnInit {
   initButtonEvents() {
     d3.select('#german-button')
       .on('click', () => {
-        window.open('/search/' + this.searchTerm + '?l=de-DE', '_self');
+        window.open(environment.url + '/search/' + this.searchTerm + '?l=de-DE', '_self');
       });
 
     d3.select('#english-button')
       .on('click', () => {
-        window.open('/search/' + this.searchTerm + '?l=en-US', '_self');
+        window.open(environment.url + '/search/' + this.searchTerm + '?l=en-US', '_self');
       });
 
     d3.select('#back-button')
@@ -107,7 +108,7 @@ export class HomeComponent implements OnInit {
 
     d3.select('#search-button')
       .on('click', () => {
-        window.open('?open=true', '_self');
+        window.open(environment.url + '?open=true', '_self');
       });
   }
 }

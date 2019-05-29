@@ -1,4 +1,5 @@
 export const environment = {
+  url: 'https://kidica.github.io/SENNA',
   production: true,
   disableAuthentication: false,
   snapshotIntervalInSeconds: 5,
