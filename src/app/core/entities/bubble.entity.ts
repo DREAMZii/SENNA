@@ -110,7 +110,6 @@ export class Bubble {
         .catch(() => {
           this.referencesLoaded = true;
           ServiceUtil.alertService.error('Initial references could not be loaded! Please refresh.');
-          this.spawnReferences();
         });
     }
   }
@@ -300,7 +299,6 @@ export class Bubble {
         .catch(() => {
           this.referencesLoaded = true;
           ServiceUtil.alertService.error('References for ' + this.searchTerm.toUpperCase() + ' could not be loaded!');
-          this.spawnReferences();
         });
     }
   }
