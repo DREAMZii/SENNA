@@ -64,12 +64,11 @@ export class HomeComponent implements OnInit {
 
   markLanguageButton() {
     if (NewsUtil.languageCode === 'en') {
-      
       d3.select('#english-button')
         .attr('xlink:href', 'assets/images/en_active.svg');
 
       d3.select('#german-button')
-        .attr('xlink:href', 'assets/images/de_inactive.svg');
+        .attr('xlink:href', 'assets/images/de_inactive_.svg');
     } else {
       d3.select('#german-button')
         .attr('xlink:href', 'assets/images/de_active.svg');
