@@ -211,7 +211,9 @@ export class Bubble {
 
       const nameText = this.group
         .insert('text', 'path:first-child')
+        .classed('name-button', true)
         .attr('font-size', fontSize)
+        .style('cursor', 'pointer')
         .text(this.searchTerm);
 
       const mindWidth = 100 / BubbleUtil.scalingFactor ** this.referredNumber;
@@ -226,19 +228,21 @@ export class Bubble {
       const statisticsButtonWidth = nameW / 2;
       this.group
         .insert('rect', ':first-child')
+        .classed('name-button', true)
         .attr('x', this.x - nameW  / 2 - statisticsButtonWidth * 1.5 / 2)
         .attr('y', this.y + this.radius + this.radius / 2)
         .attr('rx', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
         .attr('ry', 10 / BubbleUtil.scalingFactor ** this.referredNumber)
         .attr('width', nameW)
         .attr('height', nameH)
-        .attr('fill', BubbleUtil.grayColor);
+        .attr('fill', BubbleUtil.grayColor)
+        .style('cursor', 'pointer');
 
       nameText
         .attr('x',
           (this.x - nameW / 2)
-          + (nameW / 1.5 / 4)
-          + (1.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+          + (nameW / 2)
+          - nameText.node().getBBox().width / 2
           - statisticsButtonWidth * 1.5 / 2
         )
         .attr('y',
@@ -370,96 +374,81 @@ export class Bubble {
       .duration(750)
       .attr('height', estimatedHeight)
       .on('end', () => {
-        const fontSize = 14 / BubbleUtil.scalingFactor ** this.referredNumber;
         const x = this.x - nameW / 2 - statisticsButtonWidth * 1.5 / 2;
         const y = this.y + this.radius + this.radius / 2 + nameH + (nameH * 0.2);
 
-        this.group
-          .insert('rect', '#statistics-' + this.id + ' + *')
-          .attr('id', 'green-stat')
-          .classed('stats', true)
-          .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
-          .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
-          .attr('x', x + width / 5)
-          .attr('y', y + greenDiff)
-          .attr('width', width / 5)
-          .attr('height', 0)
-          .attr('fill', BubbleUtil.greenColor)
-          .transition()
-          .duration(500)
-          .attr('height', greenHeight + 1);
+        this.spawnStatsRect(
+          x,
+          y,
+          1,
+          width,
+          greenDiff,
+          greenHeight,
+          estimatedHeight,
+          greenPercent,
+          BubbleUtil.greenColor
+        );
 
-        const greenStatText = this.group
-          .insert('text', '#green-stat + *')
-          .classed('stats', true)
-          .attr('x', x + width / 5)
-          .attr('y', y + greenDiff - estimatedHeight * 0.05)
-          .attr('font-size', fontSize)
-          .text(Math.round(greenPercent) + '%');
+        this.spawnStatsRect(
+          x,
+          y,
+          2,
+          width,
+          grayDiff,
+          grayHeight,
+          estimatedHeight,
+          grayPercent,
+          'lightgray'
+        );
 
-        greenStatText
-          .attr('x', function() {
-            const element = d3.select(this);
-            return parseFloat(element.attr('x')) + element.node().getBBox().width / 4;
-          });
+        this.spawnStatsRect(
+          x,
+          y,
+          3,
+          width,
+          redDiff,
+          redHeight,
+          estimatedHeight,
+          redPercent,
+          BubbleUtil.redColor
+        );
+      });
+  }
 
-        this.group
-          .insert('rect', '#statistics-' + this.id + ' + *')
-          .attr('id', 'gray-stat')
-          .classed('stats', true)
-          .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
-          .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
-          .attr('x', x + width / 5 * 2)
-          .attr('y', y + grayDiff)
-          .attr('width', width / 5)
-          .attr('height', 0)
-          .attr('fill', 'darkgray')
-          .transition()
-          .duration(500)
-          .attr('height', grayHeight + 1);
+  private spawnStatsRect(x, y, index, width, diff, height, fullHeight, percent, color) {
+    const fontSize = 14 / BubbleUtil.scalingFactor ** this.referredNumber;
+    const statsWidth = width / 5 * 0.8;
 
-        const grayStatText = this.group
-          .insert('text', '#gray-stat + *')
-          .classed('stats', true)
-          .attr('x', x + width / 5 * 2)
-          .attr('y', y + grayDiff - estimatedHeight * 0.05)
-          .attr('font-size', fontSize)
-          .text(Math.round(grayPercent) + '%');
+    const rectX = x + width / 5 * index + width / 5 * 0.1;
+    const rect = this.group
+      .insert('rect', '#statistics-' + this.id + ' + *')
+      .attr('id', 'green-stat')
+      .classed('stats', true)
+      .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+      .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
+      .attr('x', rectX)
+      .attr('y', y + diff)
+      .attr('width', statsWidth)
+      .attr('height', 0)
+      .attr('fill', color)
+      .transition()
+      .duration(500)
+      .attr('height', height + 1);
 
-        grayStatText
-          .attr('x', function() {
-            const element = d3.select(this);
-            return parseFloat(element.attr('x')) + element.node().getBBox().width / 4;
-          });
+    const statText = this.group
+      .insert('text', '#green-stat + *')
+      .classed('stats', true)
+      .attr('x', rectX)
+      .attr('y', y + diff - fullHeight * 0.05)
+      .attr('font-size', fontSize)
+      .text(Math.round(percent) + '%');
 
-        this.group
-          .insert('rect', '#statistics-' + this.id + ' + *')
-          .attr('id', 'red-stat')
-          .classed('stats', true)
-          .attr('rx', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
-          .attr('ry', 7.5 / BubbleUtil.scalingFactor ** this.referredNumber)
-          .attr('x', x + width / 5 * 3)
-          .attr('y', y + redDiff)
-          .attr('width', width / 5)
-          .attr('height', 0)
-          .attr('fill', BubbleUtil.redColor)
-          .transition()
-          .duration(500)
-          .attr('height', redHeight + 1);
-
-        const redStatText = this.group
-          .insert('text', '#red-stat + *')
-          .classed('stats', true)
-          .attr('x', x + width / 5 * 3)
-          .attr('y', y + redDiff - estimatedHeight * 0.05)
-          .attr('font-size', fontSize)
-          .text(Math.round(redPercent) + '%');
-
-        redStatText
-          .attr('x', function() {
-            const element = d3.select(this);
-            return parseFloat(element.attr('x')) + element.node().getBBox().width / 4;
-          });
+    statText
+      .attr('x', function() {
+        const element = d3.select(this);
+        return rectX
+          + (rect.node().getBBox().width / 2)
+          - (element.node().getBBox().width / 2);
       });
   }
 
@@ -597,7 +586,7 @@ export class Bubble {
     });
 
     // Recenter button
-    this.group.select('circle').on('click', () => {
+    this.group.selectAll('circle, .name-button').on('click', () => {
       if (this.referencesSpawned && this.references.length <= 0) {
         ServiceUtil.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
       }
