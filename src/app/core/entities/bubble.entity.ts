@@ -393,7 +393,7 @@ export class Bubble {
           .attr('x', x + width / 5)
           .attr('y', y + greenDiff - estimatedHeight * 0.05)
           .attr('font-size', fontSize)
-          .text(Math.trunc(greenPercent) + '%');
+          .text(Math.round(greenPercent) + '%');
 
         greenStatText
           .attr('x', function() {
@@ -422,7 +422,7 @@ export class Bubble {
           .attr('x', x + width / 5 * 2)
           .attr('y', y + grayDiff - estimatedHeight * 0.05)
           .attr('font-size', fontSize)
-          .text(Math.trunc(grayPercent) + '%');
+          .text(Math.round(grayPercent) + '%');
 
         grayStatText
           .attr('x', function() {
@@ -451,7 +451,7 @@ export class Bubble {
           .attr('x', x + width / 5 * 3)
           .attr('y', y + redDiff - estimatedHeight * 0.05)
           .attr('font-size', fontSize)
-          .text(Math.trunc(redPercent) + '%');
+          .text(Math.round(redPercent) + '%');
 
         redStatText
           .attr('x', function() {
