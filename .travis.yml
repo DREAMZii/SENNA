@@ -12,11 +12,11 @@ install:
 script:
   - npm run lint
   - ng build --prod --base-href /SENA/
-  - mv dist/SENNA/index.html dist/SENA/404.html
+  - mv dist/SENA/index.html dist/SENA/404.html
 deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  local_dir: dist/SENNA
+  local_dir: dist/SENA
   on:
     branch: master
