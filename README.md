@@ -1,15 +1,15 @@
-  <h1>SENNA</h1>
+  <h1>SENA</h1>
   <p>
-    <a href="https://travis-ci.com/KIDICA/SENNA" name="SENNA Builds" target="_blank">
-      <img src="https://travis-ci.com/KIDICA/SENNA.svg?branch=master" alt="TravisCi Build Status" />
+    <a href="https://travis-ci.com/KIDICA/SENA" name="SENA Builds" target="_blank">
+      <img src="https://travis-ci.com/KIDICA/SENA.svg?branch=master" alt="TravisCi Build Status" />
     </a>
   </p>
   <p>
-    <a href="https://kidica.github.io/SENNA" target="_blank">LIVE DEMO</a>
+    <a href="https://kidica.github.io/SENA" target="_blank">LIVE DEMO</a>
     <br>
-    <a href="https://github.com/KIDICA/SENNA/issues/new">Report bug</a>
+    <a href="https://github.com/KIDICA/SENA/issues/new">Report bug</a>
     <br>
-    <a href="https://github.com/KIDICA/SENNA/issues/new">Request feature</a>
+    <a href="https://github.com/KIDICA/SENA/issues/new">Request feature</a>
   </p>
 </p>
 
@@ -62,4 +62,4 @@ We use Travis CI to run this tasks in order:
 
 ## Copyright and license
 
-Code and documentation copyright 2018 the authors. Code released under the [MIT License](https://github.com/KIDICA/SENNA/blob/master/LICENSE).
+Code and documentation copyright 2018 the authors. Code released under the [MIT License](https://github.com/KIDICA/SENA/blob/master/LICENSE).
