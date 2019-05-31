@@ -1,5 +1,5 @@
 export const environment = {
-  url: 'https://kidica.github.io/SENNA',
+  url: 'https://kidica.github.io/SENA',
   production: true,
   disableAuthentication: false,
   snapshotIntervalInSeconds: 5,
@@ -33,7 +33,7 @@ export const environment = {
     adal: {
       tenant: '13c728e0-bb0c-4cf7-8e10-5b327279d6d9',
       clientId: '9046ce57-3082-4d8b-bec4-3b76ac73f4bc',
-      redirectUri: 'https://kidica.github.io/SENNA/',
+      redirectUri: 'https://kidica.github.io/SENA/',
       endpoints: ['https://vault.azure.net']
     },
     cognitiveServices: {
