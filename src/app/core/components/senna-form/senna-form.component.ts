@@ -1,6 +1,5 @@
 ﻿import {Component} from '@angular/core';
-import {SennaFormEntity} from '@app/core/components/senna-form/senna-form.entity';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-senna-form',
@@ -10,6 +9,7 @@ import {Router} from '@angular/router';
 export class SennaFormComponent {
 
   constructor(
+    private route: ActivatedRoute,
     private router: Router,
   ) {
 
@@ -22,6 +22,11 @@ export class SennaFormComponent {
       return;
     }
 
-    this.router.navigate(['/search', this.searchTerm]);
+    const url = this.route.snapshot.url;
+    if (url.length > 0 && url[0].path === 'sentiment') {
+      this.router.navigate(['/score'], {queryParams: {q: this.searchTerm}});
+    } else {
+      this.router.navigate(['/search', this.searchTerm]);
+    }
   }
 }

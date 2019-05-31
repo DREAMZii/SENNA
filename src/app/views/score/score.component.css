@@ -1,0 +1,57 @@
+div#body {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+#first-search-button {
+  width: 8vh;
+  height: 8vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 100;
+  cursor: pointer;
+}
+
+#search-button {
+  cursor: pointer;
+  position: absolute;
+  left: 2%;
+  top: 83%;
+}
+
+#loading-gear {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+#score-counter {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  margin-top: 45vh;
+  font-size: 5vh;
+}
+
+#german-button {
+  position: absolute;
+  left: 92%;
+  top: 87%;
+  cursor: pointer;
+}
+
+#english-button {
+  position: absolute;
+  left: 86%;
+  top: 87%;
+  cursor: pointer;
+}

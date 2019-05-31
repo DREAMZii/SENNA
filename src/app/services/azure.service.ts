@@ -80,6 +80,20 @@ export class AzureService {
     );
   }
 
+  async determineSentiment(text: string) {
+    const uri = environment.azure.cognitiveServices.textAnalysisSentimentUrl;
+    const headers = new HttpHeaders(this.headersJson());
+    const request = { 'documents' : [text].map(this.mappingFunction) };
+
+    const response = await this.http.post(uri, request, {headers: headers});
+    let score = 0.5;
+    await response.subscribe((documents) => {
+      score = documents['documents'][0]['score'];
+    });
+
+    return score;
+  }
+
   async determineNewsSentiment(news: News[]) {
     const texts = [];
     for (const single of news) {

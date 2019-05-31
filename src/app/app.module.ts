@@ -24,6 +24,8 @@ import {SearchComponent} from '@app/views/search';
 import {SennaFormComponent} from '@app/core/components/senna-form/senna-form.component';
 import {SennaNewsComponent} from '@app/core/components/senna-news/senna-news.component';
 import {SennaAlertService} from '@app/core/modules/senna-alert/senna-alert.service';
+import {SentimentComponent} from "@app/views/sentiment";
+import {ScoreComponent} from "@app/views/score";
 
 @NgModule({
   imports: [
@@ -53,7 +55,9 @@ import {SennaAlertService} from '@app/core/modules/senna-alert/senna-alert.servi
     LoginComponent,
     SearchComponent,
     SennaFormComponent,
-    SennaNewsComponent
+    SennaNewsComponent,
+    SentimentComponent,
+    ScoreComponent
   ],
   providers: [
     CustomAdalService,
