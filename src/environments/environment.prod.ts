@@ -1,5 +1,5 @@
 export const environment = {
-  url: 'localhost:4200',
+  url: 'https://kidica.github.io/SENNA',
   production: true,
   disableAuthentication: false,
   snapshotIntervalInSeconds: 5,
@@ -43,6 +43,7 @@ export const environment = {
       searchUrl: 'https://westeurope.api.cognitive.microsoft.com/bing/v7.0/search',
 
       // https://westus.dev.cognitive.microsoft.com/docs/services/TextAnalytics.V2.0/operations/56f30ceeeda5650db055a3c9
+      textAnalysisLanguageUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/languages',
       textAnalysisKeyPhrasesUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases',
       textAnalysisSentimentUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment'
 
