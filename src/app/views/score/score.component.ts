@@ -37,8 +37,19 @@ export class ScoreComponent implements OnInit {
 
     this.configService.fetch(() => {
       this.azureService.determineLanguage(this.searchTerm).then((locale) => {
+        this.azureService.determineKeywords(this.searchTerm, locale).then((keyPhrases) => {
+          d3.select('#word-facts')
+            .append('p')
+            .html('<strong>Keywords</strong>: ' + keyPhrases);
+
+          d3.select('#word-facts')
+            .append('p')
+            .html('<strong>Language</strong>: ' + locale);
+        });
+
         this.azureService.determineSentiment(this.searchTerm, locale).then((score) => {
           d3.select('#loading-gear').remove();
+          d3.select('#initial-words').text(this.searchTerm);
 
           const roundedScore = Math.round(score * 100);
 
