@@ -4,8 +4,8 @@ import { HomeComponent } from './views/home';
 import { LoginComponent } from './views/login';
 import { CustomAdalGuard } from '@app/core/guards/customAdal.guard';
 import {SearchComponent} from '@app/views/search';
-import {SentimentComponent} from "@app/views/sentiment";
-import {ScoreComponent} from "@app/views/score";
+import {SentimentComponent} from '@app/views/sentiment';
+import {ScoreComponent} from '@app/views/score';
 
 const appRoutes: Routes = [
   { path: '', component: SearchComponent, canActivate: [CustomAdalGuard] },

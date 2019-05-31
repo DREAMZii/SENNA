@@ -80,18 +80,54 @@ export class AzureService {
     );
   }
 
-  async determineSentiment(text: string) {
+  async determineLanguage(text: string) {
+    const uri = environment.azure.cognitiveServices.textAnalysisLanguageUrl;
+    const headers = new HttpHeaders(this.headersJson());
+    const request = { 'documents' : [text].map(this.languageMappingFunction) };
+
+    const response = await this.http.post(uri, request, {headers: headers});
+    let language = 'en';
+    await response.toPromise().then((documents) => {
+      language = documents['documents'][0]['detectedLanguages'][0]['iso6391Name'];
+    });
+
+    return language;
+  }
+
+  async determineSentiment(text: string, locale: string) {
     const uri = environment.azure.cognitiveServices.textAnalysisSentimentUrl;
     const headers = new HttpHeaders(this.headersJson());
-    const request = { 'documents' : [text].map(this.mappingFunction) };
+    const request = { 'documents' : [{
+        'language': locale,
+        'id': 1,
+        'text': text
+      }] };
 
     const response = await this.http.post(uri, request, {headers: headers});
     let score = 0.5;
-    await response.subscribe((documents) => {
+    await response.toPromise().then((documents) => {
       score = documents['documents'][0]['score'];
     });
 
     return score;
+  }
+
+  async determineKeywords(text: string, locale: string) {
+    const uri = environment.azure.cognitiveServices.textAnalysisKeyPhrasesUrl;
+    const headers = new HttpHeaders(this.headersJson());
+    const request = { 'documents' : [{
+        'language': locale,
+        'id': 1,
+        'text': text
+      }] };
+
+    const response = await this.http.post(uri, request, {headers: headers});
+    let keyPhrases = [];
+    await response.toPromise().then((documents) => {
+      keyPhrases = documents['documents'][0]['keyPhrases'];
+    });
+
+    return keyPhrases;
   }
 
   async determineNewsSentiment(news: News[]) {
@@ -116,6 +152,13 @@ export class AzureService {
     });
 
     return news;
+  }
+
+  private languageMappingFunction(currentValue: string, index: number) {
+    return {
+      'id': index + 1,
+      'text': currentValue
+    };
   }
 
   private mappingFunction(currentValue: string, index: number) {

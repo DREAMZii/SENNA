@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import * as d3 from 'd3';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NewsUtil} from "@app/core/util/news.util";
-import {environment} from "@environments/environment.prod";
+import {NewsUtil} from '@app/core/util/news.util';
+import {environment} from '@environments/environment.prod';
 
 @Component({
   templateUrl: './sentiment.component.html',

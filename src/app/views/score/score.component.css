@@ -41,17 +41,3 @@ div#body {
   margin-top: 45vh;
   font-size: 5vh;
 }
-
-#german-button {
-  position: absolute;
-  left: 92%;
-  top: 87%;
-  cursor: pointer;
-}
-
-#english-button {
-  position: absolute;
-  left: 86%;
-  top: 87%;
-  cursor: pointer;
-}
