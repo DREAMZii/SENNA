@@ -124,6 +124,10 @@ export class AzureService {
     const response = await this.http.post(uri, request, {headers: headers});
     let keyPhrases = [];
     await response.toPromise().then((documents) => {
+      if (keyPhrases.length <= 0) {
+        return;
+      }
+
       keyPhrases = documents['documents'][0]['keyPhrases'];
     });
 
