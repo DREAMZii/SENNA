@@ -11,7 +11,7 @@ install:
 
 script:
   - npm run lint
-  - ng build --prod --base-href /SENA/
+  - ng build --prod --base-href /
   - mv dist/SENA/index.html dist/SENA/404.html
 deploy:
   provider: pages
