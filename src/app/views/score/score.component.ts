@@ -73,7 +73,7 @@ export class ScoreComponent implements OnInit {
           let counter = 0;
           const tid = setInterval(() => {
             d3.select('#score-counter')
-              .text(counter + '%');
+              .text(counter);
 
             if (counter >= roundedScore) {
               clearInterval(tid);
