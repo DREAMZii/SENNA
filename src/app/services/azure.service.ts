@@ -30,8 +30,7 @@ export class AzureService {
       .set('q', '+"' + query + '"')
       .set('count', '7')
       .set('offset', '0')
-      .set('mkt', NewsUtil.locale)
-      .set('freshness', 'week');
+      .set('mkt', NewsUtil.locale);
 
     const response = await this.http.get(uri, {headers: headers, params: params});
 
