@@ -5,7 +5,7 @@
     </a>
   </p>
   <p>
-    <a href="https://kidica.github.io/SENA" target="_blank">LIVE DEMO</a>
+    <a href="https://sena.kiondc.io" target="_blank">LIVE DEMO</a>
     <br>
     <a href="https://github.com/KIDICA/SENA/issues/new">Report bug</a>
     <br>
