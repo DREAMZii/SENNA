@@ -69,10 +69,10 @@ export class NewsUtil {
       .select('a')
       .attr('href', null);
 
-    d3.select('#news-loading')
-      .style('display', 'block');
-
     if (news.getUrl().startsWith('https://')) {
+      d3.select('#news-loading')
+        .style('display', 'block');
+
       ServiceUtil.referenceService.isContentAvailable(news.getUrl()).then((result) => {
         // Dont know why this doesnt work as boolean, works as string tho
         if (result === 'true') {
@@ -215,6 +215,9 @@ export class NewsUtil {
     if (!NewsUtil.isNewsOpen()) {
       return;
     }
+
+    d3.select('#news-loading')
+      .style('display', 'none');
 
     d3.select('#alert-boxes').style('right', '6.5%');
     d3.select('#canvas')
