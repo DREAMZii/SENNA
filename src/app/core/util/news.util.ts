@@ -77,35 +77,49 @@ export class NewsUtil {
         .style('display', 'block');
     }
 
-    ServiceUtil.referenceService.isContentAvailable(news.getUrl()).then((result) => {
-      // Dont know why this doesnt work as boolean, works as string tho
-      if (result === 'true') {
-        d3.select('#senna-news iframe')
-          .attr('src', news.getUrl())
-          .style('display', 'block')
-          .on('load', () => {
-            d3.select('#news-loading')
-              .style('display', 'none');
-          });
+    if (news.getUrl().startsWith('https://')) {
+      ServiceUtil.referenceService.isContentAvailable(news.getUrl()).then((result) => {
+        // Dont know why this doesnt work as boolean, works as string tho
+        if (result === 'true') {
+          d3.select('#senna-news iframe')
+            .attr('src', news.getUrl())
+            .style('display', 'block')
+            .on('load', () => {
+              d3.select('#news-loading')
+                .style('display', 'none');
+            });
 
-        d3.select('#senna-news .news-fallback')
-          .style('display', 'none')
-          .select('a')
-          .attr('href', null);
-      } else {
-        d3.select('#news-loading')
-          .style('display', 'none');
+          d3.select('#senna-news .news-fallback')
+            .style('display', 'none')
+            .select('a')
+            .attr('href', null);
+        } else {
+          d3.select('#news-loading')
+            .style('display', 'none');
 
-        d3.select('#senna-news iframe')
-          .attr('src', null)
-          .style('display', 'none');
+          d3.select('#senna-news iframe')
+            .attr('src', null)
+            .style('display', 'none');
 
-        d3.select('#senna-news .news-fallback')
-          .style('display', 'block')
-          .select('a')
-          .attr('href', news.getUrl());
-      }
-    });
+          d3.select('#senna-news .news-fallback')
+            .style('display', 'block')
+            .select('a')
+            .attr('href', news.getUrl());
+        }
+      });
+    } else {
+      d3.select('#news-loading')
+        .style('display', 'none');
+
+      d3.select('#senna-news iframe')
+        .attr('src', null)
+        .style('display', 'none');
+
+      d3.select('#senna-news .news-fallback')
+        .style('display', 'block')
+        .select('a')
+        .attr('href', news.getUrl());
+    }
 
     // Is not open
     if (!this.openArticles.has(news.getId())) {
