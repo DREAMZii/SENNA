@@ -57,6 +57,15 @@
   text-align: center;
 }
 
+#news-loading {
+  width: 200px;
+  display: none;
+  margin-top: 50%;
+  margin-left: -webkit-calc(50% - 100px);
+  margin-left: -moz-calc(50% - 100px);
+  margin-left: calc(50% - 100px);
+}
+
 /* Open articles */
 
 #close-button {

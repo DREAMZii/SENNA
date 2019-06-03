@@ -36,6 +36,9 @@ export class NewsUtil {
       .duration(1000)
       .style('width', '36.5%')
       .on('end', function() {
+        d3.select('#news-loading')
+          .style('display', 'block');
+
         d3.select('#close-button').style('display', null);
       });
   }
@@ -59,18 +62,40 @@ export class NewsUtil {
     d3.select('#news-headline h2')
       .text(news.getName());
 
+    // Make iframe etc. invisible
+    d3.select('#senna-news iframe')
+      .attr('src', null)
+      .style('display', 'none');
+
+    d3.select('#senna-news .news-fallback')
+      .style('display', 'none')
+      .select('a')
+      .attr('href', null);
+
+    if (NewsUtil.isNewsOpen()) {
+      d3.select('#news-loading')
+        .style('display', 'block');
+    }
+
     ServiceUtil.referenceService.isContentAvailable(news.getUrl()).then((result) => {
       // Dont know why this doesnt work as boolean, works as string tho
       if (result === 'true') {
         d3.select('#senna-news iframe')
           .attr('src', news.getUrl())
-          .style('display', 'block');
+          .style('display', 'block')
+          .on('load', () => {
+            d3.select('#news-loading')
+              .style('display', 'none');
+          });
 
         d3.select('#senna-news .news-fallback')
           .style('display', 'none')
           .select('a')
           .attr('href', null);
       } else {
+        d3.select('#news-loading')
+          .style('display', 'none');
+
         d3.select('#senna-news iframe')
           .attr('src', null)
           .style('display', 'none');
