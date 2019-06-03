@@ -36,9 +36,6 @@ export class NewsUtil {
       .duration(1000)
       .style('width', '36.5%')
       .on('end', function() {
-        d3.select('#news-loading')
-          .style('display', 'block');
-
         d3.select('#close-button').style('display', null);
       });
   }
@@ -72,10 +69,8 @@ export class NewsUtil {
       .select('a')
       .attr('href', null);
 
-    if (NewsUtil.isNewsOpen()) {
-      d3.select('#news-loading')
-        .style('display', 'block');
-    }
+    d3.select('#news-loading')
+      .style('display', 'block');
 
     if (news.getUrl().startsWith('https://')) {
       ServiceUtil.referenceService.isContentAvailable(news.getUrl()).then((result) => {
