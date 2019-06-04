@@ -18,5 +18,6 @@ deploy:
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   local_dir: dist/SENA
+  fqdn: sena.kiondc.io
   on:
     branch: master
