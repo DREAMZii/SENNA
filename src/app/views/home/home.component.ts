@@ -1,5 +1,4 @@
 import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
-import {Bubble} from '@app/core/entities/bubble.entity';
 import {ConfigService, ReferenceService} from '@app/services';
 
 import {CacheUtil} from '@app/core/util/cache.util';
@@ -9,57 +8,62 @@ import * as d3 from 'd3';
 import {NewsUtil} from '@app/core/util/news.util';
 import {BubbleUtil} from '@app/core/util/bubble.util';
 import {environment} from '@environments/environment.prod';
+import {Bubble} from "@app/core/entities/bubble/bubble.entity";
 
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('graphContainer') graphContainer: ElementRef;
-
   constructor(
     private configService: ConfigService,
     private router: Router,
     private route: ActivatedRoute,
     private referenceService: ReferenceService
-  ) {
-  }
-
-  private searchTerm = '';
+  ) {}
 
   ngOnInit() {
-    this.searchTerm = this.route.snapshot.paramMap.get('q');
+    let searchTerm = this.route.snapshot.paramMap.get('q');
     const localeParam = this.route.snapshot.queryParamMap.get('l');
 
-    if (this.searchTerm === '') {
-      this.router.navigate(['/']);
+    this.validateInputs(searchTerm, localeParam);
+
+    // Cheat a bit
+    if (searchTerm.toLowerCase().startsWith('kion')) {
+      searchTerm = 'Kion Group';
     }
 
+    // Validated
+    this.markLanguageButton();
+    this.initButtonEvents();
+    this.initSvgEvents();
+
+    this.configService.fetch(() => {
+      CacheUtil.getNews(searchTerm).then((news) => {
+        this.referenceService.getImage(searchTerm).then((imageUrl) => {
+          // Azure Service Key + initial news + initial image loaded
+          Bubble.createInitialBubble(searchTerm, imageUrl, news);
+        });
+      });
+    });
+  }
+
+  /**
+   * Validates required inputs
+   *
+   * @param searchTerm    - initial term that gets displayed, should not be empty
+   * @param localeParam   - locale the news will get displayed in [de-DE, en-US]
+   */
+  validateInputs(searchTerm: string, localeParam: string) {
     const allowedLocales = ['de-DE', 'en-US'];
     if (localeParam !== '' && allowedLocales.indexOf(localeParam) >= 0) {
       NewsUtil.locale = localeParam;
       NewsUtil.languageCode = localeParam.split('-')[0];
     }
 
-    if (this.searchTerm.toLowerCase().startsWith('kion')) {
-      this.searchTerm = 'Kion Group';
+    if (searchTerm === '') {
+      this.router.navigate(['/']);
     }
-
-    this.markLanguageButton();
-    this.initButtonEvents();
-
-    this.configService.fetch(() => {
-      CacheUtil.getNews(this.searchTerm).then((news) => {
-        this.referenceService.getImage(this.searchTerm).then((imageUrl) => {
-          // TODO: Fix this
-          /* tslint:disable */
-          new Bubble(this.searchTerm, imageUrl, news);
-          /* tslint:enable */
-
-          this.initSvgEvents();
-        });
-      });
-    });
   }
 
   markLanguageButton() {
@@ -79,12 +83,6 @@ export class HomeComponent implements OnInit {
   }
 
   initSvgEvents() {
-    d3.select('app-senna-news')
-      .append('div')
-      .attr('id', 'open-news-article')
-      .style('width', '3.5%')
-      .style('float', 'right');
-
     d3.select('#canvas')
       .on('click', function() {
         if (d3.event.srcElement.tagName !== 'svg') {
@@ -96,13 +94,15 @@ export class HomeComponent implements OnInit {
   }
 
   initButtonEvents() {
+    const urlSegments = this.route.snapshot.url.toString().replace(',', '/');
+
     d3.select('#german-button')
       .on('click', () => {
         if (NewsUtil.locale === 'de-DE') {
           return;
         }
 
-        window.open(environment.url + '/search/' + this.searchTerm + '?l=de-DE', '_self');
+        window.open(environment.url + urlSegments + '?l=de-DE', '_self');
       });
 
     d3.select('#english-button')
@@ -111,7 +111,7 @@ export class HomeComponent implements OnInit {
           return;
         }
 
-        window.open(environment.url + '/search/' + this.searchTerm + '?l=en-US', '_self');
+        window.open(environment.url + urlSegments + '?l=en-US', '_self');
       });
 
     d3.select('#back-button')

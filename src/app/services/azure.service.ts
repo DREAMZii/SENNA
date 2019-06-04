@@ -151,7 +151,7 @@ export class AzureService {
     const response = await this.http.post(uri, request, {headers: headers});
     await response.toPromise().then((documents) => {
       for (const sentiment of documents['documents']) {
-        news[sentiment['id'] - 1].sentiment = sentiment['score'];
+        news[sentiment['id'] - 1].score = sentiment['score'];
       }
     });
 

@@ -11,7 +11,7 @@ const appRoutes: Routes = [
   { path: '', component: SearchComponent, canActivate: [CustomAdalGuard] },
   { path: 'search/:q', component: HomeComponent, canActivate: [CustomAdalGuard] },
   { path: 'login', component: LoginComponent },
-  { path: 'sentiment', component: SentimentComponent },
+  { path: 'score', component: SentimentComponent },
   { path: 'score', component: ScoreComponent },
 
   // otherwise redirect to home

@@ -1,7 +1,14 @@
 import {NewsUtil} from '@app/core/util/news.util';
-import {BubbleUtil} from '@app/core/util/bubble.util';
+import {BubbleSegmentColor} from "@app/core/entities/bubble/bubble.segment";
+
+export enum NewsSentiment {
+  POSITIVE, NEUTRAL, NEGATIVE
+}
 
 export class News {
+  public static readonly positiveThreshhold = 0.55;
+  public static readonly negativeThreshhold = 0.45;
+
   private readonly id: number;
 
   private readonly name: string;
@@ -11,8 +18,10 @@ export class News {
   private readonly datePublished: string;
   private readonly source: string;
 
+  private sentiment: NewsSentiment;
+
   public contentAvailable = false;
-  public sentiment = 0.5;
+  public score = 0.5;
 
   constructor(name, description, category, url, datePublished, source) {
     this.id = NewsUtil.news.length;
@@ -22,8 +31,19 @@ export class News {
     this.url = url;
     this.datePublished = datePublished;
     this.source = source;
+    this.initSentiment();
 
     NewsUtil.news.push(this);
+  }
+
+  private initSentiment() {
+    if (this.score >= News.positiveThreshhold) {
+      this.sentiment = NewsSentiment.POSITIVE;
+    } else if (this.score > News.negativeThreshhold && this.score < News.positiveThreshhold) {
+      this.sentiment = NewsSentiment.NEUTRAL;
+    } else {
+      this.sentiment = NewsSentiment.NEGATIVE;
+    }
   }
 
   public getId() {
@@ -51,20 +71,21 @@ export class News {
   }
 
   public getScore() {
+    return this.score;
+  }
+
+  public getSentiment() {
     return this.sentiment;
   }
 
-  public isContentAvailable() {
-    return this.contentAvailable;
-  }
-
   public getScoreColor() {
-    if (this.sentiment >= BubbleUtil.positiveThreshhold) {
-      return BubbleUtil.greenColor;
-    } else if (this.sentiment > BubbleUtil.negativeThreshhold && this.sentiment < BubbleUtil.positiveThreshhold) {
-      return BubbleUtil.grayColor;
-    } else {
-      return BubbleUtil.redColor;
+    switch (this.sentiment) {
+      case NewsSentiment.POSITIVE:
+        return BubbleSegmentColor.GREEN;
+      case NewsSentiment.NEGATIVE:
+        return BubbleSegmentColor.RED;
+      default:
+        return BubbleSegmentColor.GRAY;
     }
   }
 }

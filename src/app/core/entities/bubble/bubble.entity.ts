@@ -1,26 +1,38 @@
 import * as d3 from 'd3';
-import {News} from '@app/core/entities/news.entity';
-import {BubbleUtil} from '@app/core/util/bubble.util';
-import {CacheUtil} from '@app/core/util/cache.util';
-import {NewsGroup} from '@app/core/entities/newsgroup.entity';
-import {ServiceUtil} from '@app/core/util/service.util';
+import {News} from '../news.entity';
+import {BubbleUtil} from '../../util/bubble.util';
+import {CacheUtil} from '../../util/cache.util';
+import {NewsGroup} from '../newsgroup.entity';
+import {ServiceUtil} from '../../util/service.util';
+import {BubbleAbstract} from '@app/core/entities/bubble/bubble.abstract';
+import {BubbleSegment} from "@app/core/entities/bubble/bubble.segment";
 
-export class Bubble {
+export class Bubble extends BubbleAbstract {
+  /**
+   * Creates the initial bubble instance to create canvas
+   *
+   * @param searchTerm  - initial searchTerm this bubble gets initiated with
+   * @param imageUrl    - initial imageUrl this bubble will display
+   * @param news        - news got from azure cognitive services to display the segments
+   */
+  public static createInitialBubble(searchTerm: string, imageUrl: string, news: any) {
+    const bubble = new Bubble(searchTerm, imageUrl, news);
+
+    bubble.preloadReferences(() => {
+      bubble.referencesLoaded = true;
+
+      d3.select('#loading-gear').remove();
+
+      bubble.spawn();
+      bubble.spawnReferences();
+    });
+  }
+
   // Relevant fields
   private id: number;
-  private readonly searchTerm: any;
-  private readonly searchImage: any;
   private searchUrl = null;
-  private readonly container: any;
   private group: any;
-  private greenSegments: number;
-  private graySegments: number;
-  private redSegments: number;
-  public radius: number;
-  private x: number;
-  private y: number;
   private newsGroup: NewsGroup;
-  public strokeWidth: number;
   private zoom: any;
 
   // Visual
@@ -29,13 +41,13 @@ export class Bubble {
   private angleOffset = 2;
 
   // Referrer
-  private readonly referredNumber: number;
-  private readonly isReferred: boolean;
-  private readonly referrer: Bubble;
+  private referredNumber = 0;
+  private isReferred = false;
+  private referrer = null;
 
   // References
   private referencesLoaded = false;
-  public shouldLoad = false;
+  private shouldLoad = false;
   private referencesSpawned = false;
   private referenceNames = [];
   private referenceImages = [];
@@ -45,11 +57,10 @@ export class Bubble {
   private rotationInterval: any;
 
   // Statistics
-  private oldNews: News[];
-  private amount: number;
-  private posAmount: number;
-  private neutAmount: number;
-  private negAmount: number;
+  private oldAmount: number;
+  private oldPosAmount: number;
+  private oldNeutAmount: number;
+  private oldNegAmount: number;
 
   /**
    * Constructor for Bubble instance
@@ -57,92 +68,34 @@ export class Bubble {
    * @param searchTerm    - search term that created the bubble
    * @param searchImage   - search image to insert into the bubble
    * @param news          - news that will create bubble
-   * @param isReferred    - whether this bubble is spawned by referring
-   * @param referrer      - referrer bubble
-   * @param radius        - radius of bubble
-   * @param container     - container where the svg should be located
+   * @param radius        - radius of the bubble in px
    */
-  constructor(
-    searchTerm,
-    searchImage,
-    news,
-    isReferred = false,
-    referrer = null,
-    radius = BubbleUtil.radius,
-    container = '#graphContainer'
+  private constructor(
+    searchTerm: string,
+    searchImage: string,
+    news: any,
+    radius = 90
   ) {
-    this.searchTerm = searchTerm;
-    this.searchImage = searchImage;
-    this.isReferred = isReferred;
-    this.referrer = referrer;
-    this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
-    this.container = d3.select(container).select('#canvas');
-    this.radius = radius;
-    this.strokeWidth = radius / 5;
-    this.applyNews(news);
+    super(searchTerm, searchImage, news, radius);
+    this.initOldNews();
+  }
 
-    ServiceUtil.azureService.searchOldNews(this.searchTerm).then((oldNews) => {
-      this.oldNews = oldNews;
-
-      if (oldNews === undefined) {
-        return;
-      }
-
-      this.amount = oldNews.length;
-      this.posAmount = oldNews.filter((single) => single.sentiment >= BubbleUtil.positiveThreshhold).length;
-      this.neutAmount = oldNews.filter(
-        (single) =>
-          single.sentiment > BubbleUtil.negativeThreshhold && single.sentiment < BubbleUtil.positiveThreshhold
+  private initOldNews() {
+    CacheUtil.getOldNews(this.searchTerm).then((oldNews: News[]) => {
+      this.oldAmount = oldNews.length;
+      this.oldPosAmount = oldNews.filter((single) =>
+        single.score >= BubbleUtil.positiveThreshhold
       ).length;
-      this.negAmount = oldNews.filter((single) => single.sentiment <= BubbleUtil.negativeThreshhold).length;
+      this.oldNeutAmount = oldNews.filter((single) =>
+        single.score > BubbleUtil.negativeThreshhold && single.score < BubbleUtil.positiveThreshhold
+      ).length;
+      this.oldNegAmount = oldNews.filter((single) =>
+        single.score <= BubbleUtil.negativeThreshhold
+      ).length;
     });
-
-    if (!isReferred) {
-      this.preloadReferences()
-        .then(() => {
-          this.referencesLoaded = true;
-
-          d3.select('#loading-gear').remove();
-
-          this.spawn();
-          this.spawnReferences();
-        })
-        .catch(() => {
-          this.referencesLoaded = true;
-          ServiceUtil.alertService.error('Initial references could not be loaded! Please refresh.');
-        });
-    }
   }
 
-  private applyNews(news) {
-    // Sort news (best one first)
-    news = news.sort((a, b) => {
-      return a.sentiment > b.sentiment ? 1 : -1;
-    });
-
-    this.newsGroup = new NewsGroup(this, news);
-
-    this.greenSegments = 0;
-    this.graySegments = 0;
-    this.redSegments = 0;
-    for (const single of news) {
-      if (single.sentiment >= BubbleUtil.positiveThreshhold) {
-        this.greenSegments++;
-      } else if (single.sentiment > BubbleUtil.negativeThreshhold && single.sentiment < BubbleUtil.positiveThreshhold) {
-        this.graySegments++;
-      } else {
-        this.redSegments++;
-      }
-    }
-  }
-
-  /**
-   * Spawns circle
-   *
-   * @param positionX - possible starting X coordinate (uses centered x of svg when not given)
-   * @param positionY - possible starting Y coordinate (uses centered y of svg when not given)
-   */
-  public spawn(positionX?, positionY?) {
+  public spawn(positionX?: number, positionY?: number) {
     BubbleUtil.bubbles.push(this);
     BubbleUtil.bubblesByName.set(this.searchTerm.toLowerCase().split(' ').join('-'), this);
 
@@ -162,9 +115,12 @@ export class Bubble {
       .classed('active', !this.isReferred)
       .classed('inactive', this.isReferred);
 
-    this.draw(this.redSegments, BubbleUtil.redColor, positionX, positionY)
-      .draw(this.graySegments, BubbleUtil.grayColor, positionX, positionY)
-      .draw(this.greenSegments, BubbleUtil.greenColor, positionX, positionY);
+    // Draw all segments
+    Array.from(this.segments.values()).forEach((sentSegments) => {
+      for (const single of sentSegments) {
+        single.draw(this);
+      }
+    });
 
     this.id = BubbleUtil.bubbles.length - 1;
 
@@ -291,19 +247,14 @@ export class Bubble {
     this.handleEvents();
 
     if (this.isReferred) {
-      this.preloadReferences()
-        .then(() => {
-          this.referencesLoaded = true;
+      this.preloadReferences(() => {
+        this.referencesLoaded = true;
 
-          if (this.shouldLoad) {
-            this.shouldLoad = false;
-            this.spawnReferences();
-          }
-        })
-        .catch(() => {
-          this.referencesLoaded = true;
-          ServiceUtil.alertService.error('References for ' + this.searchTerm.toUpperCase() + ' could not be loaded!');
-        });
+        if (this.shouldLoad) {
+          this.shouldLoad = false;
+          this.spawnReferences();
+        }
+      });
     }
   }
 
@@ -360,15 +311,15 @@ export class Bubble {
     const estimatedHeight = parseFloat(selection.attr('full-height'));
     const width = nameW + statisticsButtonWidth + statisticsButtonWidth / 4;
 
-    const greenPercent = this.posAmount * 100 / this.oldNews.length;
+    const greenPercent = this.oldPosAmount * 100 / this.oldAmount;
     const greenHeight = nameH * 10 * 0.6 * greenPercent / 100;
     const greenDiff = estimatedHeight - greenHeight - estimatedHeight * 0.1;
 
-    const grayPercent = this.neutAmount * 100 / this.oldNews.length;
+    const grayPercent = this.oldNeutAmount * 100 / this.oldAmount;
     const grayHeight = nameH * 10 * 0.6 * grayPercent / 100;
     const grayDiff = estimatedHeight - grayHeight - estimatedHeight * 0.1;
 
-    const redPercent = this.negAmount * 100 / this.oldNews.length;
+    const redPercent = this.oldNegAmount * 100 / this.oldAmount;
     const redHeight = nameH * 10 * 0.6 * redPercent / 100;
     const redDiff = estimatedHeight - redHeight - estimatedHeight * 0.1;
 
@@ -393,7 +344,7 @@ export class Bubble {
       .attr('font-size', fontSize)
       .attr('font-weight', 'bold')
       .style('opacity', 0)
-      .text('Average sentiment')
+      .text('Average score')
       .transition()
       .duration(750)
       .style('opacity', 1);
@@ -405,7 +356,7 @@ export class Bubble {
       .attr('y', initRectY + fontSize * 2.5)
       .attr('font-size', fontSize / 1.5)
       .style('opacity', 0)
-      .text('This month | ' + this.oldNews.length + ' News')
+      .text('This month | ' + this.oldAmount + ' News')
       .transition()
       .duration(750)
       .style('opacity', 1);
@@ -512,11 +463,11 @@ export class Bubble {
       .style('opacity', 1);
   }
 
-  private async preloadReferences() {
+  private preloadReferences(callback?: Function) {
     const amount = this.isReferred ? 3 : 4;
 
     // Load references on initialization
-    await CacheUtil.getReferences(this.searchTerm, amount, this.searchUrl).then( async (references: string[]) => {
+    CacheUtil.getReferences(this.searchTerm, amount, this.searchUrl).then( async (references: string[]) => {
       for (const reference of references) {
         const referenceTitle = reference['referenceTitle'];
         const referenceImageUrl = reference['referenceImageUrl'];
@@ -537,18 +488,22 @@ export class Bubble {
             return;
           }
 
-          const refBubble = new Bubble(
-            referenceTitle,
-            referenceImageUrl,
-            news,
-            true,
-            this,
-            this.radius / BubbleUtil.scalingFactor
-          );
+          const refRadius = this.radius / BubbleUtil.scalingFactor;
+          const refBubble = new Bubble(referenceTitle, referenceImageUrl,news, refRadius)
+            .setReferrer(this);
+
+
           refBubble.searchUrl = referenceSearchUrl;
           this.references.push(refBubble);
         });
       }
+
+      if (callback instanceof Function) {
+        callback();
+      }
+    }).catch(() => {
+      this.referencesLoaded = true;
+      ServiceUtil.alertService.error('References for ' + this.searchTerm.toUpperCase() + ' could not be loaded!');
     });
   }
 
@@ -582,20 +537,21 @@ export class Bubble {
   }
 
   private handleZoom() {
-    const graphContainer = d3.select('#graphContainer');
     const container = this.container;
+    const graphContainer = d3.select(container.node().parentElement);
 
     this.zoom = d3.zoom()
       .touchable(true)
       .scaleExtent([-Infinity, Infinity])
-      .on('start', zoomstart)
+      .on('start', () => {
+        d3.select('#canvas')
+          .style('cursor', 'move');
+      })
       .on('zoom', zoomed)
-      .on('end', zoomend);
-
-    function zoomstart() {
-      d3.select('#canvas')
-        .style('cursor', 'move');
-    }
+      .on('end', () => {
+        d3.select('#canvas')
+          .style('cursor', 'default');
+      });
 
     function zoomed() {
       // Loading
@@ -608,11 +564,6 @@ export class Bubble {
           return d3.select(this).classed('bubble') || d3.select(this).classed('line');
         })
         .attr('transform', d3.event.transform);
-    }
-
-    function zoomend() {
-      d3.select('#canvas')
-        .style('cursor', 'default');
     }
 
     graphContainer.call(this.zoom);
@@ -758,8 +709,9 @@ export class Bubble {
       );
 
       bubble.angleSpawned = angle;
+      bubble.setMiddlePoint(centerPoint[0], centerPoint[1]);
 
-      bubble.spawn(centerPoint[0], centerPoint[1]);
+      bubble.spawn();
 
       BubbleUtil.connect(this, bubble);
     }
@@ -769,12 +721,12 @@ export class Bubble {
     BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), null, 1, 0);
   }
 
-  public getId() {
-    return this.id;
-  }
+  public setReferrer(referrer: Bubble): Bubble {
+    this.isReferred = true;
+    this.referrer = referrer;
+    this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
 
-  public getContainer() {
-    return this.container;
+    return this;
   }
 
   public getGroup() {
@@ -793,12 +745,12 @@ export class Bubble {
     return this.referredNumber;
   }
 
-  public getStrokeWidth() {
-    return this.strokeWidth;
+  public getAngleDistance() {
+    return 360 / this.segments.size;
   }
 
-  public getAngleDistance() {
-    return 360 / (this.greenSegments + this.graySegments + this.redSegments);
+  public getStrokeWidth() {
+    return this.strokeWidth;
   }
 
   public getRadius() {

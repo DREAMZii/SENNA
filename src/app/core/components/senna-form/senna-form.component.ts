@@ -23,7 +23,7 @@ export class SennaFormComponent {
     }
 
     const url = this.route.snapshot.url;
-    if (url.length > 0 && url[0].path === 'sentiment') {
+    if (url.length > 0 && url[0].path === 'score') {
       this.router.navigate(['/score'], {queryParams: {q: this.searchTerm}});
     } else {
       this.router.navigate(['/search', this.searchTerm]);

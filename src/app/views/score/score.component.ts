@@ -83,7 +83,7 @@ export class ScoreComponent implements OnInit {
   initClickEvents() {
     d3.select('#search-button')
       .on('click', () => {
-        window.open(environment.url + '/sentiment' + '?open=true', '_self');
+        window.open(environment.url + '/score' + '?open=true', '_self');
       });
   }
 }

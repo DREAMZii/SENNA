@@ -68,6 +68,11 @@
 
 /* Open articles */
 
+#open-news-article {
+  width: 3.5%;
+  float: right;
+}
+
 #close-button {
   float: right;
   width: 30px;

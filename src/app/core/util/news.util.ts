@@ -49,7 +49,7 @@ export class NewsUtil {
     d3.select('#news-date div')
       .text(date.toLocaleDateString('de-DE'));
 
-    d3.select('#news-score div.sentiment-score')
+    d3.select('#news-score div.score-score')
       .text(Math.trunc(news.getScore() * 100));
 
     d3.select('#news-score div.score-indicator')
