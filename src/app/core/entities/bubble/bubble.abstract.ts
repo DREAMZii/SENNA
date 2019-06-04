@@ -1,7 +1,13 @@
 import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
 import * as d3 from "d3";
-import {BubbleSegment} from "@app/core/entities/bubble/bubble.segment";
+import {BubbleSegment} from "@app/core/entities/bubble/components/bubble.segment";
 import {News, NewsSentiment} from "@app/core/entities/news.entity";
+import {Bubble} from "@app/core/entities/bubble/bubble.entity";
+import {NewsGroup} from "@app/core/entities/newsgroup.entity";
+import {Focus} from "@app/core/animations/focus.animation";
+import {ZoomConfig} from "@app/core/config/zoom.config";
+import {BubbleNametag} from "@app/core/entities/bubble/components/bubble.nametag";
+import {BubbleStatistic} from "@app/core/entities/bubble/components/bubble.statistic";
 
 export abstract class BubbleAbstract {
   // Core values
@@ -11,6 +17,10 @@ export abstract class BubbleAbstract {
   protected readonly radius: number;
   protected readonly strokeWidth: number;
   protected readonly news: News[];
+  protected readonly newsGroup: NewsGroup;
+
+  // Zoom
+  protected zoom;
 
   // Middle-point
   protected x: number;
@@ -31,35 +41,63 @@ export abstract class BubbleAbstract {
     this.radius = radius;
     this.strokeWidth = radius / 5;
     this.news = news as News[];
+    this.newsGroup = new NewsGroup(this, news);
 
     // Config
     this.setMiddlePoint();
     this.initSegments();
+    this.handleZoom();
 
     // Register
     BubbleManager.register(this.searchTerm, this);
   }
 
-  private initSegments() {
-    this.news.forEach((single) => {
-      const segment = new BubbleSegment(single.getSentiment(), single.getScoreColor());
+  private handleZoom() {
+    const container = this.container;
+    const graphContainer = d3.select((container.node() as HTMLElement).parentElement);
 
-      let previousSegments = this.segments.get(single.getSentiment());
-      if (previousSegments === undefined) {
-        previousSegments = [];
+    this.zoom = d3.zoom()
+      .touchable(true)
+      .scaleExtent([-Infinity, Infinity])
+      .on('start', () => {
+        d3.select('#canvas')
+          .style('cursor', 'move');
+      })
+      .on('zoom', zoomed)
+      .on('end', () => {
+        d3.select('#canvas')
+          .style('cursor', 'default');
+      });
+
+    function zoomed() {
+      // Loading
+      if (ZoomConfig.zoomDisabled) {
+        return;
       }
+
+      container.selectAll('g')
+        .filter(function() {
+          return d3.select(this).classed('bubble') || d3.select(this).classed('line');
+        })
+        .attr('transform', d3.event.transform);
+    }
+
+    graphContainer.call(this.zoom);
+    graphContainer.on('dblclick.zoom', null);
+  }
+
+  private initSegments() {
+    for (const single of this.news) {
+      let previousSegments = this.segments.has(single.getSentiment())
+        ? this.segments.get(single.getSentiment()) : [];
+
+      const segment = new BubbleSegment(this, single);
       previousSegments.push(segment);
 
       this.segments.set(single.getSentiment(), previousSegments);
-    });
+    }
   }
 
-  /**
-   * Sets the middle-point of the bubble
-   *
-   * @param cx  - center x or middle of screen if not set
-   * @param cy  - center y or middle of screen if not set
-   */
   protected setMiddlePoint(cx?: number, cy?: number) {
     const rect = this.container.node().getBoundingClientRect();
     this.x = cx ? cx : rect.width / 2;
@@ -75,11 +113,36 @@ export abstract class BubbleAbstract {
   public abstract spawn(positionX?, positionY?);
 
   /**
+   * Get segments for types or an empty array
+   *
+   * @param type  - type to get segments for
+   */
+  public getSegments(type: NewsSentiment): BubbleSegment[] {
+    return this.segments.has(type) ? this.segments.get(type) : [];
+  }
+
+  /**
+   * Draws the name tag and statistic
+   */
+  public drawNameTagAndStatistic() {
+    const nameTag = new BubbleNametag(this);
+    nameTag.draw();
+
+    const statistic = new BubbleStatistic(this, nameTag);
+    statistic.draw();
+  }
+
+  /**
    * Get the amount of segments in a bubble based on the sentiment
    *
    * @param type  - sentiment of the news
    */
   public getSegmentCount(type: NewsSentiment): number {
-    return this.segments.get(type).length;
+    const segments = this.segments.get(type);
+    if (segments === undefined) {
+      return 0;
+    }
+
+    return segments.length;
   }
 }

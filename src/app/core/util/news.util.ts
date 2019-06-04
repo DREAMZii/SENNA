@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
-import {BubbleUtil} from '@app/core/util/bubble.util';
 import {ServiceUtil} from '@app/core/util/service.util';
+import {Focus} from "@app/core/animations/focus.animation";
+import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
 
 export class NewsUtil {
   public static news = [];
@@ -26,7 +27,7 @@ export class NewsUtil {
     }
 
     d3.select('#alert-boxes').style('right', '42.5%');
-    BubbleUtil.focusBubble(BubbleUtil.getActiveBubble(), () => {
+    Focus.focus(BubbleManager.getActiveBubble(), () => {
       d3.select('#canvas').style('width', '63.5%');
     }, 0.635);
 
@@ -222,7 +223,7 @@ export class NewsUtil {
     d3.select('#alert-boxes').style('right', '6.5%');
     d3.select('#canvas')
       .style('width', '100%');
-    BubbleUtil.focusBubble(BubbleUtil.getActiveBubble());
+    Focus.focus(BubbleManager.getActiveBubble());
 
     d3.select('#senna-news')
       .classed('open', false)

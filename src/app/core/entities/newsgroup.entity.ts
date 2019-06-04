@@ -3,6 +3,7 @@ import {Bubble} from '@app/core/entities/bubble/bubble.entity';
 import {BubbleUtil} from '@app/core/util/bubble.util';
 import * as d3 from 'd3';
 import {NewsUtil} from '@app/core/util/news.util';
+import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
 
 export class NewsGroup {
   private readonly bubble: Bubble;
@@ -12,7 +13,7 @@ export class NewsGroup {
   private isDrawn = false;
 
   constructor(bubble, news: News[]) {
-    this.bubble = bubble;
+    this.bubble = bubble as Bubble;
     this.news = news;
   }
 
@@ -27,7 +28,7 @@ export class NewsGroup {
       .style('opacity', '0');
 
     const angle = 360 / this.news.length * (this.news.indexOf(single) + 1);
-    const factor = BubbleUtil.scalingFactor ** this.bubble.getReferredNumber();
+    const factor = Bubble.scalingFactor ** this.bubble.getReferredNumber();
     const point = BubbleUtil.getPointOnCircle(
       this.bubble.getCenterX(),
       this.bubble.getCenterY(),
@@ -61,7 +62,7 @@ export class NewsGroup {
         const newsText = d3.select(this);
         const newsId = parseInt(newsText.attr('news-id'), 10);
 
-        NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
+        NewsUtil.openNews(BubbleManager.getActiveBubble().getNews(newsId));
       })
       .on('mouseenter', () => {
         const rect = this.group.select('rect');
@@ -102,7 +103,7 @@ export class NewsGroup {
         const newsText = this.group.select('text');
         const newsId = parseInt(newsText.attr('news-id'), 10);
 
-        NewsUtil.openNews(BubbleUtil.getActiveBubble().getNews(newsId));
+        NewsUtil.openNews(BubbleManager.getActiveBubble().getNews(newsId));
       })
       .on('mouseenter', function() {
         d3.select(this)

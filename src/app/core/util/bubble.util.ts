@@ -1,121 +1,13 @@
 import * as d3 from 'd3';
+import {Bubble} from "@app/core/entities/bubble/bubble.entity";
 
 export class BubbleUtil {
-  // Storage
-  public static bubbles = [];
-  public static bubblesByName = new Map();
-
   // Standard values
-  public static greenColor = '#8CA528';
-  public static grayColor = '#E1E1E1';
-  public static redColor = '#AE0055';
   public static lineColor = 'black';
 
-  public static readonly positiveThreshhold = 0.55;
-  public static readonly negativeThreshhold = 0.4;
-
-  public static angleShift = 90;
-
-  public static scalingFactor = 1.5;
   public static scale = 1;
   public static offsetX = 0;
   public static offsetY = 0;
-
-  public static radius = 100;
-
-  // Settings
-  public static zoomDisabled = false;
-
-  public static getActiveBubble() {
-    const activeBubbleId = parseInt(d3.select('.active').select('circle').attr('bubble-id'), 10);
-    return BubbleUtil.bubbles[activeBubbleId];
-  }
-
-  public static focusBubble(bubble, callback?, focusOnWidth = 1, duration = 750) {
-    if (this.zoomDisabled) {
-      return;
-    }
-
-    if (bubble !== this.getActiveBubble()) {
-      d3.selectAll('text.stats')
-        .transition()
-        .duration(750)
-        .style('opacity', 0)
-        .on('end', function () {
-          d3.select(this).remove();
-        });
-
-      d3.selectAll('rect.stats')
-        .transition()
-        .duration(750)
-        .attr('height', 0)
-        .on('end', function () {
-          d3.select(this).remove();
-        });
-
-      this.getActiveBubble().newsGroup.remove();
-    }
-
-    const rect = bubble.container.node().getBoundingClientRect();
-
-    const scale = BubbleUtil.scalingFactor ** bubble.referredNumber;
-
-    const kx = ((rect.width * focusOnWidth) / 2) * (scale - 1);
-    const ky = (rect.height / 2) * (scale - 1);
-
-    const tx = ((rect.width * focusOnWidth) / 2 - bubble.x) * scale;
-    const ty = (rect.height / 2 - bubble.y) * scale;
-
-    const graphContainer = d3.select('#graphContainer');
-    let blockedCallback = false;
-    graphContainer.selectAll('g')
-      .filter(function() {
-        return d3.select(this).classed('bubble') || d3.select(this).classed('line');
-      })
-      .transition()
-      .duration(duration)
-      .attr('transform', d3.zoomIdentity
-        .translate(
-          -kx + tx,
-          -ky + ty
-        ).scale(scale).toString())
-      .on('end', function() {
-        // Only use callback once instead, not for every circle
-        if (blockedCallback) {
-          return;
-        }
-
-        graphContainer.call(bubble.zoom.transform, d3.zoomIdentity.translate(-kx + tx, -ky + ty).scale(scale));
-
-        BubbleUtil.scale = scale;
-        BubbleUtil.offsetX = -kx + tx;
-        BubbleUtil.offsetY = -ky + ty;
-
-        BubbleUtil.markActiveBubble(bubble.container, bubble.group);
-
-
-        if (callback instanceof Function) {
-          callback();
-        }
-
-        blockedCallback = true;
-      });
-  }
-
-  private static markActiveBubble(container, group) {
-    container.selectAll('g')
-      .filter('.bubble')
-      .classed('active', false)
-      .classed('inactive', true)
-      .transition()
-      .style('opacity', '0.5');
-
-    group
-      .classed('active', true)
-      .classed('inactive', false)
-      .transition()
-      .style('opacity', '1');
-  }
 
   /**
    * Connect two bubbles
@@ -161,6 +53,10 @@ export class BubbleUtil {
       .attr('y1', y1)
       .attr('x2', x2)
       .attr('y2', y2);
+  }
+
+  public static scaleDown(bubble: Bubble, number: number): number {
+    return number / (Bubble.scalingFactor ** bubble.getReferredNumber());
   }
 
   public static getPointOnCircle(cx, cy, radius, angle) {

@@ -1,8 +1,10 @@
 import {NewsUtil} from '@app/core/util/news.util';
-import {BubbleSegmentColor} from "@app/core/entities/bubble/bubble.segment";
+import {BubbleSegmentColor} from "@app/core/entities/bubble/components/bubble.segment";
 
 export enum NewsSentiment {
-  POSITIVE, NEUTRAL, NEGATIVE
+  POSITIVE = 'POSITIVE',
+  NEUTRAL = 'NEUTRAL',
+  NEGATIVE = 'NEGATIVE'
 }
 
 export class News {
@@ -31,19 +33,8 @@ export class News {
     this.url = url;
     this.datePublished = datePublished;
     this.source = source;
-    this.initSentiment();
 
     NewsUtil.news.push(this);
-  }
-
-  private initSentiment() {
-    if (this.score >= News.positiveThreshhold) {
-      this.sentiment = NewsSentiment.POSITIVE;
-    } else if (this.score > News.negativeThreshhold && this.score < News.positiveThreshhold) {
-      this.sentiment = NewsSentiment.NEUTRAL;
-    } else {
-      this.sentiment = NewsSentiment.NEGATIVE;
-    }
   }
 
   public getId() {
@@ -75,6 +66,18 @@ export class News {
   }
 
   public getSentiment() {
+    if (this.sentiment !== undefined) {
+      return this.sentiment;
+    }
+
+    if (this.score >= News.positiveThreshhold) {
+      this.sentiment = NewsSentiment.POSITIVE;
+    } else if (this.score > News.negativeThreshhold && this.score < News.positiveThreshhold) {
+      this.sentiment = NewsSentiment.NEUTRAL;
+    } else {
+      this.sentiment = NewsSentiment.NEGATIVE;
+    }
+
     return this.sentiment;
   }
 

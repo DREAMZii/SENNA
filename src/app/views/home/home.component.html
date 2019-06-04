@@ -4,7 +4,13 @@
 
   <svg id="canvas" width="100%" height="100%">
     <defs>
-      <clipPath id="clip"></clipPath>
+      <filter x="0" y="0" width="1" height="1" id="solid">
+        <feFlood flood-color="lightgray"/>
+        <feComposite in="SourceGraphic" operator="xor" />
+      </filter>
+      <clipPath id="clip">
+
+      </clipPath>
     </defs>
     <image id="search-button" class="quick-button" xlink:href="assets/images/search.svg" width="8%" height="16%" x="2%" y="83%"></image>
     <image id="center-button" class="quick-button" xlink:href="assets/images/center.svg" width="4%" height="8%" x="11%" y="87%"></image>

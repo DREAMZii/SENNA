@@ -9,6 +9,9 @@ import {NewsUtil} from '@app/core/util/news.util';
 import {BubbleUtil} from '@app/core/util/bubble.util';
 import {environment} from '@environments/environment.prod';
 import {Bubble} from "@app/core/entities/bubble/bubble.entity";
+import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
+import {Focus} from "@app/core/animations/focus.animation";
+import {ZoomConfig} from "@app/core/config/zoom.config";
 
 @Component({
   templateUrl: './home.component.html',
@@ -116,19 +119,23 @@ export class HomeComponent implements OnInit {
 
     d3.select('#back-button')
       .on('click', () => {
-        const referrer = BubbleUtil.getActiveBubble().getReferrer();
+        const referrer = BubbleManager.getActiveBubble().getReferrer();
 
         if (referrer === null) {
           return;
         }
 
-        BubbleUtil.focusBubble(referrer);
+        Focus.focus(referrer);
       });
 
     d3.select('#center-button')
       .on('click', () => {
+        if (ZoomConfig.zoomDisabled) {
+          return;
+        }
+
         // Focus origin bubble
-        BubbleUtil.focusBubble(BubbleUtil.bubbles[0]);
+        Focus.focus(BubbleManager.getInitialBubble());
       });
 
     d3.select('#search-button')

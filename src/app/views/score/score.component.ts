@@ -4,9 +4,9 @@ import {ActivatedRoute} from '@angular/router';
 import {environment} from '@environments/environment.prod';
 import {SennaAlertService} from '@app/core/modules/senna-alert/senna-alert.service';
 import {AzureService, ConfigService} from '@app/services';
-import {News} from '@app/core/entities/news.entity';
-import {NewsUtil} from '@app/core/util/news.util';
 import {BubbleUtil} from '@app/core/util/bubble.util';
+import {News} from "@app/core/entities/news.entity";
+import {BubbleSegmentColor} from "@app/core/entities/bubble/components/bubble.segment";
 
 @Component({
   templateUrl: './score.component.html',
@@ -51,12 +51,12 @@ export class ScoreComponent implements OnInit {
           const counterTime = roundedScore * intervalTime;
 
           let color = 'black';
-          if (score >= BubbleUtil.positiveThreshhold) {
-            color = BubbleUtil.greenColor;
-          } else if (score > BubbleUtil.negativeThreshhold && score < BubbleUtil.positiveThreshhold) {
-            color = BubbleUtil.grayColor;
+          if (score >= News.positiveThreshhold) {
+            color = BubbleSegmentColor.GREEN;
+          } else if (score > News.negativeThreshhold && score < News.positiveThreshhold) {
+            color = BubbleSegmentColor.GRAY;
           } else {
-            color = BubbleUtil.redColor;
+            color = BubbleSegmentColor.RED;
           }
 
           d3.select('#score-counter')
