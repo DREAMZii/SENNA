@@ -1,7 +1,7 @@
 import {Animation} from "@app/core/animations/animation.interface";
 import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
 import * as d3 from "d3";
-import {Bubble} from "@app/core/entities/bubble/bubble.entity";
+import {BubbleConfig} from "@app/core/config/bubble.config";
 
 export class Focus implements Animation {
   public static currentScale = 0;
@@ -15,7 +15,7 @@ export class Focus implements Animation {
 
     const rect = bubble.getContainer().node().getBoundingClientRect();
 
-    const scale = Bubble.scalingFactor ** bubble.getReferredNumber();
+    const scale = BubbleConfig.SCALING_FACTOR ** bubble.getReferredNumber();
 
     const kx = ((rect.width * focusOnWidth) / 2) * (scale - 1);
     const ky = (rect.height / 2) * (scale - 1);
@@ -75,7 +75,7 @@ export class Focus implements Animation {
     BubbleManager.getActiveBubble().getNewsGroup().remove();
   }
 
-  private static markBubbleAsActive(bubble: Bubble) {
+  private static markBubbleAsActive(bubble) {
     bubble.getContainer()
       .selectAll('g')
       .filter('.bubble')

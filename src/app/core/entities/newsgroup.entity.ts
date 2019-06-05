@@ -4,6 +4,7 @@ import {BubbleUtil} from '@app/core/util/bubble.util';
 import * as d3 from 'd3';
 import {NewsUtil} from '@app/core/util/news.util';
 import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
+import {BubbleConfig} from "@app/core/config/bubble.config";
 
 export class NewsGroup {
   private readonly bubble: Bubble;
@@ -28,7 +29,7 @@ export class NewsGroup {
       .style('opacity', '0');
 
     const angle = 360 / this.news.length * (this.news.indexOf(single) + 1);
-    const factor = Bubble.scalingFactor ** this.bubble.getReferredNumber();
+    const factor = BubbleConfig.SCALING_FACTOR ** this.bubble.getReferredNumber();
     const point = BubbleUtil.getPointOnCircle(
       this.bubble.getCenterX(),
       this.bubble.getCenterY(),

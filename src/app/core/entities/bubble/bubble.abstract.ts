@@ -2,12 +2,11 @@ import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
 import * as d3 from "d3";
 import {BubbleSegment} from "@app/core/entities/bubble/components/bubble.segment";
 import {News, NewsSentiment} from "@app/core/entities/news.entity";
-import {Bubble} from "@app/core/entities/bubble/bubble.entity";
 import {NewsGroup} from "@app/core/entities/newsgroup.entity";
-import {Focus} from "@app/core/animations/focus.animation";
 import {ZoomConfig} from "@app/core/config/zoom.config";
 import {BubbleNametag} from "@app/core/entities/bubble/components/bubble.nametag";
 import {BubbleStatistic} from "@app/core/entities/bubble/components/bubble.statistic";
+import {BubbleImage} from "@app/core/entities/bubble/components/bubble.image";
 
 export abstract class BubbleAbstract {
   // Core values
@@ -49,7 +48,8 @@ export abstract class BubbleAbstract {
     this.handleZoom();
 
     // Register
-    BubbleManager.register(this.searchTerm, this);
+    const formattedTitle = this.searchTerm.split(' ').join('-').toLowerCase();
+    BubbleManager.register(formattedTitle, this);
   }
 
   private handleZoom() {
@@ -119,6 +119,14 @@ export abstract class BubbleAbstract {
    */
   public getSegments(type: NewsSentiment): BubbleSegment[] {
     return this.segments.has(type) ? this.segments.get(type) : [];
+  }
+
+  /**
+   * Draws the image in the center of the circle
+   */
+  public drawImage() {
+    const image = new BubbleImage(this);
+    image.draw();
   }
 
   /**

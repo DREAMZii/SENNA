@@ -7,11 +7,9 @@ import {BubbleAbstract} from '@app/core/entities/bubble/bubble.abstract';
 import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
 import {Focus} from "@app/core/animations/focus.animation";
 import {ZoomConfig} from "@app/core/config/zoom.config";
+import {BubbleConfig} from "@app/core/config/bubble.config";
 
 export class Bubble extends BubbleAbstract {
-  public static scalingFactor = 1.5;
-  public static drawn = [];
-
   /**
    * Creates the initial bubble instance to create canvas
    *
@@ -36,6 +34,7 @@ export class Bubble extends BubbleAbstract {
   private id: number;
   private searchUrl = null;
   private group: any;
+  private isSpawned = false;
 
   // Visual
   private angleSpawned = 360;
@@ -96,7 +95,7 @@ export class Bubble extends BubbleAbstract {
   }
 
   public spawn(positionX?: number, positionY?: number) {
-    Bubble.drawn.push(this);
+    this.isSpawned = true;
 
     let query = '.active';
     if (d3.select(query).node() === null) {
@@ -129,47 +128,8 @@ export class Bubble extends BubbleAbstract {
 
     this.id = BubbleManager.getBubbles().length - 1;
 
-    if (this.searchImage === '') {
-      const text = this.group
-      .append('text')
-      .attr('font-size', 16 / (Bubble.scalingFactor ** this.referredNumber))
-      .text(this.searchTerm);
-
-      const width = text.node().getComputedTextLength();
-      text
-        .attr('x', this.x - width / 2)
-        .attr('y', this.y);
-    } else {
-      const rectWH = this.radius + this.radius / 3.5;
-
-      this.group
-        .append('rect')
-        .attr('id', 'bubble-rect-' + this.id)
-        .attr('x', this.x - rectWH / 2)
-        .attr('y', this.y - rectWH / 2)
-        .attr('rx', 20 / Bubble.scalingFactor ** this.referredNumber)
-        .attr('ry', 20 / Bubble.scalingFactor ** this.referredNumber)
-        .attr('width', rectWH)
-        .attr('height', rectWH)
-        .attr('xlink:href', this.searchImage)
-        .attr('clip-path', 'url(#clip)');
-
-      this.container
-        .select('#clip')
-        .append('use')
-        .attr('xlink:href', '#bubble-rect-' + this.id);
-
-      this.group
-        .append('image')
-        .attr('x', this.x - rectWH / 2)
-        .attr('y', this.y - rectWH / 2)
-        .attr('width', rectWH)
-        .attr('height', rectWH)
-        .attr('xlink:href', this.searchImage)
-        .attr('clip-path', 'url(#clip)');
-
-      this.drawNameTagAndStatistic();
-    }
+    this.drawImage();
+    this.drawNameTagAndStatistic();
 
     // Draw invisible circle for click event
     this.group
@@ -219,7 +179,7 @@ export class Bubble extends BubbleAbstract {
             return;
           }
 
-          const refRadius = this.radius / Bubble.scalingFactor;
+          const refRadius = this.radius / BubbleConfig.SCALING_FACTOR;
           const refBubble = new Bubble(referenceTitle, referenceImageUrl,news, refRadius)
             .setReferrer(this);
 
@@ -313,8 +273,16 @@ export class Bubble extends BubbleAbstract {
     // Spawn references
     this.referencesSpawned = true;
 
-    const spawnableBubbles = this.references.filter(bubble => Bubble.drawn.indexOf(bubble) < 0);
-    const alreadyExisting = this.references.filter(bubble => Bubble.drawn.indexOf(bubble) >= 0);
+    const spawnableBubbles = [];
+    const alreadyExisting = [];
+
+    for (const bubble of this.references) {
+      if (bubble.isSpawned) {
+        alreadyExisting.push(bubble);
+      } else {
+        spawnableBubbles.push(bubble);
+      }
+    }
 
     for (const bubble of alreadyExisting) {
       BubbleUtil.connect(this, bubble);
@@ -323,10 +291,9 @@ export class Bubble extends BubbleAbstract {
     for (let i = 0; i < spawnableBubbles.length; i++) {
       const bubble = spawnableBubbles[i];
       const referencesCount = spawnableBubbles.length;
-      let initialAngle = bubble.angleSpawned;
+      let initialAngle = this.angleSpawned;
       let angle = 0;
       if (this.isReferred) {
-        initialAngle = bubble.getReferrer().angleSpawned;
         const range = 90;
         const min = initialAngle - 90 + 45;
 
@@ -349,7 +316,7 @@ export class Bubble extends BubbleAbstract {
       const centerPoint = BubbleUtil.getPointOnCircle(
         this.x,
         this.y,
-        this.radius * (Bubble.scalingFactor * 3.5),
+        this.radius * (BubbleConfig.SCALING_FACTOR * 3.5),
         angle
       );
 
@@ -380,6 +347,10 @@ export class Bubble extends BubbleAbstract {
 
   public getSearchTerm() {
     return this.searchTerm;
+  }
+
+  public getSearchImage() {
+    return this.searchImage;
   }
 
   public getContainer() {

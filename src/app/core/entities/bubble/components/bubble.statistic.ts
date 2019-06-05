@@ -40,10 +40,7 @@ export class BubbleStatistic {
       .attr('width', statisticsButtonWidth)
       .attr('height', nameH)
       .attr('fill', BubbleSegmentColor.GRAY)
-      .style('cursor', 'pointer')
-      .on('click', () => {
-        this.openStatistics(nameW, nameH, statisticsButtonWidth);
-      });
+      .style('cursor', 'pointer');
 
     this.bubble
       .getGroup()
@@ -69,7 +66,7 @@ export class BubbleStatistic {
       ServiceUtil.alertService.warning('No references for term ' + this.bubble.getSearchTerm().toUpperCase() + '!');
     }
 
-    let selection = d3.select('#statistics-' + this.bubble.getId());
+    let selection = this.bubble.getGroup().select('#statistics-' + this.bubble.getId());
 
     // When not open, create the general things
     let initRectX;

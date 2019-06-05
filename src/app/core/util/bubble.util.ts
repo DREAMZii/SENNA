@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {Bubble} from "@app/core/entities/bubble/bubble.entity";
+import {BubbleConfig} from "@app/core/config/bubble.config";
 
 export class BubbleUtil {
   // Standard values
@@ -55,8 +55,8 @@ export class BubbleUtil {
       .attr('y2', y2);
   }
 
-  public static scaleDown(bubble: Bubble, number: number): number {
-    return number / (Bubble.scalingFactor ** bubble.getReferredNumber());
+  public static scaleDown(bubble, number: number): number {
+    return number / (BubbleConfig.SCALING_FACTOR ** bubble.getReferredNumber());
   }
 
   public static getPointOnCircle(cx, cy, radius, angle) {
