@@ -1,8 +1,8 @@
-import {Bubble} from "../bubble.entity";
-import {BubbleUtil} from "../../../util/bubble.util";
-import {BubbleConfig} from "../../../config/bubble.config";
-import {BubbleSegmentColor} from "@app/core/entities/bubble/components/bubble.segment";
-import {BubbleAbstract} from "@app/core/entities/bubble/bubble.abstract";
+import {Bubble} from '../bubble.entity';
+import {CircleUtil} from '../../../util/circle.util';
+import {BubbleConfig} from '../../../config/bubble.config';
+import {BubbleSegmentColor} from '@app/core/entities/bubble/components/bubble.segment';
+import {BubbleAbstract} from '@app/core/entities/bubble/bubble.abstract';
 
 export class BubbleNametag {
   private readonly bubble: Bubble;
@@ -17,7 +17,7 @@ export class BubbleNametag {
   }
 
   public draw() {
-    const fontSize = BubbleUtil.scaleDown(this.bubble, BubbleConfig.FONT_SIZE);
+    const fontSize = this.bubble.scaleDown(BubbleConfig.FONT_SIZE);
 
     const nameText = this.bubble
       .getGroup()
@@ -27,22 +27,22 @@ export class BubbleNametag {
       .style('cursor', 'pointer')
       .text(this.bubble.getSearchTerm());
 
-    const scaledMinWidth = BubbleUtil.scaleDown(this.bubble, BubbleConfig.NAMETAG_MIN_WIDTH);
+    const mindWidth = this.bubble.scaleDown(BubbleConfig.NAMETAG_MIN_WIDTH);
 
-    this.nameHeight = nameText.node().getBBox().height * 1.5;
     this.nameWidth = nameText.node().getBBox().width * 1.5;
-    if (this.nameWidth <= scaledMinWidth) {
-      this.nameWidth = scaledMinWidth;
+    if (this.nameWidth <= mindWidth) {
+      this.nameWidth = mindWidth;
     }
+    this.nameHeight = nameText.node().getBBox().height * 1.5;
 
     const statisticsButtonWidth = this.nameWidth / 2;
-    const corner = BubbleUtil.scaleDown(this.bubble, BubbleConfig.NAMETAG_CORNER_ROUND);
+    const corner = this.bubble.scaleDown(BubbleConfig.NAMETAG_CORNER_ROUND);
     this.bubble
       .getGroup()
       .insert('rect', ':first-child')
       .classed('name-button', true)
       .attr('x', this.bubble.getCenterX() - this.nameWidth  / 2 - statisticsButtonWidth * 1.5 / 2)
-      .attr('y', this.bubble.getCenterY() + (this.bubble.getRadius() * 1.5))
+      .attr('y', this.bubble.getCenterY() + this.bubble.getRadius() * 1.5)
       .attr('rx', corner)
       .attr('ry', corner)
       .attr('width', this.nameWidth)
@@ -60,7 +60,7 @@ export class BubbleNametag {
       .attr('y',
         (this.bubble.getCenterY() + this.bubble.getRadius() * 1.5)
         + (this.nameHeight / 1.5)
-        + BubbleUtil.scaleDown(this.bubble, 1.5)
+        + this.bubble.scaleDown(1.5)
       );
   }
 

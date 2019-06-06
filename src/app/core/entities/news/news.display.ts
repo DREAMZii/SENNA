@@ -1,28 +1,23 @@
 import * as d3 from 'd3';
-import {ServiceUtil} from '@app/core/util/service.util';
-import {Focus} from "@app/core/animations/focus.animation";
-import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
+import {NewsManager} from '@app/core/entities/news/news.manager';
+import {StaticService} from '@app/services/static.service';
+import {BubbleManager} from '@app/core/entities/bubble/bubble.manager';
+import {Focus} from '@app/core/animations/focus.animation';
 
-export class NewsUtil {
-  public static news = [];
-  public static openArticles = new Map();
+export class NewsDisplay {
+  public static isNewsOpen() {
+    return d3.select('#senna-news').classed('open');
+  }
 
-  public static openNewsId: number;
-
-  public static readonly width = 400;
-
-  public static locale = 'en-US';
-  public static languageCode = 'en';
-
-  public static openNews(news) {
+  public static open(news) {
     // Prepare data whether it is open or not
-    if (this.openNewsId !== news.getId()) {
-      this.prepareNews(news);
+    if (NewsManager.openNewsId !== news.getId()) {
+      NewsDisplay.prepareNews(news);
     }
 
-    NewsUtil.openNewsId = news.getId();
+    NewsManager.openNewsId = news.getId();
 
-    if (NewsUtil.isNewsOpen()) {
+    if (NewsDisplay.isNewsOpen()) {
       return;
     }
 
@@ -74,7 +69,7 @@ export class NewsUtil {
       d3.select('#news-loading')
         .style('display', 'block');
 
-      ServiceUtil.referenceService.isContentAvailable(news.getUrl()).then((result) => {
+      StaticService.referenceService.isContentAvailable(news.getUrl()).then((result) => {
         // Dont know why this doesnt work as boolean, works as string tho
         if (result === 'true') {
           d3.select('#senna-news iframe')
@@ -118,15 +113,15 @@ export class NewsUtil {
     }
 
     // Is not open
-    if (!this.openArticles.has(news.getId())) {
-      this.openNewsTab(news);
+    if (!NewsManager.openArticles.has(news.getId())) {
+      NewsDisplay.openNewsTab(news);
     } else {
       const selectedNewsBox = d3.selectAll('.news-article')
         .filter(function() {
           return parseInt(d3.select(this).attr('news-id'), 10) === news.getId();
         });
 
-      selectedNewsBox.call(this.markBoxAsActive);
+      selectedNewsBox.call(NewsDisplay.markBoxAsActive);
     }
   }
 
@@ -147,11 +142,11 @@ export class NewsUtil {
       .on('click', function() {
         const newsBox = d3.select(this);
         if (!newsBox.classed('open-article')) {
-          newsBox.call(NewsUtil.markBoxAsActive);
+          newsBox.call(NewsDisplay.markBoxAsActive);
         }
 
         const newsId = parseInt(newsBox.attr('news-id'), 10);
-        NewsUtil.openNews(NewsUtil.news[newsId]);
+        NewsDisplay.open(NewsManager.news[newsId]);
       });
 
     openArticleBox.call(this.markBoxAsActive);
@@ -162,7 +157,7 @@ export class NewsUtil {
       .style('transform', 'rotate(180deg)')
       .text(news.getName().substring(0, 25) + '...');
 
-    this.openArticles.set(news.getId(), news);
+    NewsManager.openArticles.set(news.getId(), news);
   }
 
   private static markBoxAsActive(newsBox) {
@@ -192,28 +187,28 @@ export class NewsUtil {
   public static removeActiveNews() {
     const newsBox = d3.selectAll('.news-article')
       .filter(function() {
-        return parseInt(d3.select(this).attr('news-id'), 10) === NewsUtil.openNewsId;
+        return parseInt(d3.select(this).attr('news-id'), 10) === NewsManager.openNewsId;
       });
 
     const boxBefore = (newsBox.node() as HTMLElement).previousElementSibling;
     const boxAfter = (newsBox.node() as HTMLElement).nextElementSibling;
 
-    NewsUtil.openArticles.delete(NewsUtil.openNewsId);
+    NewsManager.openArticles.delete(NewsManager.openNewsId);
     newsBox.remove();
 
-    if (NewsUtil.openArticles.size <= 0) {
-      NewsUtil.closeNews();
-      NewsUtil.openNewsId = -1;
+    if (NewsManager.openArticles.size <= 0) {
+      NewsDisplay.closeNews();
+      NewsManager.openNewsId = -1;
     } else {
       const newActiveBox = boxBefore === null ? d3.select(boxAfter) : d3.select(boxBefore);
       const newActiveNewsId = parseInt(newActiveBox.attr('news-id'), 10);
-      NewsUtil.openNews(NewsUtil.news[newActiveNewsId]);
-      newActiveBox.call(NewsUtil.markBoxAsActive);
+      NewsDisplay.open(NewsManager.news[newActiveNewsId]);
+      newActiveBox.call(NewsDisplay.markBoxAsActive);
     }
   }
 
   public static closeNews() {
-    if (!NewsUtil.isNewsOpen()) {
+    if (!NewsDisplay.isNewsOpen()) {
       return;
     }
 
@@ -233,75 +228,5 @@ export class NewsUtil {
       .on('start', function() {
         d3.select('#close-button').style('display', 'none');
       });
-  }
-
-  public static isNewsOpen() {
-    return d3.select('#senna-news').classed('open');
-  }
-
-  public static wrap(textContainer, news, width, lineHeight) {
-    textContainer.each(function() {
-      const text = d3.select(this);
-      const titleWords = news.getName().split(/\s+/).reverse();
-      const score = 'Sentiment - Score: ' + Math.trunc(news.getScore() * 100);
-      const scoreWords = score.split(/\s+/).reverse();
-      const sourceWords = news.getSource().split(/\s+/).reverse();
-      const dateWords = news.getDatePublished().split(/\s+/).reverse();
-      const descWords = news.getDescription().split(/\s+/).reverse();
-
-      NewsUtil.tspan(titleWords, text, width, lineHeight, true, false, true);
-      NewsUtil.tspan(scoreWords, text, width, lineHeight);
-      NewsUtil.tspan(sourceWords, text, width, lineHeight, true, true);
-      NewsUtil.tspan(dateWords, text, width, lineHeight);
-      NewsUtil.tspan(descWords, text, width, lineHeight, false, true);
-    });
-  }
-
-  private static tspan(words, text, width, lineHeight, bold = false, extraLine = false, headline = false) {
-    const size = parseFloat(text.attr('font-size'));
-    const x = text.attr('x');
-    const y = text.attr('y');
-    const dx = parseFloat(text.attr('dx'));
-    const dy = parseFloat(text.attr('dy'));
-
-    let initialDy = dy;
-    if (text.select(':last-child').node() !== null) {
-      initialDy = parseFloat(text.select(':last-child').attr('dy')) + dy;
-    }
-
-    if (extraLine) {
-      initialDy += dy;
-    }
-
-    let word;
-    let lineNumber = 0;
-    let line = [];
-    let tspan = text
-      .append('tspan')
-      .attr('x', x)
-      .attr('y', y)
-      .attr('dx', dx + 'px')
-      .attr('dy', initialDy + 'px')
-      .attr('font-weight', bold ? 'bold' : null)
-      .attr('font-size', headline ? size * 1.3 : size);
-
-    while (word = words.pop()) {
-      line.push(word);
-      tspan.text(line.join(' '));
-      if (tspan.node().getComputedTextLength() > width - dx) {
-        line.pop();
-        tspan.text(line.join(' '));
-        line = [word];
-        tspan = text
-          .append('tspan')
-          .attr('x', x)
-          .attr('y', y)
-          .attr('dx', dx + 'px')
-          .attr('dy', ++lineNumber * lineHeight + initialDy + 'px')
-          .attr('font-weight', bold ? 'bold' : null)
-          .attr('font-size', headline ? size * 1.3 : size)
-          .text(word);
-      }
-    }
   }
 }

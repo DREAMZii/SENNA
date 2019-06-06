@@ -1,10 +1,8 @@
 import {Injectable} from '@angular/core';
-import {Bubble} from "@app/core/entities/bubble/bubble.entity";
+import {Bubble} from '@app/core/entities/bubble/bubble.entity';
 
 @Injectable({ providedIn: 'root' })
 export class BubbleManager {
-  /** Static **/
-
   private static bubbles = new Map<String, Bubble>();
 
   private static initialBubble: Bubble;
@@ -36,9 +34,7 @@ export class BubbleManager {
     return this.bubbles;
   }
 
-  public static getBubbles() : Bubble[] {
+  public static getBubbles(): Bubble[] {
     return Array.from(this.bubbles.values());
   }
-
-  /** Instance **/
 }

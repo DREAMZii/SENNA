@@ -1,8 +1,8 @@
 import {ExpirationStrategy} from 'node-ts-cache/src/strategies/ExpirationStrategy';
 import {MemoryStorage} from 'node-ts-cache/src/storages/MemoryStorage';
-import {ServiceUtil} from '@app/core/util/service.util';
+import {StaticService} from '@app/services/static.service';
 
-export class CacheUtil {
+export class Cache {
   private static cache = new ExpirationStrategy(new MemoryStorage());
 
   public static async getNews(term: string) {
@@ -12,7 +12,7 @@ export class CacheUtil {
       return cachedNews;
     }
 
-    let news = await ServiceUtil.azureService.searchNews(term);
+    let news = await StaticService.azureService.searchNews(term);
     if (!news) {
       news = [];
     }
@@ -30,7 +30,7 @@ export class CacheUtil {
       return cachedNews;
     }
 
-    let news = await ServiceUtil.azureService.searchOldNews(term);
+    let news = await StaticService.azureService.searchOldNews(term);
     if (!news) {
       news = [];
     }
@@ -48,7 +48,7 @@ export class CacheUtil {
       return cachedReferences;
     }
 
-    const references = await ServiceUtil.referenceService.getReferences(term, amount, searchUrl);
+    const references = await StaticService.referenceService.getReferences(term, amount, searchUrl);
     await this.cache.setItem(key, references, {isCachedForever: true});
 
     console.log('Cached references for ' + term);

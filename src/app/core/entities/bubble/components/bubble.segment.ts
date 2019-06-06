@@ -1,8 +1,9 @@
-import {BubbleUtil} from "../../../util/bubble.util";
-import {Bubble} from "../bubble.entity";
-import {News, NewsSentiment} from "../../news.entity";
-import {ZoomConfig} from "../../../config/zoom.config";
-import {Focus} from "../../../animations/focus.animation";
+import {CircleUtil} from '../../../util/circle.util';
+import {Bubble} from '../bubble.entity';
+import {News, NewsSentiment} from '../../news/news.entity';
+import {ZoomConfig} from '../../../config/zoom.config';
+import {Focus} from '../../../animations/focus.animation';
+import {NewsManager} from '@app/core/entities/news/news.manager';
 
 export enum BubbleSegmentColor {
   GREEN = '#8CA528',
@@ -45,7 +46,7 @@ export class BubbleSegment {
       .attr('stroke-width', this.bubble.getStrokeWidth())
       .attr('news-id', this.newsId)
       .attr('d', () => {
-        return BubbleUtil.describeArc(
+        return CircleUtil.describeArc(
           this.bubble.getCenterX(),
           this.bubble.getCenterY(),
           this.bubble.getRadius(),
@@ -82,9 +83,9 @@ export class BubbleSegment {
         return;
       }
 
-      this.bubble
-        .getNewsGroup()
-        .draw(this.bubble.getNews(this.newsId));
+      NewsManager
+        .news[this.newsId]
+        .draw(this.bubble);
       Focus.focus(this.bubble);
     });
   }

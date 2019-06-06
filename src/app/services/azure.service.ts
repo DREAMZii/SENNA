@@ -5,8 +5,9 @@ import { ConfigService } from './config.service';
 import {
   HTTP_HEADER_AZ_CS_SUBSCRIPTION_API_KEY_NAME
 } from '@app/core/constants/http.constants';
-import {News} from '@app/core/entities/news.entity';
-import {NewsUtil} from '@app/core/util/news.util';
+import {News} from '@app/core/entities/news/news.entity';
+import {TextUtil} from '@app/core/util/text.util';
+import {NewsManager} from '@app/core/entities/news/news.manager';
 
 
 @Injectable({ providedIn: 'root' })
@@ -31,7 +32,7 @@ export class AzureService {
       .set('count', '7')
       .set('offset', '0')
       .set('sortBy', 'date')
-      .set('mkt', NewsUtil.locale)
+      .set('mkt', NewsManager.locale)
       .set('freshness', 'week');
 
     const response = await this.http.get(uri, {headers: headers, params: params});
@@ -45,7 +46,12 @@ export class AzureService {
       }
     });
 
-    return await this.determineNewsSentiment(newsEntities);
+    let scoredNews = await this.determineNewsSentiment(newsEntities);
+    scoredNews = scoredNews.sort((a, b) => {
+      return a.getScore() > b.getScore() ? 1 : -1;
+    });
+
+    return scoredNews;
   }
 
   async searchOldNews(query: string) {
@@ -55,7 +61,7 @@ export class AzureService {
       .set('q', '+"' + query + '"')
       .set('count', '100')
       .set('offset', '0')
-      .set('mkt', NewsUtil.locale);
+      .set('mkt', NewsManager.locale);
 
     const response = await this.http.get(uri, {headers: headers, params: params});
 
@@ -167,7 +173,7 @@ export class AzureService {
 
   private mappingFunction(currentValue: string, index: number) {
     return {
-      'language': NewsUtil.languageCode,
+      'language': NewsManager.languageCode,
       'id': index + 1,
       'text': currentValue
     };

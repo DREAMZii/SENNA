@@ -19,7 +19,7 @@ import {SennaAlertModule} from '@app/core/modules';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {TranslateCompiler, TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateMessageFormatCompiler} from 'ngx-translate-messageformat-compiler';
-import {ServiceUtil} from '@app/core/util/service.util';
+import {StaticService} from '@app/services/static.service';
 import {SearchComponent} from '@app/views/search';
 import {SennaFormComponent} from '@app/core/components/senna-form/senna-form.component';
 import {SennaNewsComponent} from '@app/core/components/senna-news/senna-news.component';
@@ -77,10 +77,10 @@ export class AppModule {
     private newsService: NewsService,
     private alertService: SennaAlertService
   ) {
-    ServiceUtil.referenceService = referenceService;
-    ServiceUtil.azureService = azureService;
-    ServiceUtil.newsService = newsService;
-    ServiceUtil.alertService = alertService;
+    StaticService.referenceService = referenceService;
+    StaticService.azureService = azureService;
+    StaticService.newsService = newsService;
+    StaticService.alertService = alertService;
   }
 }
 

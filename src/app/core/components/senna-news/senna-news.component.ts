@@ -1,7 +1,7 @@
 ﻿import {Component, OnInit} from '@angular/core';
 
 import * as d3 from 'd3';
-import {NewsUtil} from '@app/core/util/news.util';
+import {NewsDisplay} from '@app/core/entities/news/news.display';
 
 @Component({
   selector: 'app-senna-news',
@@ -13,7 +13,7 @@ export class SennaNewsComponent implements OnInit {
     // Init events
     d3.select('#close-button')
       .on('click', () => {
-        NewsUtil.removeActiveNews();
+        NewsDisplay.removeActiveNews();
       });
   }
 }

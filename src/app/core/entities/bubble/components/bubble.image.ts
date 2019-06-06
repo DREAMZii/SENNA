@@ -1,7 +1,6 @@
-import {Bubble} from "@app/core/entities/bubble/bubble.entity";
-import {BubbleAbstract} from "@app/core/entities/bubble/bubble.abstract";
-import {BubbleConfig} from "@app/core/config/bubble.config";
-import {BubbleUtil} from "@app/core/util/bubble.util";
+import {Bubble} from '@app/core/entities/bubble/bubble.entity';
+import {BubbleAbstract} from '@app/core/entities/bubble/bubble.abstract';
+import {BubbleConfig} from '@app/core/config/bubble.config';
 
 export class BubbleImage {
   private readonly bubble: Bubble;
@@ -17,7 +16,7 @@ export class BubbleImage {
       const text = this.bubble
         .getGroup()
         .append('text')
-        .attr('font-size', BubbleUtil.scaleDown(this.bubble, BubbleConfig.FONT_SIZE))
+        .attr('font-size', this.bubble.scaleDown(BubbleConfig.FONT_SIZE))
         .text(this.bubble.getSearchTerm());
 
       const width = text.node().getComputedTextLength();
@@ -33,8 +32,8 @@ export class BubbleImage {
         .attr('id', 'bubble-rect-' + this.bubble.getId())
         .attr('x', this.bubble.getCenterX() - rectWH / 2)
         .attr('y', this.bubble.getCenterY() - rectWH / 2)
-        .attr('rx', BubbleUtil.scaleDown(this.bubble, 20))
-        .attr('ry', BubbleUtil.scaleDown(this.bubble, 20))
+        .attr('rx', this.bubble.scaleDown(20))
+        .attr('ry', this.bubble.scaleDown(20))
         .attr('width', rectWH)
         .attr('height', rectWH)
         .attr('xlink:href', this.bubble.getSearchImage())

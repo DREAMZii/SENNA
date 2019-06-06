@@ -1,17 +1,18 @@
-import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ConfigService, ReferenceService} from '@app/services';
 
-import {CacheUtil} from '@app/core/util/cache.util';
+import {Cache} from '@app/core/cache/cache';
 import {ActivatedRoute, Router} from '@angular/router';
 
 import * as d3 from 'd3';
-import {NewsUtil} from '@app/core/util/news.util';
-import {BubbleUtil} from '@app/core/util/bubble.util';
 import {environment} from '@environments/environment.prod';
-import {Bubble} from "@app/core/entities/bubble/bubble.entity";
-import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
-import {Focus} from "@app/core/animations/focus.animation";
-import {ZoomConfig} from "@app/core/config/zoom.config";
+import {Bubble} from '@app/core/entities/bubble/bubble.entity';
+import {BubbleManager} from '@app/core/entities/bubble/bubble.manager';
+import {Focus} from '@app/core/animations/focus.animation';
+import {ZoomConfig} from '@app/core/config/zoom.config';
+import {NewsManager} from '@app/core/entities/news/news.manager';
+import {TextUtil} from '@app/core/util/text.util';
+import {NewsDisplay} from '@app/core/entities/news/news.display';
 
 @Component({
   templateUrl: './home.component.html',
@@ -42,7 +43,7 @@ export class HomeComponent implements OnInit {
     this.initSvgEvents();
 
     this.configService.fetch(() => {
-      CacheUtil.getNews(searchTerm).then((news) => {
+      Cache.getNews(searchTerm).then((news) => {
         this.referenceService.getImage(searchTerm).then((imageUrl) => {
           // Azure Service Key + initial news + initial image loaded
           Bubble.createInitialBubble(searchTerm, imageUrl, news);
@@ -60,8 +61,8 @@ export class HomeComponent implements OnInit {
   validateInputs(searchTerm: string, localeParam: string) {
     const allowedLocales = ['de-DE', 'en-US'];
     if (localeParam !== '' && allowedLocales.indexOf(localeParam) >= 0) {
-      NewsUtil.locale = localeParam;
-      NewsUtil.languageCode = localeParam.split('-')[0];
+      NewsManager.locale = localeParam;
+      NewsManager.languageCode = localeParam.split('-')[0];
     }
 
     if (searchTerm === '') {
@@ -70,7 +71,7 @@ export class HomeComponent implements OnInit {
   }
 
   markLanguageButton() {
-    if (NewsUtil.languageCode === 'en') {
+    if (NewsManager.languageCode === 'en') {
       d3.select('#english-button')
         .attr('xlink:href', 'assets/images/en_active.svg');
 
@@ -92,7 +93,7 @@ export class HomeComponent implements OnInit {
           return;
         }
 
-        NewsUtil.closeNews();
+        NewsDisplay.closeNews();
       });
   }
 
@@ -101,7 +102,7 @@ export class HomeComponent implements OnInit {
 
     d3.select('#german-button')
       .on('click', () => {
-        if (NewsUtil.locale === 'de-DE') {
+        if (NewsManager.locale === 'de-DE') {
           return;
         }
 
@@ -110,7 +111,7 @@ export class HomeComponent implements OnInit {
 
     d3.select('#english-button')
       .on('click', () => {
-        if (NewsUtil.locale === 'en-US') {
+        if (NewsManager.locale === 'en-US') {
           return;
         }
 

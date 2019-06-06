@@ -1,9 +1,8 @@
-import {Animation} from "@app/core/animations/animation.interface";
-import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
-import * as d3 from "d3";
-import {BubbleConfig} from "@app/core/config/bubble.config";
+import {BubbleManager} from '@app/core/entities/bubble/bubble.manager';
+import * as d3 from 'd3';
+import {BubbleConfig} from '@app/core/config/bubble.config';
 
-export class Focus implements Animation {
+export class Focus {
   public static currentScale = 0;
   public static currentTranslateX = 0;
   public static currentTranslateY = 0;
@@ -72,7 +71,13 @@ export class Focus implements Animation {
         d3.select(this).remove();
       });
 
-    BubbleManager.getActiveBubble().getNewsGroup().remove();
+    d3.selectAll('.news')
+      .transition()
+      .duration(750)
+      .style('opacity', '0')
+      .on('end', function() {
+        d3.select(this).remove();
+      });
   }
 
   private static markBubbleAsActive(bubble) {

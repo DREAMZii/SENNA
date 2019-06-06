@@ -4,9 +4,10 @@ import {ActivatedRoute} from '@angular/router';
 import {environment} from '@environments/environment.prod';
 import {SennaAlertService} from '@app/core/modules/senna-alert/senna-alert.service';
 import {AzureService, ConfigService} from '@app/services';
-import {BubbleUtil} from '@app/core/util/bubble.util';
-import {News} from "@app/core/entities/news.entity";
-import {BubbleSegmentColor} from "@app/core/entities/bubble/components/bubble.segment";
+import {CircleUtil} from '@app/core/util/circle.util';
+import {News} from '@app/core/entities/news/news.entity';
+import {BubbleSegmentColor} from '@app/core/entities/bubble/components/bubble.segment';
+import {NewsConfig} from '@app/core/config/news.config';
 
 @Component({
   templateUrl: './score.component.html',
@@ -51,9 +52,9 @@ export class ScoreComponent implements OnInit {
           const counterTime = roundedScore * intervalTime;
 
           let color = 'black';
-          if (score >= News.positiveThreshhold) {
+          if (score >= NewsConfig.POSITIVE_THRESHHOLD) {
             color = BubbleSegmentColor.GREEN;
-          } else if (score > News.negativeThreshhold && score < News.positiveThreshhold) {
+          } else if (score > NewsConfig.NEGATIVE_THRESHHOLD && score < NewsConfig.POSITIVE_THRESHHOLD) {
             color = BubbleSegmentColor.GRAY;
           } else {
             color = BubbleSegmentColor.RED;

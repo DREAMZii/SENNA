@@ -1,15 +1,15 @@
-import {Bubble} from "../bubble.entity";
-import {BubbleUtil} from "../../../util/bubble.util";
-import {BubbleConfig} from "../../../config/bubble.config";
-import {ZoomConfig} from "../../../config/zoom.config";
-import {BubbleManager} from "../bubble.manager";
-import {ServiceUtil} from "../../../util/service.util";
-import * as d3 from "d3";
-import {Focus} from "../../../animations/focus.animation";
-import {News} from "../../news.entity";
-import {BubbleNametag} from "@app/core/entities/bubble/components/bubble.nametag";
-import {BubbleSegmentColor} from "@app/core/entities/bubble/components/bubble.segment";
-import {BubbleAbstract} from "@app/core/entities/bubble/bubble.abstract";
+import {Bubble} from '../bubble.entity';
+import {CircleUtil} from '../../../util/circle.util';
+import {BubbleConfig} from '../../../config/bubble.config';
+import {ZoomConfig} from '../../../config/zoom.config';
+import {BubbleManager} from '../bubble.manager';
+import {StaticService} from '../../../../services/static.service';
+import * as d3 from 'd3';
+import {Focus} from '../../../animations/focus.animation';
+import {News} from '../../news/news.entity';
+import {BubbleNametag} from '@app/core/entities/bubble/components/bubble.nametag';
+import {BubbleSegmentColor} from '@app/core/entities/bubble/components/bubble.segment';
+import {BubbleAbstract} from '@app/core/entities/bubble/bubble.abstract';
 
 export class BubbleStatistic {
   private readonly bubble: Bubble;
@@ -28,7 +28,7 @@ export class BubbleStatistic {
     const nameH = this.nameTag.getNameHeight();
     const statisticsButtonWidth = this.nameTag.getNameWidth() / 2;
 
-    const corner = BubbleUtil.scaleDown(this.bubble, BubbleConfig.NAMETAG_CORNER_ROUND);
+    const corner = this.bubble.scaleDown(BubbleConfig.NAMETAG_CORNER_ROUND);
     this.bubble
       .getGroup()
       .insert('rect', ':first-child')
@@ -63,7 +63,7 @@ export class BubbleStatistic {
     }
 
     if (this.bubble.isReferencesSpawned() && this.bubble.getReferences().length <= 0) {
-      ServiceUtil.alertService.warning('No references for term ' + this.bubble.getSearchTerm().toUpperCase() + '!');
+      StaticService.alertService.warning('No references for term ' + this.bubble.getSearchTerm().toUpperCase() + '!');
     }
 
     let selection = this.bubble.getGroup().select('#statistics-' + this.bubble.getId());
@@ -75,7 +75,7 @@ export class BubbleStatistic {
       initRectX = this.bubble.getCenterX() - nameW / 2 - statisticsButtonWidth * 1.5 / 2;
       initRectY = this.bubble.getCenterY() + (this.bubble.getRadius() * 1.5) + nameH + (nameH * 0.2);
 
-      const corner = BubbleUtil.scaleDown(this.bubble, BubbleConfig.NAMETAG_CORNER_ROUND);
+      const corner = this.bubble.scaleDown(BubbleConfig.NAMETAG_CORNER_ROUND);
       selection = this.bubble
         .getGroup()
         .insert('rect', ':first-child')
@@ -128,7 +128,7 @@ export class BubbleStatistic {
       this.bubble.spawnReferences();
     });
 
-    const fontSize = BubbleUtil.scaleDown(this.bubble, BubbleConfig.FONT_SIZE);
+    const fontSize = this.bubble.scaleDown(BubbleConfig.FONT_SIZE);
     const averageText = this.bubble
       .getGroup()
       .insert('text', '#statistics-' + this.bubble.getId() + ' + *')
@@ -218,11 +218,11 @@ export class BubbleStatistic {
   }
 
   private spawnStatsRect(x, y, index, width, diff, height, fullHeight, percent, color) {
-    const fontSize = BubbleUtil.scaleDown(this.bubble, BubbleConfig.FONT_SIZE);;
+    const fontSize = this.bubble.scaleDown(BubbleConfig.FONT_SIZE);
     const statsWidth = width / 5 * 0.8;
 
     const rectX = x + width / 5 * index + width / 5 * 0.1;
-    const corner = BubbleUtil.scaleDown(this.bubble, BubbleConfig.NAMETAG_CORNER_ROUND);
+    const corner = this.bubble.scaleDown(BubbleConfig.NAMETAG_CORNER_ROUND);
     const rect = this.bubble
       .getGroup()
       .insert('rect', '#statistics-' + this.bubble.getId() + ' + *')
@@ -237,7 +237,7 @@ export class BubbleStatistic {
       .attr('fill', color)
       .transition()
       .duration(500)
-      .attr('height', height + BubbleUtil.scaleDown(this.bubble, 1));
+      .attr('height', height + this.bubble.scaleDown(1));
 
     const statText = this.bubble
       .getGroup()

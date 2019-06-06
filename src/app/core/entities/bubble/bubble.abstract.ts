@@ -1,22 +1,22 @@
-import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
-import * as d3 from "d3";
-import {BubbleSegment} from "@app/core/entities/bubble/components/bubble.segment";
-import {News, NewsSentiment} from "@app/core/entities/news.entity";
-import {NewsGroup} from "@app/core/entities/newsgroup.entity";
-import {ZoomConfig} from "@app/core/config/zoom.config";
-import {BubbleNametag} from "@app/core/entities/bubble/components/bubble.nametag";
-import {BubbleStatistic} from "@app/core/entities/bubble/components/bubble.statistic";
-import {BubbleImage} from "@app/core/entities/bubble/components/bubble.image";
+import {BubbleManager} from '@app/core/entities/bubble/bubble.manager';
+import * as d3 from 'd3';
+import {BubbleSegment} from '@app/core/entities/bubble/components/bubble.segment';
+import {News, NewsSentiment} from '@app/core/entities/news/news.entity';
+import {ZoomConfig} from '@app/core/config/zoom.config';
+import {BubbleNametag} from '@app/core/entities/bubble/components/bubble.nametag';
+import {BubbleStatistic} from '@app/core/entities/bubble/components/bubble.statistic';
+import {BubbleImage} from '@app/core/entities/bubble/components/bubble.image';
 
 export abstract class BubbleAbstract {
   // Core values
+  protected readonly id: number;
   protected readonly searchTerm: any;
   protected readonly searchImage: any;
   protected readonly container: any;
   protected readonly radius: number;
   protected readonly strokeWidth: number;
   protected readonly news: News[];
-  protected readonly newsGroup: NewsGroup;
+  protected group: any;
 
   // Zoom
   protected zoom;
@@ -34,13 +34,13 @@ export abstract class BubbleAbstract {
     news: any,
     radius: number
   ) {
+    this.id = BubbleManager.getBubbles().length;
     this.searchTerm = searchTerm;
     this.searchImage = searchImage;
     this.container = d3.select('#graphContainer').select('#canvas');
     this.radius = radius;
     this.strokeWidth = radius / 5;
     this.news = news as News[];
-    this.newsGroup = new NewsGroup(this, news);
 
     // Config
     this.setMiddlePoint();
@@ -88,7 +88,7 @@ export abstract class BubbleAbstract {
 
   private initSegments() {
     for (const single of this.news) {
-      let previousSegments = this.segments.has(single.getSentiment())
+      const previousSegments = this.segments.has(single.getSentiment())
         ? this.segments.get(single.getSentiment()) : [];
 
       const segment = new BubbleSegment(this, single);
@@ -98,6 +98,12 @@ export abstract class BubbleAbstract {
     }
   }
 
+  /**
+   * Sets the Middle-Point for the circle
+   *
+   * @param cx  - center x
+   * @param cy  - center y
+   */
   protected setMiddlePoint(cx?: number, cy?: number) {
     const rect = this.container.node().getBoundingClientRect();
     this.x = cx ? cx : rect.width / 2;
@@ -152,5 +158,58 @@ export abstract class BubbleAbstract {
     }
 
     return segments.length;
+  }
+
+  /** GETTER **/
+  public getId() {
+    return this.id;
+  }
+
+  public getSearchTerm() {
+    return this.searchTerm;
+  }
+
+  public getSearchImage() {
+    return this.searchImage;
+  }
+
+  public getContainer() {
+    return this.container;
+  }
+
+  public getGroup() {
+    return this.group;
+  }
+
+  public getZoom() {
+    return this.zoom;
+  }
+
+  public getNews() {
+    return this.news;
+  }
+
+  public getAngleDistance() {
+    const count = this.getSegmentCount(NewsSentiment.POSITIVE)
+      + this.getSegmentCount(NewsSentiment.NEUTRAL)
+      + this.getSegmentCount(NewsSentiment.NEGATIVE);
+
+    return 360 / count;
+  }
+
+  public getStrokeWidth() {
+    return this.strokeWidth;
+  }
+
+  public getRadius() {
+    return this.radius;
+  }
+
+  public getCenterX() {
+    return this.x;
+  }
+
+  public getCenterY() {
+    return this.y;
   }
 }

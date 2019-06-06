@@ -1,39 +1,18 @@
 import * as d3 from 'd3';
-import {News, NewsSentiment} from '../news.entity';
-import {BubbleUtil} from '../../util/bubble.util';
-import {CacheUtil} from '../../util/cache.util';
-import {ServiceUtil} from '../../util/service.util';
 import {BubbleAbstract} from '@app/core/entities/bubble/bubble.abstract';
-import {BubbleManager} from "@app/core/entities/bubble/bubble.manager";
-import {Focus} from "@app/core/animations/focus.animation";
-import {ZoomConfig} from "@app/core/config/zoom.config";
-import {BubbleConfig} from "@app/core/config/bubble.config";
+import {BubbleManager} from '@app/core/entities/bubble/bubble.manager';
+import {Focus} from '@app/core/animations/focus.animation';
+import {ZoomConfig} from '@app/core/config/zoom.config';
+import {BubbleConfig} from '@app/core/config/bubble.config';
+import {NewsConfig} from '@app/core/config/news.config';
+import {News, NewsSentiment} from '@app/core/entities/news/news.entity';
+import {StaticService} from '@app/services/static.service';
+import {CircleUtil} from '@app/core/util/circle.util';
+import {Cache} from '@app/core/cache/cache';
 
 export class Bubble extends BubbleAbstract {
-  /**
-   * Creates the initial bubble instance to create canvas
-   *
-   * @param searchTerm  - initial searchTerm this bubble gets initiated with
-   * @param imageUrl    - initial imageUrl this bubble will display
-   * @param news        - news got from azure cognitive services to display the segments
-   */
-  public static createInitialBubble(searchTerm: string, imageUrl: string, news: any) {
-    const bubble = new Bubble(searchTerm, imageUrl, news);
-
-    bubble.preloadReferences(() => {
-      bubble.referencesLoaded = true;
-
-      d3.select('#loading-gear').remove();
-
-      bubble.spawn();
-      bubble.spawnReferences();
-    });
-  }
-
   // Relevant fields
-  private id: number;
   private searchUrl = null;
-  private group: any;
   private isSpawned = false;
 
   // Visual
@@ -61,6 +40,30 @@ export class Bubble extends BubbleAbstract {
   private oldNeutAmount: number;
   private oldNegAmount: number;
 
+  /** STATIC **/
+
+  /**
+   * Creates the initial bubble instance to create canvas
+   *
+   * @param searchTerm  - initial searchTerm this bubble gets initiated with
+   * @param imageUrl    - initial imageUrl this bubble will display
+   * @param news        - news got from azure cognitive services to display the segments
+   */
+  public static createInitialBubble(searchTerm: string, imageUrl: string, news: any) {
+    const bubble = new Bubble(searchTerm, imageUrl, news);
+
+    bubble.preloadReferences(() => {
+      bubble.referencesLoaded = true;
+
+      d3.select('#loading-gear').remove();
+
+      bubble.spawn();
+      bubble.spawnReferences();
+    });
+  }
+
+  /** INSTANCE **/
+
   /**
    * Constructor for Bubble instance
    *
@@ -80,20 +83,32 @@ export class Bubble extends BubbleAbstract {
   }
 
   private initOldNews() {
-    CacheUtil.getOldNews(this.searchTerm).then((oldNews: News[]) => {
+    Cache.getOldNews(this.searchTerm).then((oldNews: News[]) => {
       this.oldAmount = oldNews.length;
       this.oldPosAmount = oldNews.filter((single) =>
-        single.score >= News.positiveThreshhold
+        single.score >= NewsConfig.POSITIVE_THRESHHOLD
       ).length;
       this.oldNeutAmount = oldNews.filter((single) =>
-        single.score > News.negativeThreshhold && single.score < News.positiveThreshhold
+        single.score > NewsConfig.NEGATIVE_THRESHHOLD && single.score < NewsConfig.POSITIVE_THRESHHOLD
       ).length;
       this.oldNegAmount = oldNews.filter((single) =>
-        single.score <= News.negativeThreshhold
+        single.score <= NewsConfig.NEGATIVE_THRESHHOLD
       ).length;
     });
   }
 
+  /**
+   * Scales down a number based on the current referrednumber
+   *
+   * @param number  - to scale down
+   */
+  public scaleDown(number: number) {
+    return number / (BubbleConfig.SCALING_FACTOR ** this.referredNumber);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public spawn(positionX?: number, positionY?: number) {
     this.isSpawned = true;
 
@@ -104,7 +119,9 @@ export class Bubble extends BubbleAbstract {
 
     this.group = this.container
       .insert('g', query)
-      .attr('transform', `translate(${BubbleUtil.offsetX}, ${BubbleUtil.offsetY}) scale(${BubbleUtil.scale})`)
+      .attr('transform',
+        `translate(${Focus.currentTranslateX}, ${Focus.currentTranslateY})
+        scale(${Focus.currentScale})`)
       .style('position', 'absolute')
       .style('top', 0)
       .style('left', 0)
@@ -125,8 +142,6 @@ export class Bubble extends BubbleAbstract {
     this.getSegments(NewsSentiment.POSITIVE).forEach((single) => {
       single.draw();
     });
-
-    this.id = BubbleManager.getBubbles().length - 1;
 
     this.drawImage();
     this.drawNameTagAndStatistic();
@@ -158,7 +173,7 @@ export class Bubble extends BubbleAbstract {
     const amount = this.isReferred ? 3 : 4;
 
     // Load references on initialization
-    CacheUtil.getReferences(this.searchTerm, amount, this.searchUrl).then( async (references: string[]) => {
+    Cache.getReferences(this.searchTerm, amount, this.searchUrl).then( async (references: string[]) => {
       for (const reference of references) {
         const referenceTitle = reference['referenceTitle'];
         const referenceImageUrl = reference['referenceImageUrl'];
@@ -173,14 +188,14 @@ export class Bubble extends BubbleAbstract {
           continue;
         }
 
-        await CacheUtil.getNews(referenceTitle).then((news: News[]) => {
+        await Cache.getNews(referenceTitle).then((news: News[]) => {
           // We don't want those
           if (news.length <= 0) {
             return;
           }
 
           const refRadius = this.radius / BubbleConfig.SCALING_FACTOR;
-          const refBubble = new Bubble(referenceTitle, referenceImageUrl,news, refRadius)
+          const refBubble = new Bubble(referenceTitle, referenceImageUrl, news, refRadius)
             .setReferrer(this);
 
 
@@ -194,7 +209,7 @@ export class Bubble extends BubbleAbstract {
       }
     }).catch((e) => {
       this.referencesLoaded = true;
-      ServiceUtil.alertService.error('References for ' + this.searchTerm.toUpperCase() + ' could not be loaded!');
+      StaticService.alertService.error('References for ' + this.searchTerm.toUpperCase() + ' could not be loaded!');
 
       console.error(e);
     });
@@ -204,7 +219,7 @@ export class Bubble extends BubbleAbstract {
     // Recenter button
     this.group.selectAll('circle, .name-button').on('click', () => {
       if (this.referencesSpawned && this.references.length <= 0) {
-        ServiceUtil.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
+        StaticService.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
       }
 
       Focus.focus(this, () => {
@@ -221,8 +236,11 @@ export class Bubble extends BubbleAbstract {
     });
   }
 
+  /**
+   * Starts the rotating animation for loading
+   */
   public startRotating() {
-    if (!this.isReferred) {
+    if (!this.isReferred || this.rotationInterval < 0) {
       return;
     }
 
@@ -243,12 +261,16 @@ export class Bubble extends BubbleAbstract {
     }
 
     clearInterval(this.rotationInterval);
+    this.rotationInterval = -1;
 
     this.group
       .selectAll('path')
       .attr('transform', null);
   }
 
+  /**
+   * Spawns the references of the bubble related to the angle this bubble got spawned in
+   */
   public spawnReferences() {
     // Already queued or even spawned
     if (this.referencesSpawned) {
@@ -262,7 +284,7 @@ export class Bubble extends BubbleAbstract {
 
     if (this.references.length <= 0) {
       this.referencesSpawned = true;
-      ServiceUtil.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
+      StaticService.alertService.warning('No references for term ' + this.searchTerm.toUpperCase() + '!');
 
       this.stopRotation();
       ZoomConfig.zoomDisabled = false;
@@ -285,13 +307,13 @@ export class Bubble extends BubbleAbstract {
     }
 
     for (const bubble of alreadyExisting) {
-      BubbleUtil.connect(this, bubble);
+      this.connect(bubble);
     }
 
     for (let i = 0; i < spawnableBubbles.length; i++) {
       const bubble = spawnableBubbles[i];
       const referencesCount = spawnableBubbles.length;
-      let initialAngle = this.angleSpawned;
+      const initialAngle = this.angleSpawned;
       let angle = 0;
       if (this.isReferred) {
         const range = 90;
@@ -313,7 +335,7 @@ export class Bubble extends BubbleAbstract {
         angle = i * initialAngle / referencesCount + angleOffset;
       }
 
-      const centerPoint = BubbleUtil.getPointOnCircle(
+      const centerPoint = CircleUtil.getPointOnCircle(
         this.x,
         this.y,
         this.radius * (BubbleConfig.SCALING_FACTOR * 3.5),
@@ -325,13 +347,64 @@ export class Bubble extends BubbleAbstract {
 
       bubble.spawn();
 
-      BubbleUtil.connect(this, bubble);
+      this.connect(bubble);
     }
 
     this.stopRotation();
     ZoomConfig.zoomDisabled = false;
     Focus.focus(BubbleManager.getActiveBubble(), null, 1, 0);
   }
+
+
+  /**
+   * Connect two bubbles
+   *
+   * @param bubble  - to connect to
+   */
+  public connect(bubble) {
+    // Calculate angle between 2 middle points
+    const xDiff = bubble.x - this.x;
+    const yDiff = bubble.y - this.y;
+    const angleInRad1 = Math.atan2(yDiff, xDiff);
+
+    const xDiff2 = this.x - bubble.x;
+    const yDiff2 = this.y - bubble.y;
+    const angleInRad2 = Math.atan2(yDiff2, xDiff2);
+
+    // Find point on circle relative to calculated angle
+    const x1 = this.x + (this.radius + this.strokeWidth) * Math.cos(angleInRad1);
+    const y1 = this.y + (this.radius + this.strokeWidth) * Math.sin(angleInRad1);
+
+    // Find point on circle 2
+    const x2 = bubble.x + (bubble.radius + bubble.strokeWidth) * Math.cos(angleInRad2);
+    const y2 = bubble.y + (bubble.radius + bubble.strokeWidth) * Math.sin(angleInRad2);
+
+    const group = d3.select('#graphContainer')
+      .select('#canvas')
+      .insert('g', 'g:first-of-type')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('transform',
+        `translate(${Focus.currentTranslateX}, ${Focus.currentTranslateY})
+        scale(${Focus.currentScale})`
+      )
+      .style('position', 'absolute')
+      .style('top', 0)
+      .style('left', 0)
+      .style('z-index', 0)
+      .classed('line', true);
+
+    // Append line with calculated endpoints
+    group.append('line')
+      .style('stroke', 'black')
+      .style('stroke-width', this.scaleDown(1))
+      .attr('x1', x1)
+      .attr('y1', y1)
+      .attr('x2', x2)
+      .attr('y2', y2);
+  }
+
+  /** SETTER **/
 
   public setReferrer(referrer: Bubble): Bubble {
     this.isReferred = true;
@@ -341,37 +414,7 @@ export class Bubble extends BubbleAbstract {
     return this;
   }
 
-  public getId() {
-    return this.id;
-  }
-
-  public getSearchTerm() {
-    return this.searchTerm;
-  }
-
-  public getSearchImage() {
-    return this.searchImage;
-  }
-
-  public getContainer() {
-    return this.container;
-  }
-
-  public getGroup() {
-    return this.group;
-  }
-
-  public getZoom() {
-    return this.zoom;
-  }
-
-  public getNewsGroup() {
-    return this.newsGroup;
-  }
-
-  public getNews(newsId: number) {
-    return this.newsGroup.getNews()[newsId];
-  }
+  /** GETTER **/
 
   public getReferrer() {
     return this.referrer;
@@ -379,30 +422,6 @@ export class Bubble extends BubbleAbstract {
 
   public getReferredNumber() {
     return this.referredNumber;
-  }
-
-  public getAngleDistance() {
-    const count = this.getSegmentCount(NewsSentiment.POSITIVE)
-        + this.getSegmentCount(NewsSentiment.NEUTRAL)
-        + this.getSegmentCount(NewsSentiment.NEGATIVE);
-
-    return 360 / count;
-  }
-
-  public getStrokeWidth() {
-    return this.strokeWidth;
-  }
-
-  public getRadius() {
-    return this.radius;
-  }
-
-  public getCenterX() {
-    return this.x;
-  }
-
-  public getCenterY() {
-    return this.y;
   }
 
   public isReferencesSpawned() {
