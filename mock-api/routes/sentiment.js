@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function(req, res) {
-  var response = require(__basedir + '/data/references.json');
+router.post('/', function(req, res) {
+  var response = require(__basedir + '/data/sentiment.json');
   res.json(response);
 });
 

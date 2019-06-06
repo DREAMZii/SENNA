@@ -5,10 +5,10 @@
 export const environment = {
   url: 'http://localhost:4200/',
   production: false,
-  disableAuthentication: false,
+  disableAuthentication: true,
   snapshotIntervalInSeconds: 5,
   config: {
-    url: 'https://yacovi-config-service.azurewebsites.net/api/GetConfig'
+    url: 'http://localhost:7071/api/GetConfig'
   },
   references: {
     url: 'http://localhost:7071/api/SearchReferences'
@@ -43,13 +43,13 @@ export const environment = {
     cognitiveServices: {
 
       // https://dev.cognitive.microsoft.com/docs/services/e5e22123c5d24f1081f63af1548defa1/operations/56b449fbcf5ff81038d15cdf
-      newsSearchUrl: 'https://westeurope.api.cognitive.microsoft.com/bing/v7.0/news/search',
+      newsSearchUrl: 'http://localhost:7071/api/News',
       searchUrl: 'https://westeurope.api.cognitive.microsoft.com/bing/v7.0/search',
 
       // https://westus.dev.cognitive.microsoft.com/docs/services/TextAnalytics.V2.0/operations/56f30ceeeda5650db055a3c9
       textAnalysisLanguageUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/languages',
       textAnalysisKeyPhrasesUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases',
-      textAnalysisSentimentUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment'
+      textAnalysisSentimentUrl: 'http://localhost:7071/api/Sentiment'
 
     }
   }

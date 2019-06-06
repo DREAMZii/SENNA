@@ -47,9 +47,11 @@ export class AzureService {
     });
 
     let scoredNews = await this.determineNewsSentiment(newsEntities);
-    scoredNews = scoredNews.sort((a, b) => {
-      return a.getScore() > b.getScore() ? 1 : -1;
-    });
+    if (scoredNews.length > 0) {
+      scoredNews = scoredNews.sort((a, b) => {
+        return a.getScore() > b.getScore() ? 1 : -1;
+      });
+    }
 
     return scoredNews;
   }

@@ -28,12 +28,22 @@
 1. Go to project folder and install dependencies.
  ```bash
  npm install
+ cd mock-api
+ npm install
  ```
 
 2. Launch development server:
  ```bash
- npm run start
+ ng serve
  ```
+ Open another terminal to start up node server, too!
+  ```bash
+  cd mock-api
+  npm start
+  ```
+  
+3. http://localhost:4200/search/Kion <br>
+At the moment only `Kion` or `Kion Group` is supported for mocked data!
  
 ## What's included
 

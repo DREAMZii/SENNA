@@ -1,0 +1,182 @@
+{
+  "_type": "News",
+  "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/news\/search?q=+%22Kion+Group%22",
+  "queryContext": {
+    "originalQuery": " \"Kion Group\"",
+    "adultIntent": false
+  },
+  "totalEstimatedMatches": 7120,
+  "sort": [
+    {
+      "name": "Best match",
+      "id": "relevance",
+      "isSelected": false,
+      "url": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/news\/search?q=+%22Kion+Group%22"
+    },
+    {
+      "name": "Most recent",
+      "id": "date",
+      "isSelected": true,
+      "url": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/news\/search?q=+%22Kion+Group%22&sortby=date"
+    }
+  ],
+  "value": [
+    {
+      "name": "Material Handling Equipment Market Insights & Forecast to 2024, Key Players: JBT Corporation, Kion Group AG, KUKA AG, Flexlink",
+      "url": "http:\/\/www.digitaljournal.com\/pr\/4335520",
+      "description": "Sellbyville, DE -- (SBWIRE) -- 06\/05\/2019 -- Global Market Insights recently introduced new report on global Material Handling Equipment market with an in-depth study providing complete analysis of the industry size, share and statistics for the period ...",
+      "about": [
+        {
+          "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/entities\/77aba937-1dd8-fe28-9745-77c69e35dbc6",
+          "name": "Antigua and Barbuda"
+        },
+        {
+          "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/entities\/4ab6c540-ce19-bdac-0903-e33130f65302",
+          "name": "Players"
+        },
+        {
+          "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/entities\/b51c6f7c-0589-2fe4-45d3-ee63d70c4faf",
+          "name": "KION Group"
+        }
+      ],
+      "provider": [
+        {
+          "_type": "Organization",
+          "name": "Digital Journal",
+          "image": {
+            "thumbnail": {
+              "contentUrl": "https:\/\/www.bing.com\/th?id=AR_0535756cffbac73bf9390fd7a41a8eaf&pid=news"
+            }
+          }
+        }
+      ],
+      "datePublished": "2019-06-05T15:25:00.0000000Z",
+      "category": "Business"
+    },
+    {
+      "name": "Lift Truck Market is Exhibiting a Perspective CAGR 2019 to 2026",
+      "url": "https:\/\/www.marketwatch.com\/press-release\/lift-truck-market-is-exhibiting-a-perspective-cagr-2019-to-2026-2019-06-05",
+      "description": "In global market, the following companies are covered: Toyota Industries Corporation KION Group Mitsubishi Nichiyu Forklift Jungheinrich AG Crown Equipment Hyster-Yale Materials Handling Anhui Forklift Truck Doosan Industrial Vehicle Hangcha Group Clark ...",
+      "provider": [
+        {
+          "_type": "Organization",
+          "name": "MarketWatch",
+          "image": {
+            "thumbnail": {
+              "contentUrl": "https:\/\/www.bing.com\/th?id=AR_441785deaf1a49733ea1c3b5b1003bbd&pid=news"
+            }
+          }
+        }
+      ],
+      "datePublished": "2019-06-05T12:26:00.0000000Z"
+    },
+    {
+      "name": "Introducing KION GROUP (ETR:KGX), A Stock That Climbed 48% In The Last Five Years",
+      "url": "https:\/\/finance.yahoo.com\/news\/introducing-kion-group-etr-kgx-124754755.html",
+      "image": {
+        "thumbnail": {
+          "contentUrl": "https:\/\/www.bing.com\/th?id=ON.27791EAA12A5716309EADC006628275F&pid=News",
+          "width": 700,
+          "height": 253
+        }
+      },
+      "description": "Want to participate in a short research study? Help shape the future of investing tools and you could win a $250 gift card! It might be of some concern to shareholders to see the KION GROUP AG ...",
+      "provider": [
+        {
+          "_type": "Organization",
+          "name": "YAHOO!",
+          "image": {
+            "thumbnail": {
+              "contentUrl": "https:\/\/www.bing.com\/th?id=AR_e1eef5681737e5676d7a09990b13411a&pid=news"
+            }
+          }
+        }
+      ],
+      "datePublished": "2019-06-04T13:04:00.0000000Z"
+    },
+    {
+      "name": "Global Order Picker Market 2019 Industry Size, Segments, Growth Factor, Share and Demand Analysis and 2023 Forecast Research Report",
+      "url": "https:\/\/www.marketwatch.com\/press-release\/global-order-picker-market-2019-industry-size-segments-growth-factor-share-and-demand-analysis-and-2023-forecast-research-report-2019-06-03",
+      "description": "Global Order Picker market competition by top manufacturers, with production, price, revenue (value) and each manufacturer including · Toyota · Kion Group AG · Jungheinrich AG · Hyster-Yale Materials Handling",
+      "provider": [
+        {
+          "_type": "Organization",
+          "name": "MarketWatch",
+          "image": {
+            "thumbnail": {
+              "contentUrl": "https:\/\/www.bing.com\/th?id=AR_441785deaf1a49733ea1c3b5b1003bbd&pid=news"
+            }
+          }
+        }
+      ],
+      "datePublished": "2019-06-03T11:55:00.0000000Z",
+      "category": "ScienceAndTechnology"
+    },
+    {
+      "name": "KION Group AG",
+      "url": "https:\/\/www.bloomberg.com\/quote\/KGX:GR",
+      "description": "DGAP-PVR: KION GROUP AG: Release according to Article 40, Section 1 of the WpHG [the German Securities Trading Act] with the ob May 28, 2019 DGAP-PVR: KION GROUP AG: Release according to Article 40, Section 1 of the WpHG [the German Securities Trading Act ...",
+      "about": [
+        {
+          "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/entities\/b36f2e36-b90d-c1e3-075f-967ffa1d03ba",
+          "name": "Bloomberg Markets"
+        },
+        {
+          "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/entities\/b51c6f7c-0589-2fe4-45d3-ee63d70c4faf",
+          "name": "KION Group"
+        },
+        {
+          "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/entities\/77aba937-1dd8-fe28-9745-77c69e35dbc6",
+          "name": "Antigua and Barbuda"
+        }
+      ],
+      "provider": [
+        {
+          "_type": "Organization",
+          "name": "Bloomberg L.P.",
+          "image": {
+            "thumbnail": {
+              "contentUrl": "https:\/\/www.bing.com\/th?id=AR_547fa6d5f7b56fc1176cbdaadbcad3bc&pid=news"
+            }
+          }
+        }
+      ],
+      "datePublished": "2019-05-30T19:55:00.0000000Z"
+    },
+    {
+      "name": "Audit Committee of KION GROUP AG",
+      "url": "https:\/\/www.bloomberg.com\/research\/stocks\/private\/committees.asp?privcapId=29228863",
+      "description": "Alexandra Schädler 16 Relationships Employee Representative Member of Supervisory Board Jörg Milla 16 Relationships Employee Representative Member of Supervisory Board Alexander Dibelius 104 Relationships Member of Supervisory Board Kui Jiang 69 ...",
+      "provider": [
+        {
+          "_type": "Organization",
+          "name": "Bloomberg L.P.",
+          "image": {
+            "thumbnail": {
+              "contentUrl": "https:\/\/www.bing.com\/th?id=AR_547fa6d5f7b56fc1176cbdaadbcad3bc&pid=news"
+            }
+          }
+        }
+      ],
+      "datePublished": "2019-05-26T06:01:00.0000000Z"
+    },
+    {
+      "name": "Analysts Set Kion Group AG (KGX) PT at $60.93",
+      "url": "https:\/\/www.dispatchtribunal.com\/2019\/05\/20\/analysts-set-kion-group-ag-kgx-pt-at-60-93.html",
+      "description": "Complete the form below to receive the latest headlines and analysts' recommendations for Kion Group with our free daily email newsletter: Kion Group AG (FRA:KGX) has earned a consensus recommendation of “Buy” from the sixteen ratings firms that are ...",
+      "about": [
+        {
+          "readLink": "https:\/\/westeurope.api.cognitive.microsoft.com\/api\/v7\/entities\/b51c6f7c-0589-2fe4-45d3-ee63d70c4faf",
+          "name": "KION Group"
+        }
+      ],
+      "provider": [
+        {
+          "_type": "Organization",
+          "name": "dispatchtribunal.com"
+        }
+      ],
+      "datePublished": "2019-05-20T23:22:00.0000000Z"
+    }
+  ]
+}
