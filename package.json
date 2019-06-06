@@ -25,6 +25,7 @@
     "adal-angular4": "^4.0.9",
     "core-js": "^2.5.4",
     "d3": "^5.7.0",
+    "forever": "^1.0.0",
     "messageformat": "^2.1.0",
     "ngx-translate-messageformat-compiler": "^4.4.0",
     "node-ts-cache": "^2.0.0",

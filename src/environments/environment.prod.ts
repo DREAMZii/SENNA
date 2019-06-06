@@ -45,7 +45,7 @@ export const environment = {
       // https://westus.dev.cognitive.microsoft.com/docs/services/TextAnalytics.V2.0/operations/56f30ceeeda5650db055a3c9
       textAnalysisLanguageUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/languages',
       textAnalysisKeyPhrasesUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases',
-      textAnalysisSentimentUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/score'
+      textAnalysisSentimentUrl: 'https://westeurope.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment'
 
     }
   }

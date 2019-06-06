@@ -1,0 +1,11 @@
+
+> angular-node-express-api@0.0.0 start /home/timmi/Desktop/kion/SENNA/mock-api
+> node ./bin/www
+
+
+┌─────────────────────────────────────────────────────────┐
+│                 npm update check failed                 │
+│           Try running with sudo or get access           │
+│          to the local update config store via           │
+│ sudo chown -R $USER:$(id -gn $USER) /home/timmi/.config │
+└─────────────────────────────────────────────────────────┘

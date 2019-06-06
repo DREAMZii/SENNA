@@ -11,13 +11,13 @@ export const environment = {
     url: 'https://yacovi-config-service.azurewebsites.net/api/GetConfig'
   },
   references: {
-    url: 'http://0.0.0.0:7071/api/SearchReferences'
+    url: 'http://localhost:7071/api/SearchReferences'
   },
   image: {
-    url: 'http://0.0.0.0:7071/api/Image'
+    url: 'http://localhost:7071/api/Image'
   },
   contentAvailable: {
-    url: 'http://0.0.0.0:7071/api/ContentAvailable'
+    url: 'http://localhost:7071/api/ContentAvailable'
   },
   bing: {
     url: 'https://bing.com',
