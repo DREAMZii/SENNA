@@ -8,6 +8,8 @@ export class BubbleManager {
   private static initialBubble: Bubble;
   private static activeBubble: Bubble;
 
+  private static currentId = 0;
+
   public static register(searchTerm: string, bubble: any) {
     // First bubble is active
     if (!this.initialBubble) {
@@ -36,5 +38,9 @@ export class BubbleManager {
 
   public static getBubbles(): Bubble[] {
     return Array.from(this.bubbles.values());
+  }
+
+  public static getNextId(): number {
+    return this.currentId++;
   }
 }

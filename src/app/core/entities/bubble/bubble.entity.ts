@@ -32,7 +32,7 @@ export class Bubble extends BubbleAbstract {
   private references = [];
 
   // Loading
-  private rotationInterval: any;
+  private rotationInterval = null;
 
   // Statistics
   private oldAmount: number;
@@ -111,6 +111,9 @@ export class Bubble extends BubbleAbstract {
    */
   public spawn(positionX?: number, positionY?: number) {
     this.isSpawned = true;
+    const formattedTitle = this.searchTerm.split(' ').join('-').toLowerCase();
+    // Register
+    BubbleManager.register(formattedTitle, this);
 
     let query = '.active';
     if (d3.select(query).node() === null) {
@@ -198,11 +201,12 @@ export class Bubble extends BubbleAbstract {
           const refBubble = new Bubble(referenceTitle, referenceImageUrl, news, refRadius)
             .setReferrer(this);
 
-
           refBubble.searchUrl = referenceSearchUrl;
           this.references.push(refBubble);
         });
       }
+
+      console.log(this.references);
 
       if (callback instanceof Function) {
         callback();
@@ -240,7 +244,7 @@ export class Bubble extends BubbleAbstract {
    * Starts the rotating animation for loading
    */
   public startRotating() {
-    if (!this.isReferred || this.rotationInterval < 0) {
+    if (!this.isReferred || this.rotationInterval !== null) {
       return;
     }
 
@@ -261,7 +265,7 @@ export class Bubble extends BubbleAbstract {
     }
 
     clearInterval(this.rotationInterval);
-    this.rotationInterval = -1;
+    this.rotationInterval = null;
 
     this.group
       .selectAll('path')
@@ -299,7 +303,7 @@ export class Bubble extends BubbleAbstract {
     const alreadyExisting = [];
 
     for (const bubble of this.references) {
-      if (bubble.isSpawned) {
+      if (BubbleManager.getBubbles().indexOf(bubble) >= 0) {
         alreadyExisting.push(bubble);
       } else {
         spawnableBubbles.push(bubble);
@@ -307,7 +311,9 @@ export class Bubble extends BubbleAbstract {
     }
 
     for (const bubble of alreadyExisting) {
-      this.connect(bubble);
+      if (bubble.isSpawned) {
+        this.connect(bubble);
+      }
     }
 
     for (let i = 0; i < spawnableBubbles.length; i++) {
@@ -409,7 +415,7 @@ export class Bubble extends BubbleAbstract {
   public setReferrer(referrer: Bubble): Bubble {
     this.isReferred = true;
     this.referrer = referrer;
-    this.referredNumber = this.isReferred ? referrer.referredNumber + 1 : 0;
+    this.referredNumber = referrer.referredNumber + 1;
 
     return this;
   }

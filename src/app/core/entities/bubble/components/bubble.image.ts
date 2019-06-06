@@ -22,7 +22,7 @@ export class BubbleImage {
       const width = text.node().getComputedTextLength();
       text
         .attr('x', this.bubble.getCenterX() - width / 2)
-        .attr('y', this.bubble.getCenterY);
+        .attr('y', this.bubble.getCenterY());
     } else {
       const rectWH = this.bubble.getRadius() + this.bubble.getRadius() / 3.5;
 

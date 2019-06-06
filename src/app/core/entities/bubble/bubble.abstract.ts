@@ -34,7 +34,7 @@ export abstract class BubbleAbstract {
     news: any,
     radius: number
   ) {
-    this.id = BubbleManager.getBubbles().length;
+    this.id = BubbleManager.getNextId();
     this.searchTerm = searchTerm;
     this.searchImage = searchImage;
     this.container = d3.select('#graphContainer').select('#canvas');
@@ -46,10 +46,6 @@ export abstract class BubbleAbstract {
     this.setMiddlePoint();
     this.initSegments();
     this.handleZoom();
-
-    // Register
-    const formattedTitle = this.searchTerm.split(' ').join('-').toLowerCase();
-    BubbleManager.register(formattedTitle, this);
   }
 
   private handleZoom() {
