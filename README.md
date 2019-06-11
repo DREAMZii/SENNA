@@ -15,9 +15,16 @@
 
 ## Table of contents
 
+- [Introduction](#introduction)
 - [Quick start](#quick-start)
-- [What's included](#whats-included)
+- [Architecture](#architecture)
+- [Views](#views)
+- [Tasks](#tasks)
 - [Copyright and license](#copyright-and-license)
+
+## Introduction
+
+SENA is the short term for "Sentiment Analysis". We use the "Bing News-Search API (https://azure.microsoft.com/en-us/services/cognitive-services/bing-news-search-api/) to display news for the given term. Those news are displayed in a circle (also called "Bubbles"). We display 7 news max. for every bubble for readability. Every bubble has 7 segments, every segment displays a single news. When you click on a single segment it displays some short facts about the news. Every segment has a score which gets decided by an AI (https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/). The rated segment also gets a color for whatever rating it gets (green >= 0.6, negative <= 0.4, gray = everything between 0.4 and 0.6). We also display 0-4 "related searchterms" for every searchterm (every related bubble also displays 0-7 news). With a click on a related bubble, it spreads out more related searchterms. This can lead to an endless "mindmap-style" news rating system.
 
 ## Quick start
 
@@ -45,13 +52,30 @@
 3. http://localhost:4200/search/Kion <br>
 At the moment only `Kion` or `Kion Group` is supported for mocked data!
  
-## What's included
+## Architecture
 
-+ Authentication with KION Azure AD
-+ Access to <a href='https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home' target='_blank'>Azure Cognitive Services</a> API
-* Internationalization with ng-translate and ngx-translate-extract. Also use cache busting for translation files with [webpack translate loader](https://github.com/ngx-translate/http-loader#angular-cliwebpack-translateloader-example)
-* Unit tests with Jasmine and Karma including code coverage
-* End-to-end tests with Protractor
+SENA has 4 (+1) main components:
+* An angular frontend written in typescript
+* Azure Functions for getting the azure cognitive service api-key, getting the related searchterms from bing and getting the related image for a searchterm. (written in Java)
+* The Bing News-Search AP to get all recent news for a searchterm
+* The Microsoft Cognitive Text-Analytics API to give the news an automatic rating
+* (An express.js backend for mocking search results and images, so everyone can start up this project without any paid API-key)
+
+## Views
+
+SENA has 3 main views:
+* /login:
+> → Login to your KION account for all features including authentication
+> → To disable this, look into the environment file (disableAuthentication)
+* /:
+> → The initial searchfield to start searching for news
+* /search/{searchTerm}
+> → The main view of the application
+> → Bubbles are also displayed in here with all features available
+
+All assets including SVG-files etc. can be found in assets/.
+
+## Tasks
 
 Tasks                    | Description
 -------------------------|---------------------------------------------------------------------------------------
